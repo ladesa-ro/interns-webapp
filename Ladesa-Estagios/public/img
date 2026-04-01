@@ -22,4 +22,4 @@ Diferença importante: * Se a imagem está em src, você a usa assim: import log
 Se a imagem está em public, você a usa assim: img src="/logo.png".
 
 Quando NÃO usar a pasta public?
-A recomendação oficial do React é: Sempre que possível, coloque seus arquivos na pasta src.
+A recomendação oficial do React é: Sempre que possível, coloque seus arquivos na pasta src. abc
