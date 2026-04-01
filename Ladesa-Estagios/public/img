@@ -1,0 +1,25 @@
+A pasta public do React é o lugar para arquivos que você quer que o navegador acesse diretamente, sem passar pelo processo de "empacotamento" (build) do Webpack ou Vite.
+
+Imagine que tudo o que está na pasta src é o código que o React vai processar, "minificar" e transformar. Já o que está na public é entregue exatamente como está.
+
+Aqui está o que você deve colocar lá:
+
+1. Arquivos Estáticos que não mudam
+favicon.ico: O ícone que aparece na aba do navegador.
+
+manifest.json: Configurações para Progressive Web Apps (PWA), como ícones de celular e cores de tema.
+
+robots.txt: Instruções para os robôs de busca (como o Google) sobre quais páginas indexar.
+
+2. O arquivo index.html
+Este é o arquivo mais importante da pasta. É o "esqueleto" único da sua aplicação. O React vai injetar todo o seu código dentro de uma <div> (geralmente com id="root") que está dentro desse HTML.
+
+3. Imagens que você não quer importar via código
+Se você tem uma imagem que precisa de um caminho fixo ou que será referenciada fora do JavaScript, coloque-a aqui.
+
+Diferença importante: * Se a imagem está em src, você a usa assim: import logo from './logo.png'.
+
+Se a imagem está em public, você a usa assim: img src="/logo.png".
+
+Quando NÃO usar a pasta public?
+A recomendação oficial do React é: Sempre que possível, coloque seus arquivos na pasta src.
