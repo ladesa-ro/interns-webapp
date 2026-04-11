@@ -5,8 +5,10 @@ import {
   AlertCircle,
   FileText,
 } from "lucide-react";
-
+import "../styles.css";
+import { useNavigate } from "react-router-dom";
 export default function Painel() {
+  const navigate = useNavigate();
   return (
     <div className="painel">
       <h1>Painel CIEC</h1>
@@ -14,7 +16,7 @@ export default function Painel() {
 
       {/* CARDS */}
       <div className="cards">
-        <div className="card green">
+        <div className="card green" onClick={() => navigate("/Empresa")}style={{ cursor: "pointer" }}>
           <Building2 className="icon-card" />
           <h3>Empresas Cadastradas</h3>
           <span>24</span>
