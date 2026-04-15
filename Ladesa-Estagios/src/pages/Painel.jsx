@@ -16,7 +16,11 @@ export default function Painel() {
 
       {/* CARDS */}
       <div className="cards">
-        <div className="card green" onClick={() => navigate("/Empresa")}style={{ cursor: "pointer" }}>
+        <div
+          className="card green"
+          onClick={() => navigate("/empresa")}
+          style={{ cursor: "pointer" }}
+        >
           <Building2 className="icon-card" />
           <h3>Empresas Cadastradas</h3>
           <span>24</span>
@@ -55,7 +59,7 @@ export default function Painel() {
           <div className="alert-content">
             <span className="icon">⚠</span>
             <div>
-              <p>8 alunos do 3° ano sem estágio</p>
+              <p className="vermelho">8 alunos do 3° ano sem estágio</p>
               <small>Requer atenção imediata</small>
             </div>
           </div>
@@ -65,7 +69,7 @@ export default function Painel() {
           <div className="alert-content">
             <span className="icon">⚠</span>
             <div>
-              <p>12 alunos na lista de espera</p>
+              <p className="amarelo">12 alunos na lista de espera</p>
               <small>Verificar vagas disponíveis</small>
             </div>
           </div>
@@ -75,7 +79,7 @@ export default function Painel() {
           <div className="alert-content">
             <span className="icon">⚠</span>
             <div>
-              <p>5 estágios terminam este mês</p>
+              <p className="azul">5 estágios terminam este mês</p>
               <small>Preparar documentação</small>
             </div>
           </div>
