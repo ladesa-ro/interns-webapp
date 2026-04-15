@@ -50,7 +50,7 @@ export default function Sidebar() {
           to="/perfil"
           className={location.pathname === "/perfil" ? "active" : ""}
         >
-          <User size={18} />
+          <Icon_Perfil/>
           <span>Perfil</span>
         </Link>
       </nav>
