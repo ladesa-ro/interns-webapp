@@ -13,7 +13,6 @@
 
 /* SIDEBAR */
 
-
 .sidebar {
   width: 220px;
   background: #0f6d3a;
@@ -128,7 +127,16 @@
   /* força altura mínima */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   border-left: 5px solid;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Transição suave */
+}
+
+.card:hover {
+  transform: scale(1.05);
+  /* Aumenta o tamanho do card */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  /* Sombra mais forte */
 }
 
 .card h3 {
@@ -196,6 +204,7 @@
 .yellow-alert {
   background: #fff8e5;
   color: #b7950b;
+
 }
 
 .blue-alert {
@@ -231,3 +240,7 @@
 
 /*Meu deus que bagunça da desgraça*/
 /*Separa os arquivos css*/
+
+/*não, se vira beta ...
+ass: victor aura
+*/
