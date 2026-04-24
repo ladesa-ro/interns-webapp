@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 import Sidebar from "./Sidebar";
-
 import Painel from "../pages/Painel";
 import Empresa from "../pages/Empresa";
 import Vaga from "../pages/Vaga";
