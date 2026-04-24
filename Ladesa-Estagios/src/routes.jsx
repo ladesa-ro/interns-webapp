@@ -2,19 +2,18 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Painel from "./pages/Painel";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Layout from "./components/Layout";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" />} />
-
       <Route path="/login" element={<Login />} />
 
       <Route
-        path="/painel"
+        path="/*"
         element={
           <ProtectedRoute>
-            <Painel />
+            <Layout />
           </ProtectedRoute>
         }
       />
