@@ -14,10 +14,10 @@ export default function Layout() {
       <div className="content">
         <Routes>
           <Route path="/" element={<Painel />} />
-          <Route path="/empresa" element={<Empresa />} />
-          <Route path="/vaga" element={<Vaga />} />
-          <Route path="/lista" element={<ListaEspera />} />
-          <Route path="/perfil" element={<Perfil />} />
+          <Route path="empresa" element={<Empresa />} />
+          <Route path="vaga" element={<Vaga />} />
+          <Route path="lista" element={<ListaEspera />} />
+          <Route path="perfil" element={<Perfil />} />
         </Routes>
       </div>
     </div>
