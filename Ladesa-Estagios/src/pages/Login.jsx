@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
+import LoginForm from "../components/LoginForm";
 
 export default function Login() {
   const [form, setForm] = useState({
     matricula: "",
     senha: "",
-  });
+  }); //Objeto para armazenar os dados do formulário (tem outro jeito que é fazendo um useState para cada tipo const [senha, setSenha] mas ia ser uma gambiarra boa)
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); //Serve pra mandar o usuário pra outra página (que é o Painel :D)
 
   function handleChange({ target }) {
     const { name, value } = target;
@@ -49,26 +50,10 @@ export default function Login() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-
-      <input
-        type="text"
-        name="matricula" 
-        placeholder="Matrícula"
-        value={form.matricula}
-        onChange={handleChange}
-      />
-
-      <input
-        type="password"
-        name="senha"
-        placeholder="Senha"
-        value={form.senha}
-        onChange={handleChange}
-      />
-
-      <button type="submit">Entrar</button>
-    </form>
+    <LoginForm
+    form={form}
+    onChange={handleChange}
+    onSubmit={handleSubmit}
+    />
   );
 }
