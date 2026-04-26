@@ -3,7 +3,7 @@ import { useNavigate, Navigate } from "react-router-dom";
 
 export default function Login() {
   const [form, setForm] = useState({
-    email: "",
+    matricula: "",
     senha: "",
   });
 
@@ -14,24 +14,38 @@ export default function Login() {
     setForm({ ...form, [name]: value });
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) { 
     e.preventDefault();
 
-    // 🔥 simulação de login
-    if (form.email === "admin@gmail.com" && form.senha === "123") {
-      const fakeToken = "abc123";
+    try {
+      const response = await fetch(
+        "https://dev.ladesa.com.br/api/v1/autenticacao/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            matricula: form.matricula,
+            senha: form.senha,
+          }),
+        }
+      );
 
-      localStorage.setItem("token", fakeToken);
+      const data = await response.json();
 
-      navigate("/painel");
-    } else {
-      alert("Login inválido");
+      console.log("Resposta da API:", data);
+
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+        navigate("/");
+      } else {
+        alert("Login inválido");
+      }
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      alert("Erro ao conectar com o servidor");
     }
-  }
-
-  // 🔒 impede acessar login estando logado
-  if (localStorage.getItem("token")) {
-    return <Navigate to="/painel" />;
   }
 
   return (
@@ -39,10 +53,10 @@ export default function Login() {
       <h2>Login</h2>
 
       <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={form.email}
+        type="text"
+        name="matricula" 
+        placeholder="Matrícula"
+        value={form.matricula}
         onChange={handleChange}
       />
 
