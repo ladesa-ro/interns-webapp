@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import titulo from "../assets/titulo.svg";
+import Titulo from "../components/icons_Components/Icon_Logo_Comp";
 import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -21,7 +21,7 @@ export default function Sidebar() {
 
   return (
     <div className="sidebar">
-      <img src={titulo} alt="Logo" className="logo" />
+      <Titulo className= 'logo' />
 
       <nav>
         <Link to="/" className={location.pathname === "/" ? "active" : ""}>

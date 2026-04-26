@@ -1,0 +1,19 @@
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+} /*Por enquanto o display vai ser flex pra eu conseguir mexer no form*/
+/*Depois vou modificar para adicionar posteriormente o mascote*/
+
+.card{
+    background: #ffffff; /*full white - Corrigir isso posteriormente*/
+    border: solid 1px #9F9F9F; /*Borda preta - Corrigir isso posteriormente*/
+}
+.logo{
+    color: black;
+}
+.form{
+    display: grid;
+    gap: 20px;
+}
