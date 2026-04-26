@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 import Sidebar from "./Sidebar";
-
 import Painel from "../pages/Painel";
 import Empresa from "../pages/Empresa";
 import Vaga from "../pages/Vaga";
@@ -14,11 +13,11 @@ export default function Layout() {
 
       <div className="content">
         <Routes>
-          <Route path="/" element={<Painel />} />
-          <Route path="/empresa" element={<Empresa />} />
-          <Route path="/vaga" element={<Vaga />} />
-          <Route path="/lista" element={<ListaEspera />} />
-          <Route path="/perfil" element={<Perfil />} />
+          <Route index element={<Painel />} />
+          <Route path="empresa" element={<Empresa />} />
+          <Route path="vaga" element={<Vaga />} />
+          <Route path="lista" element={<ListaEspera />} />
+          <Route path="perfil" element={<Perfil />} />
         </Routes>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
-import titulo from "../assets/titulo.svg";
+import Titulo from "../components/icons_Components/Icon_Logo_Comp";
+import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Building2,
@@ -11,10 +12,16 @@ import {
 
 export default function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate(); 
+
+  function handleLogout() {
+    localStorage.removeItem("token"); 
+    navigate("/login", { replace: true });
+  }
 
   return (
     <div className="sidebar">
-      <img src={titulo} alt="Logo" className="logo" />
+      <Titulo className= 'logo' />
 
       <nav>
         <Link to="/" className={location.pathname === "/" ? "active" : ""}>
@@ -50,7 +57,7 @@ export default function Sidebar() {
           to="/perfil"
           className={location.pathname === "/perfil" ? "active" : ""}
         >
-          <Icon_Perfil/>
+          <User size={18} />
           <span>Perfil</span>
         </Link>
       </nav>
@@ -59,7 +66,7 @@ export default function Sidebar() {
       {/*}<div className="divider"></div>
       */}
       {/* BOTÃO SAIR */}
-      <button className="logout">
+      <button className="logout" onClick={handleLogout}>
         <LogOut size={18} />
         <span>Sair</span>
       </button>

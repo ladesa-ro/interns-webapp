@@ -1,52 +1,43 @@
-import React, { useState } from "react";
+import React from 'react';
+import styles from './LoginForm.module.css';
+import Titulo from '../components/icons_Components/Icon_Logo_Comp';
+import Imagem from '../components/image_Components/Image_Login_Comp';
 
-const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Tentando logar com:", { email, password });
-    // Aqui você chamaria sua API
-  };
-
+export default function LoginForm({ form, onChange, onSubmit }) {
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-4 w-full max-w-sm"
-    >
-      <div>
-        <label className="block text-sm font-medium mb-1">E-mail</label>
-        <input
-          type="email"
-          className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
-          placeholder="seu@email.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
+    <div className={styles.container}>
+      <div className={styles.left}>
+      <div className={styles.card}>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Senha</label>
-        <input
-          type="password"
-          className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
-          placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
+    <form onSubmit={onSubmit} className={styles.form}>
+      <Titulo className={styles.logo} />
 
-      <button
-        type="submit"
-        className="bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
-      >
-        Entrar
-      </button>
+      <input
+        type="text"
+        name="matricula" 
+        placeholder="Insira seu usuário"
+        value={form.matricula}
+        onChange={onChange}
+      />
+
+      <input
+        type="password"
+        name="senha"
+        placeholder="Insira sua senha"
+        value={form.senha}
+        onChange={onChange}
+      />
+
+      <p>Esqueceu a senha? <a href="/">Clique aqui.</a></p>
+
+      <button type="submit">Entrar</button>
     </form>
+    </div>
+    </div>
+    <div className={styles.right}>
+    <Imagem/>
+    </div>
+    </div>
   );
-};
-
-export default LoginForm;
+}

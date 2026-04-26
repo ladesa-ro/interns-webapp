@@ -1,0 +1,71 @@
+a{
+    text-decoration: none;
+    color: #2F9E41;
+    font-weight: 500;
+}
+
+p{
+    font-weight: 500;
+}
+
+button{
+    font-weight: 500;
+    font-size: 0.8rem;
+    background: #267E34;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 0.2rem;
+    color: #ffffff;
+}
+
+.container{
+    display: flex;
+    min-height: 100vh;
+} /*Por enquanto o display vai ser flex pra eu conseguir mexer no form*/
+/*Depois vou modificar para adicionar posteriormente o mascote*/
+
+.left{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.card{
+    width: 100%;
+    max-width: 320px;
+
+    background: #ffffff; /*full white - Corrigir isso posteriormente*/
+    padding: 30px;
+    border: solid 1.5px #9F9F9F; /*Borda preta - Corrigir isso posteriormente*/
+    border-radius: 0.4rem;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+.logo{
+    color: black;
+}
+
+.imagemBackground{
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.form{
+    display: grid;
+    gap: 20px;
+}
+
+.right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.right svg {
+    width: 100%;
+}
