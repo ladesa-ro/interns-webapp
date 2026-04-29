@@ -1,28 +1,30 @@
-a {
-  text-decoration: none;
-  color: #2F9E41;
+p{
+  color: #9F9F9F;
   font-weight: 500;
+  font-size: 0.65rem;font-weight: 500;
+  margin: 0 auto;
 }
 
-p {
-  font-weight: 500;
+p a{
+  text-decoration: none;
+  color: #2F9E41;
+  
 }
 
 input {
   border: solid 1.5px #9F9F9F;
-  border-radius: 0.3rem;
-  padding: 0.5rem;
+  border-radius: 0.5rem;
+  padding: 0.95rem;
   width: 100%;
 }
 
 button {
   font-weight: 500;
   font-size: 0.8rem;
-
   background: #267E34;
-  padding: 0.5rem;
+  padding: 0.9rem 8.2rem 0.9rem 8.2rem;
   border: none;
-  border-radius: 0.2rem;
+  border-radius: 0.5rem;
   color: #ffffff;
 
   cursor: pointer;
@@ -38,11 +40,12 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 2rem;
 }
 
 .card {
   width: 100%;
-  max-width: 320px;
+  max-width: 343px;
 
   background: #ffffff;
   padding: 2rem;
@@ -78,7 +81,8 @@ button {
 }
 
 .right svg {
-  width: 100%;
+  height: 100vh;
+  width: 100vw;
 }
 
 .inputPassWord {
@@ -92,10 +96,10 @@ button {
   padding-right: 2.5rem;
 }
 
-.iconEye {
+/*.iconEye {
   position: absolute;
   right: 0.5rem;
   top: 0.4rem;
   cursor: pointer;
   user-select: none;
-}
+}*/
