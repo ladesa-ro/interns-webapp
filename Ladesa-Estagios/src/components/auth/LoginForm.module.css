@@ -1,11 +1,14 @@
-a {
-  text-decoration: none;
-  color: #2F9E41;
+p{
+  color: #9F9F9F;
   font-weight: 500;
+  font-size: 0.65rem;font-weight: 500;
+  margin: 0 auto;
 }
 
-p {
-  font-weight: 500;
+p a{
+  text-decoration: none;
+  color: #2F9E41;
+  
 }
 
 input {
@@ -18,11 +21,10 @@ input {
 button {
   font-weight: 500;
   font-size: 0.8rem;
-
   background: #267E34;
   padding: 0.5rem;
   border: none;
-  border-radius: 0.2rem;
+  border-radius: 0.5rem;
   color: #ffffff;
 
   cursor: pointer;
