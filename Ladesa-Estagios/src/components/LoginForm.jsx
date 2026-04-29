@@ -5,6 +5,10 @@ import Imagem from '../components/image_Components/Image_Login_Comp';
 
 
 export default function LoginForm({ form, onChange, onSubmit }) {
+
+  const [showPassword, setShowPassword] = React.useState(false); //Função para mostrar e ocultar a senha
+
+
   return (
     <div className={styles.container}>
       <div className={styles.left}>
@@ -12,7 +16,7 @@ export default function LoginForm({ form, onChange, onSubmit }) {
 
     <form onSubmit={onSubmit} className={styles.form}>
       <Titulo className={styles.logo} />
-
+      {/* <label htmlFor="matricula">Usuário</label>  | Falar sobre as Labels na reunião*/} 
       <input
         type="text"
         name="matricula" 
@@ -21,14 +25,19 @@ export default function LoginForm({ form, onChange, onSubmit }) {
         onChange={onChange}
       />
 
+      {/* <label htmlFor="senha">Senha</label>  | Falar sobre as Labels na reunião*/} 
+      <div className={styles.inputPassWord}>
       <input
-        type="password"
+        type={showPassword ? "text" : "password"}
         name="senha"
         placeholder="Insira sua senha"
         value={form.senha}
         onChange={onChange}
       />
-
+      <span className={styles.iconEye} onClick={() => setShowPassword(!showPassword)}>
+        {showPassword ? '👁️' : '🔒'}
+      </span>
+      </div>
       <p>Esqueceu a senha? <a href="/">Clique aqui.</a></p>
 
       <button type="submit">Entrar</button>
