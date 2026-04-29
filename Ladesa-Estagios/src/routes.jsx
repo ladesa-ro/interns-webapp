@@ -1,8 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login";
-import Painel from "./pages/Painel";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Layout from "./components/Layout";
+import Login from "./pages/auth/Login";
+import ProtectedRoute from "./components/guards/ProtectedRoute";
+import Layout from "./components/layout/Layout";
 
 export default function AppRoutes() {
   return (

@@ -1,21 +1,21 @@
 import { useState } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
-import LoginForm from "../components/LoginForm";
+import { useNavigate } from "react-router-dom";
+import LoginForm from "../../components/auth/LoginForm";
 
 export default function Login() {
   const [form, setForm] = useState({
     matricula: "",
     senha: "",
-  }); //Objeto para armazenar os dados do formulário (tem outro jeito que é fazendo um useState para cada tipo const [senha, setSenha] mas ia ser uma gambiarra boa)
+  });
 
-  const navigate = useNavigate(); //Serve pra mandar o usuário pra outra página (que é o Painel :D)
+  const navigate = useNavigate();
 
   function handleChange({ target }) {
     const { name, value } = target;
     setForm({ ...form, [name]: value });
   }
 
-  async function handleSubmit(e) { 
+  async function handleSubmit(e) {
     e.preventDefault();
 
     try {
@@ -35,8 +35,6 @@ export default function Login() {
 
       const data = await response.json();
 
-      console.log("Resposta da API:", data);
-
       if (data.access_token) {
         localStorage.setItem("token", data.access_token);
         navigate("/");
@@ -49,11 +47,5 @@ export default function Login() {
     }
   }
 
-  return (
-    <LoginForm
-    form={form}
-    onChange={handleChange}
-    onSubmit={handleSubmit}
-    />
-  );
+  return <LoginForm form={form} onChange={handleChange} onSubmit={handleSubmit} />;
 }

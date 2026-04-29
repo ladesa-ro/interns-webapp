@@ -1,6 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
-import Titulo from "../components/icons_Components/Icon_Logo_Comp";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import Titulo from "../icons_Components/Icon_Logo_Comp";
 import {
   LayoutDashboard,
   Building2,
@@ -12,16 +11,16 @@ import {
 
 export default function Sidebar() {
   const location = useLocation();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   function handleLogout() {
-    localStorage.removeItem("token"); 
+    localStorage.removeItem("token");
     navigate("/login", { replace: true });
   }
 
   return (
     <div className="sidebar">
-      <Titulo className= 'logo' />
+      <Titulo className="logo" />
 
       <nav>
         <Link to="/" className={location.pathname === "/" ? "active" : ""}>
@@ -62,10 +61,6 @@ export default function Sidebar() {
         </Link>
       </nav>
 
-      {/* LINHA BRANCA */}
-      {/*}<div className="divider"></div>
-      */}
-      {/* BOTÃO SAIR */}
       <button className="logout" onClick={handleLogout}>
         <LogOut size={18} />
         <span>Sair</span>

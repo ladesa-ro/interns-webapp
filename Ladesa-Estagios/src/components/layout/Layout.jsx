@@ -1,10 +1,10 @@
 import { Routes, Route } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import Painel from "../pages/Painel";
-import Empresa from "../pages/Empresa";
-import Vaga from "../pages/Vaga";
-import ListaEspera from "../pages/ListaEspera";
-import Perfil from "../pages/Perfil";
+import Painel from "../../pages/dashboard/Painel";
+import Empresa from "../../pages/empresas/Empresa";
+import Vaga from "../../pages/vagas/Vaga";
+import ListaEspera from "../../pages/lista-espera/ListaEspera";
+import Perfil from "../../pages/perfil/Perfil";
 
 export default function Layout() {
   return (
