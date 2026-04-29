@@ -29,12 +29,12 @@ export default function LoginForm({ form, onChange, onSubmit }) {
                 value={form.senha}
                 onChange={onChange}
               />
-              <span
+              {/*<span
                 className={styles.iconEye}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <Eye /> : <EyeOff />}
-              </span>
+              </span>  */}
             </div>
 
             <p>
