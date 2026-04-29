@@ -95,12 +95,13 @@ button{
 
 .inputPassWord input{
     width: 100%;
-    padding-right: 40px;
+    padding-right: 2.5rem;
 }
 
 .iconEye{
     position: absolute;
-    right: 10px;
+    right: 0.5rem;
+    top: 0.4rem;
     cursor: pointer;
     user-select: none;
 }

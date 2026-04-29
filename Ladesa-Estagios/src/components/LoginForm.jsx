@@ -1,8 +1,9 @@
 import React from 'react';
 import styles from './LoginForm.module.css';
 import Titulo from '../components/icons_Components/Icon_Logo_Comp';
+import IconEyeOpen from '../components/icons_Components/Icon_EyeOpen_Comp';
 import Imagem from '../components/image_Components/Image_Login_Comp';
-
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginForm({ form, onChange, onSubmit }) {
 
@@ -35,7 +36,7 @@ export default function LoginForm({ form, onChange, onSubmit }) {
         onChange={onChange}
       />
       <span className={styles.iconEye} onClick={() => setShowPassword(!showPassword)}>
-        {showPassword ? '👁️' : '🔒'}
+        {showPassword ? <Eye /> : <EyeOff />}
       </span>
       </div>
       <p>Esqueceu a senha? <a href="/">Clique aqui.</a></p>
