@@ -40,6 +40,7 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 2rem;
 }
 
 .card {
@@ -95,10 +96,10 @@ button {
   padding-right: 2.5rem;
 }
 
-.iconEye {
+/*.iconEye {
   position: absolute;
   right: 0.5rem;
   top: 0.4rem;
   cursor: pointer;
   user-select: none;
-}
+}*/
