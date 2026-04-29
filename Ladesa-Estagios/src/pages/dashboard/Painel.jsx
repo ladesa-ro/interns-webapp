@@ -5,16 +5,17 @@ import {
   AlertCircle,
   FileText,
 } from "lucide-react";
-import "../styles.css";
+import "../../styles/global.css";
 import { useNavigate } from "react-router-dom";
+
 export default function Painel() {
   const navigate = useNavigate();
+
   return (
     <div className="painel">
       <h1>Painel CIEC</h1>
       <p className="sub">Visão geral do Sistema de Gerenciamento de Estágios</p>
 
-      {/* CARDS */}
       <div className="cards">
         <div
           className="card green"
@@ -51,7 +52,6 @@ export default function Painel() {
         </div>
       </div>
 
-      {/* ALERTAS */}
       <div className="alertas">
         <h3>Alertas e Pendências</h3>
 
