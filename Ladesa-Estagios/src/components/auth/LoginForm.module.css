@@ -80,22 +80,25 @@ button:active {
 .inputUser, .inputPassword {
   position: relative;
   width: 100%;
-  height: 54px; /*mudar depois*/
+  margin-bottom: 0.4rem;
+   /*mudar depois*/
 } /*rever este código*/
 
 
 .inputUser input, .inputPassword input {
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
   width: 100%;
   padding: 0.95rem;
+  box-sizing: border-box;
+  min-width: 3.5rem;
   border: solid 2px #9F9F9F;
   border-radius: 0.5rem;
   background: transparent;
   outline: none;
   font-size: 1rem;
-  z-index: 1; /* Input fica abaixo da animação da label para não cobri-la */
+  z-index: 2; /* Input fica abaixo da animação da label para não cobri-la */
   box-sizing: border-box;
   transition: all 0.2s ease-in-out;
 }
@@ -121,11 +124,15 @@ button:active {
 .inputUser input:not(:placeholder-shown) + .labelLine,
 .inputPassword input:focus + .labelLine,
 .inputPassword input:not(:placeholder-shown) + .labelLine {
-  top: -0.6rem;         /* Sobe para a borda */
-  left: 0.8rem;         /* Ajusta lateralmente */
-  font-size: 0.8rem;    /* Diminui o tamanho */
-  color: #267E34;       /* Fica verde */
+  top: -0.6rem;         
+  left: 0.8rem;         
+  font-size: 0.8rem;        
   font-weight: 600;
+}
+
+.inputUser input:focus + .labelLine,
+.inputPassword input:focus + .labelLine {
+  color: #267E34;
 }
 
 /* Destaque do Input no Focus */
