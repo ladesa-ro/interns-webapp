@@ -1,10 +1,16 @@
 
 
 input {
-  border: solid 1.5px #9F9F9F;
+  border: solid 2px #9F9F9F;
   border-radius: 0.5rem;
   padding: 0.95rem;
   width: 100%;
+}
+
+input:focus {
+  outline: none;
+  border-color: #267E34;
+  box-shadow: 0 0 10px rgba(38, 126, 52, 0.7);
 }
 
 button {
@@ -84,7 +90,7 @@ button {
 .forgotPassword {
   color: #9F9F9F;
   font-weight: 500;
-  font-size: 0.65rem;
+  font-size: 0.8rem;
   text-align: center;
 }
 
@@ -92,6 +98,7 @@ button {
   text-decoration: none;
   color: #2F9E41;
 }
+
 
 /*.iconEye {
   position: absolute;
