@@ -1,6 +1,7 @@
 
 
 input {
+  position: absolute;
   border: solid 2px #9F9F9F;
   border-radius: 0.5rem;
   padding: 0.95rem;
@@ -21,8 +22,8 @@ button {
   border: none;
   border-radius: 0.5rem;
   color: #ffffff;
-
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 button:active {
@@ -34,7 +35,7 @@ button:active {
   min-height: 100vh;
 }
 
-.left {
+.left, .right {
   flex: 1;
   display: flex;
   justify-content: center;
@@ -71,28 +72,66 @@ button:active {
   justify-content: center;
 }
 
-.right {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .right svg {
   height: 100%;
   width: 100%;
 }
 
-.inputPassword {
+.inputUser, .inputPassword {
   position: relative;
+  width: 100%;
+  height: 54px; /*mudar depois*/
+} /*rever este código*/
+
+
+.inputUser input, .inputPassword input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 0.95rem;
+  border: solid 2px #9F9F9F;
+  border-radius: 0.5rem;
+  background: transparent;
+  outline: none;
+  font-size: 1rem;
+  z-index: 1; /* Input fica abaixo da animação da label para não cobri-la */
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
 }
 
-.inputPassword input {
-  padding-right: 2.5rem;
+.labelLine {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  padding: 0 4px;
+  background-color: white; /* Cobre a borda do input quando sobe */
+  color: #9F9F9F;
+  font-size: 0.95rem;
+  transition: all 0.2s ease-in-out;
+  pointer-events: none; /* Clique passa pelo texto e atinge o input */
+  z-index: 2;
 }
 
-.labelLine{
-  
+/* Lógica da Animação: 
+   Se o input estiver em foco (:focus) OU tiver texto digitado (:not(:placeholder-shown))
+   A label (.labelLine) que é o próximo elemento (+) sofre as mudanças:
+*/
+.inputUser input:focus + .labelLine,
+.inputUser input:not(:placeholder-shown) + .labelLine,
+.inputPassword input:focus + .labelLine,
+.inputPassword input:not(:placeholder-shown) + .labelLine {
+  top: -0.6rem;         /* Sobe para a borda */
+  left: 0.8rem;         /* Ajusta lateralmente */
+  font-size: 0.8rem;    /* Diminui o tamanho */
+  color: #267E34;       /* Fica verde */
+  font-weight: 600;
+}
+
+/* Destaque do Input no Focus */
+.inputUser input:focus, .inputPassword input:focus {
+  border-color: #267E34;
+  box-shadow: 0 0 10px rgba(38, 126, 52, 0.5);
 }
 
 .forgotPassword {
