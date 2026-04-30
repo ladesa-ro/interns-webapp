@@ -21,7 +21,9 @@ export default function LoginForm({ form, onChange, onSubmit }) {
               value={form.matricula}
               onChange={onChange}
             />
-            <div className={styles.labelLine}>Usuário</div>
+            <label htmlFor="matricula" className={styles.labelLine}>
+              Usuário
+            </label>
             </div>
 
             <div className={styles.inputPassword}>
@@ -32,7 +34,9 @@ export default function LoginForm({ form, onChange, onSubmit }) {
                 value={form.senha}
                 onChange={onChange}
               />
-              <div className={styles.labelLine}>Senha</div>
+              <label htmlFor="senha" className={styles.labelLine}>
+                Senha
+              </label>
               {/*<span
                 className={styles.iconEye}
                 onClick={() => setShowPassword(!showPassword)}
