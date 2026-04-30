@@ -36,7 +36,7 @@ export default function LoginForm({ form, onChange, onSubmit }) {
                 {showPassword ? <Eye /> : <EyeOff />}
               </span>  */}
             </div>
-
+            
             <p className={styles.forgotPassword}>
               Esqueceu a senha? <a href="/">Clique aqui.</a>
             </p>
