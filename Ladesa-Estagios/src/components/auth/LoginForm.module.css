@@ -83,12 +83,16 @@ button:active {
   width: 100%;
 }
 
-.inputPassWord {
+.inputPassword {
   position: relative;
 }
 
-.inputPassWord input {
+.inputPassword input {
   padding-right: 2.5rem;
+}
+
+.labelLine{
+  
 }
 
 .forgotPassword {
