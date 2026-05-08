@@ -30,7 +30,7 @@ export default function Empresas() {
           <Cards
           titulo="Empresas com estágio ativo"
           valor="24"
-          cor="blue"
+          cor="green"
           />
         </div>
 
