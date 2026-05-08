@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import "../../styles/global.css";
 import { useNavigate } from "react-router-dom";
+import Cards from "../../components/pages_Components/cards";
 
 export default function Painel() {
   const navigate = useNavigate();
@@ -17,15 +18,18 @@ export default function Painel() {
       <p className="sub">Visão geral do Sistema de Gerenciamento de Estágios</p>
 
       <div className="cards">
-        <div
-          className="card green"
+        <Cards
+          titulo="Empresas Cadastradas"
+          valor="24"
+          cor="green"
+          Icon={Building2}
           onClick={() => navigate("/empresa")}
           style={{ cursor: "pointer" }}
         >
           <Building2 className="icon-card" />
           <h3>Empresas Cadastradas</h3>
           <span>24</span>
-        </div>
+        </Cards>
 
         <div className="card blue">
           <Briefcase className="icon-card" />
