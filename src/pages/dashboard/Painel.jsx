@@ -24,36 +24,36 @@ export default function Painel() {
           cor="green"
           Icon={Building2}
           onClick={() => navigate("/empresa")}
-          style={{ cursor: "pointer" }}
-        >
-          <Building2 className="icon-card" />
-          <h3>Empresas Cadastradas</h3>
-          <span>24</span>
-        </Cards>
+          style={{ cursor: "pointer" }}/>
 
-        <div className="card blue">
-          <Briefcase className="icon-card" />
-          <h3>Vagas Disponíveis</h3>
-          <span>15</span>
-        </div>
+        <Cards
+          titulo="Vagas Disponíveis"
+          valor="15"
+          cor="blue"
+          Icon={Briefcase}
+          onClick={() => navigate("/vagas")}
+        />
 
-        <div className="card purple">
-          <Users className="icon-card" />
-          <h3>Alunos em Estágio</h3>
-          <span>42</span>
-        </div>
+        <Cards
+        titulo="Alunos em Estágio"
+        valor="42"
+        cor="purple"
+        Icon={Users}
+        />
 
-        <div className="card red">
-          <AlertCircle className="icon-card" />
-          <h3>Alunos do 3° ano sem Estágio</h3>
-          <span>8</span>
-        </div>
+        <Cards
+          titulo="Alunos do 3° ano sem Estágio"
+          valor="8"
+          cor="red"
+          Icon={AlertCircle}
+        />
 
-        <div className="card orange">
-          <FileText className="icon-card" />
-          <h3>Relatórios 2° ano</h3>
-          <span>8</span>
-        </div>
+        <Cards
+          titulo="Relatórios 2° ano"
+          valor="8"
+          cor="orange"
+          Icon={FileText}
+        />
       </div>
 
       <div className="alertas">
