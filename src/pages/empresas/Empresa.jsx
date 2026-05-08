@@ -1,15 +1,17 @@
-import "./empresas.css";
+import styles from "./empresas.module.css";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
+import Cards from "../../components/global_Components/cards";
 
 export default function Empresas() {
   const navigate = useNavigate();
 
   return (
-    <div className="layout">
-      <main className="empresas-container">
-        <div className="topo">
-          <button className="voltar" onClick={() => navigate("/")}>
+    <div className={styles.layout}>
+      <main className={styles.empresasContainer}>
+        <div className={styles.topo}>
+          <button className={styles.voltar} onClick={() => navigate("/")}>
             <ArrowLeft size={20} />
           </button>
 
@@ -19,19 +21,20 @@ export default function Empresas() {
           </div>
         </div>
 
-        <div className="cards">
-          <div className="card">
-            <p>Quantidade de empresas</p>
-            <span>24</span>
-          </div>
-
-          <div className="card">
-            <p>Empresas com estágio ativo</p>
-            <span>24</span>
-          </div>
+        <div className={styles.cards}>
+         <Cards
+            titulo="Quantidade de empresas"
+            valor="24"
+            cor="green"
+          />
+          <Cards
+          titulo="Empresas com estágio ativo"
+          valor="24"
+          cor="blue"
+          />
         </div>
 
-        <div className="tabela-box">
+        <div className={styles.tabelaBox}>
           <table>
             <thead>
               <tr>

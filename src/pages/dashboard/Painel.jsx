@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import "../../styles/global.css";
 import { useNavigate } from "react-router-dom";
-import Cards from "../../components/pages_Components/cards";
+import Cards from "../../components/global_Components/cards";
 
 export default function Painel() {
   const navigate = useNavigate();
