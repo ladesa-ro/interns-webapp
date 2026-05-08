@@ -13,7 +13,7 @@ export default function Cards({
       onClick={onClick}
       style={{ cursor: onClick ? "pointer" : "default" }}
     >
-      <Icon className="icon-card" />
+      {Icon && <Icon className="icon-card" />}
 
       <h3>{titulo}</h3>
 
