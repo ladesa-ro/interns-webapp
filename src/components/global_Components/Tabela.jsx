@@ -1,0 +1,55 @@
+import React from 'react';
+
+const empresas = [{
+    nome: "Tech Solutions",
+    curso: "Informática",
+    contato: "techsolutions@gmail.com"
+},
+{
+    nome: "Inova Digital",
+    curso: "Informática",
+    contato: "inovadigital@gmail.com"
+},
+{
+    nome: "Laboratório BioVida",
+    curso: "Química",
+    contato: "biovida@gmail.com"
+},
+{
+    nome: "QuimLab Análise",
+    curso: "Química",
+    contato: "quimlab@gmail.com"
+},
+{
+    nome: "Floresta Viva",
+    curso: "Floresta",
+    contato: "floresta@gmail.com"
+}
+
+];
+const Tabela = () => {
+  return (
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome da Empresa</th>
+                    <th>Curso</th>
+                    <th>Contato</th>
+                </tr>
+            </thead>
+            <tbody>
+                {empresas.map((empresa, index) => (
+                    <tr key={index}>
+                        <td>{empresa.nome}</td>
+                        <td>{empresa.curso}</td>
+                        <td>{empresa.contato}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+  );
+};
+
+export default Tabela;
