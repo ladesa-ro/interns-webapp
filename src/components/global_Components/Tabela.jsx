@@ -1,5 +1,5 @@
 import React from 'react';
-
+import styles from "./Tabela.module.css";
 const empresas = [{
     nome: "Tech Solutions",
     curso: "Informática",
@@ -29,7 +29,7 @@ const empresas = [{
 ];
 const Tabela = () => {
   return (
-    <div>
+    <div className={styles.tabela}>
         <table>
             <thead>
                 <tr>

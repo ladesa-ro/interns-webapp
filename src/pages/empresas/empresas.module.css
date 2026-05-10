@@ -19,10 +19,6 @@
   justify-content: center;
 }
 
-.tabelaBox {
-  overflow: auto;
-}
-
 .cards{
   display: flex;
   gap: 16px;
