@@ -32,7 +32,7 @@ const Tabela = () => {
     <div className={styles.tabela}>
         <table>
             <thead>
-                <tr>
+                <tr className={styles.titulo}>
                     <th>Nome da Empresa</th>
                     <th>Curso</th>
                     <th>Contato</th>
@@ -40,7 +40,7 @@ const Tabela = () => {
             </thead>
             <tbody>
                 {empresas.map((empresa, index) => (
-                    <tr key={index}>
+                    <tr key={index} className={styles.linha}>
                         <td>{empresa.nome}</td>
                         <td>{empresa.curso}</td>
                         <td>{empresa.contato}</td>
