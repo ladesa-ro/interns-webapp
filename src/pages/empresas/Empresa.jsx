@@ -12,13 +12,17 @@ export default function Empresas() {
     <div className={styles.layout}>
       <main className={styles.empresasContainer}>
         <div className={styles.topo}>
+          <div className={styles.tituloArea}>
           <button className={styles.voltar} onClick={() => navigate("/")}>
             <ArrowLeft size={20} />
           </button>
-
           <div>
             <h1>Painel CIEC</h1>
             <p>Empresas Cadastradas</p>
+            </div>
+            <div/>
+
+            
           </div>
         </div>
 
