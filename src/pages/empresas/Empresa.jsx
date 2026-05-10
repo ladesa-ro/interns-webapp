@@ -34,7 +34,6 @@ export default function Empresas() {
           cor="green"
           />
         </div>
-
         <Tabela/>
       </main>
     </div>
