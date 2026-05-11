@@ -1,5 +1,7 @@
 import React from "react";
 
+import styles from "./Cards.module.css";
+
 export default function Cards({
   titulo,
   valor,
@@ -9,11 +11,11 @@ export default function Cards({
 }) {
   return (
     <div
-      className={`card ${cor}`}
+      className={`${styles.card} ${styles[cor]}`}
       onClick={onClick}
       style={{ cursor: onClick ? "pointer" : "default" }}
     >
-      {Icon && <Icon className="icon-card" />}
+      {Icon && <Icon className={styles.iconCard} />}
 
       <h3>{titulo}</h3>
 
