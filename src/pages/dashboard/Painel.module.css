@@ -1,0 +1,79 @@
+.painel h1 {
+  margin-bottom: 5px;
+  color: #0f6d3a;
+}
+
+.painel p {
+  color: #0f6d3a;
+}
+
+.sub {
+  color: gray;
+  margin-bottom: 20px;
+}
+
+.cards {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.alertas {
+  width: 40%;
+  margin-top: 30px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.09);
+}
+
+.alert {
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.alert p {
+  font-weight: bold;
+}
+
+.alert span {
+  font-size: 13px;
+}
+
+.redAlert {
+  background: #fdecea;
+  color: #c0392b;
+}
+
+.yellowAlert {
+  background: #fff8e5;
+  color: #b7950b;
+}
+
+.blueAlert {
+  background: #eaf3fb;
+  color: blue;
+}
+
+.alertContent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  font-size: 20px;
+}
+
+.vermelho {
+  color: #c0392b;
+}
+
+.amarelo {
+  color: #b7950b;
+}
+
+.azul {
+  color: blue;
+}
