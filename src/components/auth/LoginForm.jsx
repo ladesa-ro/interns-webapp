@@ -50,7 +50,9 @@ export default function LoginForm({ form, onChange, onSubmit }) {
               Esqueceu a senha? <a href="/">Clique aqui.</a>
             </p>
 
-            <button type="submit">Entrar</button>
+            <button type="submit" className={styles.button}>
+              Entrar
+            </button>
           </form>
         </div>
       </div>
