@@ -1,0 +1,349 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+  width: 220px;
+  background: #0f6d3a;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 20px;
+
+  position: fixed;
+
+  height: 100vh;
+  left: 0;
+  top: 0;
+}
+
+.logo {
+  height: 100px;
+  width: 180px;
+
+  margin-bottom: 30px;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar a {
+  text-decoration: none;
+  color: white;
+
+  padding: 10px;
+
+  border-radius: 6px;
+
+  transition: 0.2s;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar a:hover {
+  background: #1c8f53;
+}
+
+.sidebar .active {
+  background: #1c8f53;
+}
+
+.logout {
+  margin-top: auto;
+
+  padding: 10px;
+
+  border: none;
+
+  background: #084c2a;
+  color: white;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.divider {
+  height: 1px;
+
+  background: rgba(255, 255, 255, 0.4);
+
+  margin: 20px 0;
+}
+
+/* CONTENT */
+
+.content {
+  flex: 1;
+
+  padding: 20px;
+
+  background: #f4f4f4;
+
+  margin-left: 220px;
+
+  height: 100vh;
+
+  overflow-y: auto;
+}
+
+/* PAINEL */
+
+.painel {
+  padding: 20px;
+}
+
+.painel h1 {
+  margin-bottom: 5px;
+  color: #0f6d3a;
+}
+
+.sub {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* WRAPPER DOS CARDS */
+
+.cards-wrapper {
+  position: relative;
+}
+
+/* CONTAINER */
+
+.cards-container {
+  width: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding-bottom: 10px;
+
+  scroll-behavior: smooth;
+
+  scrollbar-width: none;
+}
+
+.cards-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* CARDS */
+
+.cards {
+  display: flex;
+
+  flex-wrap: nowrap;
+
+  gap: 20px;
+}
+
+.card {
+  min-width: 280px;
+  height: 140px;
+
+  flex-shrink: 0;
+
+  background: white;
+
+  border-radius: 12px;
+
+  padding: 15px;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card h3 {
+  font-size: 14px;
+  color: #555;
+}
+
+.card span {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.icon-card {
+  width: 40px;
+  height: 40px;
+
+  margin-bottom: 10px;
+}
+
+/* CORES */
+
+.green {
+  border-left: 5px solid #16a34a;
+}
+
+.blue {
+  border-left: 5px solid #2563eb;
+}
+
+.purple {
+  border-left: 5px solid #9333ea;
+}
+
+.red {
+  border-left: 5px solid #dc2626;
+}
+
+.orange {
+  border-left: 5px solid #f97316;
+}
+
+.card.green .icon-card {
+  color: #16a34a;
+}
+
+.card.blue .icon-card {
+  color: #2563eb;
+}
+
+.card.purple .icon-card {
+  color: #9333ea;
+}
+
+.card.red .icon-card {
+  color: #dc2626;
+}
+
+.card.orange .icon-card {
+  color: #f97316;
+}
+
+/* SETA FLUTUANTE */
+
+.seta-scroll {
+  position: absolute;
+
+  right: 10px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 55px;
+  height: 55px;
+
+  border-radius: 50%;
+
+  border: none;
+
+  background: #0f6d3a;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  z-index: 10;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+  animation: pulse 1.5s infinite;
+}
+
+.seta-scroll:hover {
+  background: #169c55;
+}
+
+/* ANIMAÇÃO */
+
+@keyframes pulse {
+  0% {
+    transform: translateY(-50%) scale(1);
+  }
+
+  50% {
+    transform: translateY(-50%) scale(1.08);
+  }
+
+  100% {
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+/* ALERTAS */
+
+.alertas {
+  width: 40%;
+
+  margin-top: 30px;
+
+  background: white;
+
+  padding: 20px;
+
+  border-radius: 10px;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.09);
+}
+
+.tituloAlerta {
+  color: #0f6d3a;
+}
+
+.alert {
+  padding: 15px;
+
+  border-radius: 10px;
+
+  margin-top: 15px;
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alert p {
+  font-weight: bold;
+}
+
+.red-alert {
+  background: #fee2e2;
+  color: #c0392b;
+}
+
+.yellow-alert {
+  background: #fef9c3;
+  color: #b7950b;
+}
+
+.blue-alert {
+  background: #dbeafe;
+  color: blue;
+}
