@@ -1,0 +1,86 @@
+.card {
+  flex: 1;
+  min-width: 180px;
+
+  background: white;
+
+  padding: 20px;
+  border-radius: 10px;
+
+  min-height: 160px;
+
+  border-left: 5px solid;
+
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.05);
+
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card h3 {
+  font-size: 14px;
+  color: #555;
+
+  margin-top: 10px;
+}
+
+.card span {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.iconCard {
+  width: 40px;
+  height: 40px;
+}
+
+/* CORES */
+
+.green {
+  border-color: #2ecc71;
+}
+
+.blue {
+  border-color: #3498db;
+}
+
+.purple {
+  border-color: #9b59b6;
+}
+
+.red {
+  border-color: #e74c3c;
+}
+
+.orange {
+  border-color: #f39c12;
+}
+
+/* COR DOS ÍCONES */
+
+.green .iconCard {
+  color: #2ecc71;
+}
+
+.blue .iconCard {
+  color: #3498db;
+}
+
+.purple .iconCard {
+  color: #9b59b6;
+}
+
+.red .iconCard {
+  color: #e74c3c;
+}
+
+.orange .iconCard {
+  color: #f39c12;
+}

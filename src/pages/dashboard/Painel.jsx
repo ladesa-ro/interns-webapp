@@ -5,26 +5,32 @@ import {
   AlertCircle,
   FileText,
 } from "lucide-react";
-import "../../styles/global.css";
+
 import { useNavigate } from "react-router-dom";
+
 import Cards from "../../components/global_Components/cards";
+
+import styles from "./Painel.module.css";
 
 export default function Painel() {
   const navigate = useNavigate();
 
   return (
-    <div className="painel">
+    <div className={styles.painel}>
       <h1>Painel CIEC</h1>
-      <p className="sub">Visão geral do Sistema de Gerenciamento de Estágios</p>
 
-      <div className="cards">
+      <p className={styles.sub}>
+        Visão geral do Sistema de Gerenciamento de Estágios
+      </p>
+
+      <div className={styles.cards}>
         <Cards
           titulo="Empresas Cadastradas"
           valor="24"
           cor="green"
           Icon={Building2}
           onClick={() => navigate("/empresa")}
-          style={{ cursor: "pointer" }}/>
+        />
 
         <Cards
           titulo="Vagas Disponíveis"
@@ -35,10 +41,10 @@ export default function Painel() {
         />
 
         <Cards
-        titulo="Alunos em Estágio"
-        valor="42"
-        cor="purple"
-        Icon={Users}
+          titulo="Alunos em Estágio"
+          valor="42"
+          cor="purple"
+          Icon={Users}
         />
 
         <Cards
@@ -56,34 +62,46 @@ export default function Painel() {
         />
       </div>
 
-      <div className="alertas">
+      <div className={styles.alertas}>
         <h3>Alertas e Pendências</h3>
 
-        <div className="alert red-alert">
-          <div className="alert-content">
-            <span className="icon">⚠</span>
+        <div className={`${styles.alert} ${styles.redAlert}`}>
+          <div className={styles.alertContent}>
+            <span className={styles.icon}>⚠</span>
+
             <div>
-              <p className="vermelho">8 alunos do 3° ano sem estágio</p>
+              <p className={styles.vermelho}>
+                8 alunos do 3° ano sem estágio
+              </p>
+
               <small>Requer atenção imediata</small>
             </div>
           </div>
         </div>
 
-        <div className="alert yellow-alert">
-          <div className="alert-content">
-            <span className="icon">⚠</span>
+        <div className={`${styles.alert} ${styles.yellowAlert}`}>
+          <div className={styles.alertContent}>
+            <span className={styles.icon}>⚠</span>
+
             <div>
-              <p className="amarelo">12 alunos na lista de espera</p>
+              <p className={styles.amarelo}>
+                12 alunos na lista de espera
+              </p>
+
               <small>Verificar vagas disponíveis</small>
             </div>
           </div>
         </div>
 
-        <div className="alert blue-alert">
-          <div className="alert-content">
-            <span className="icon">⚠</span>
+        <div className={`${styles.alert} ${styles.blueAlert}`}>
+          <div className={styles.alertContent}>
+            <span className={styles.icon}>⚠</span>
+
             <div>
-              <p className="azul">5 estágios terminam este mês</p>
+              <p className={styles.azul}>
+                5 estágios terminam este mês
+              </p>
+
               <small>Preparar documentação</small>
             </div>
           </div>
