@@ -13,31 +13,40 @@ export default function LoginForm({ form, onChange, onSubmit }) {
         <div className={styles.card}>
           <form onSubmit={onSubmit} className={styles.form}>
             <Titulo className={styles.logo} />
+            <div className={styles.inputUser}>
             <input
               type="text"
               name="matricula"
-              placeholder="Insira seu usuário"
+              placeholder=""
               value={form.matricula}
               onChange={onChange}
             />
+            <label htmlFor="matricula" className={styles.labelLine}>
+              Usuário
+            </label>
+            </div>
 
-            <div className={styles.inputPassWord}>
+            <div className={styles.inputPassword}>
               <input
                 type={showPassword ? "text" : "password"}
                 name="senha"
-                placeholder="Insira sua senha"
+                placeholder=""
                 value={form.senha}
                 onChange={onChange}
               />
-              <span
+              <label htmlFor="senha" className={styles.labelLine}>
+                Senha
+              </label>
+              {/*<span
                 className={styles.iconEye}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <Eye /> : <EyeOff />}
-              </span>
-            </div>
+              </span>  */}
 
-            <p>
+            </div>
+            
+            <p className={styles.forgotPassword}>
               Esqueceu a senha? <a href="/">Clique aqui.</a>
             </p>
 

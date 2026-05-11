@@ -33,9 +33,7 @@ Centralizar, em uma interface simples e visual, informações importantes sobre:
 
 ## Estrutura do projeto
 
-O código da aplicação está na pasta:
-
-`Ladesa-Estagios/`
+O código da aplicação está na raiz do repositório.
 
 Principais diretórios:
 
@@ -53,25 +51,19 @@ Principais diretórios:
 ### Passos
 
 1. Clone este repositório.
-2. Acesse a pasta do projeto frontend:
-
-	```bash
-	cd Ladesa-Estagios
-	```
-
-3. Instale as dependências:
+2. Instale as dependências:
 
 	```bash
 	npm install
 	```
 
-4. Execute em modo de desenvolvimento:
+3. Execute em modo de desenvolvimento:
 
 	```bash
 	npm run dev
 	```
 
-5. Abra o endereço exibido no terminal (normalmente `http://localhost:5173`).
+4. Abra o endereço exibido no terminal (normalmente `http://localhost:5173`).
 
 ## Scripts disponíveis
 

@@ -1,0 +1,164 @@
+
+
+input {
+  border: solid 2px #9F9F9F;
+  border-radius: 0.5rem;
+  padding: 0.95rem;
+  width: 100%;
+}
+
+input:focus {
+  outline: none;
+  border-color: #267E34;
+  box-shadow: 0 0 10px rgba(38, 126, 52, 0.7);
+}
+
+button {
+  font-weight: 500;
+  font-size: 0.8rem;
+  background: #267E34;
+  padding: 0.9rem 8.2rem 0.9rem 8.2rem;
+  border: none;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:active {
+  box-shadow: 0 0 10px rgba(38, 126, 52, 0.7);
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.left, .right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.right{
+  height: 100vh;
+  overflow: hidden;
+}
+
+.card {
+  width: 100%;
+  max-width: 340px;
+  background: #ffffff;
+  padding: 2rem;
+  border: solid 1.5px #9F9F9F;
+  border-radius: 0.4rem;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.logo {
+  display: block;
+  margin: 0 auto 20px;
+  color: black;
+}
+
+.imagemBackground {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.form {
+  display: grid;
+  gap: 20px;
+  justify-content: center;
+}
+
+.right svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.inputUser, .inputPassword {
+  position: relative;
+  width: 100%;
+  margin-bottom: 0.4rem;
+} 
+
+
+.inputUser input, .inputPassword input {
+  width: 100%;
+  padding: 0.95rem;
+  box-sizing: border-box;
+  min-width: 3.5rem;
+  border: solid 2px #9F9F9F;
+  border-radius: 0.5rem;
+  background: transparent;
+  outline: none;
+  font-size: 1rem;
+  z-index: 2; /* Input fica abaixo da animação da label para não cobri-la */
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
+}
+
+.labelLine {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  padding: 0 4px;
+  background-color: white; /* Cobre a borda do input quando sobe */
+  color: #9F9F9F;
+  font-size: 0.95rem;
+  transition: all 0.2s ease-in-out;
+  pointer-events: none; /* Clique passa pelo texto e atinge o input */
+  z-index: 2;
+}
+
+/* Lógica da Animação: 
+   Se o input estiver em foco (:focus) OU tiver texto digitado (:not(:placeholder-shown))
+   A label (.labelLine) que é o próximo elemento (+) sofre as mudanças:
+*/
+.inputUser input:focus + .labelLine,
+.inputUser input:not(:placeholder-shown) + .labelLine,
+.inputPassword input:focus + .labelLine,
+.inputPassword input:not(:placeholder-shown) + .labelLine {
+  top: -0.6rem;         
+  left: 0.8rem;         
+  font-size: 0.8rem;        
+  font-weight: 600;
+}
+
+.inputUser input:focus + .labelLine,
+.inputPassword input:focus + .labelLine {
+  color: #267E34;
+}
+
+/* Destaque do Input no Focus */
+.inputUser input:focus, .inputPassword input:focus {
+  border-color: #267E34;
+  box-shadow: 0 0 10px rgba(38, 126, 52, 0.5);
+}
+
+.forgotPassword {
+  color: #9F9F9F;
+  font-weight: 500;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.forgotPassword a{
+  text-decoration: none;
+  color: #2F9E41;
+}
+
+
+/*.iconEye {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.4rem;
+  cursor: pointer;
+  user-select: none;
+}*/
