@@ -11,6 +11,14 @@
   align-items: column;
 }
 
+h1 {
+  color: #016630;
+}
+
+p {
+  color: #016630;
+}
+
 .tituloArea {
   display: flex;
   align-items: center;
@@ -35,6 +43,6 @@ button {
 
 .cards {
   display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 25px;
+  margin-top: 10px;
 }
