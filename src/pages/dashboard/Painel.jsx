@@ -8,7 +8,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-import Cards from "../../components/global_Components/cards";
+import Cards from "../../components/global_Components/Cards.jsx";
 
 import styles from "./Painel.module.css";
 

@@ -1,12 +1,12 @@
 import React from "react";
 
 import styles from "./Cards.module.css";
-
 export default function Cards({
   titulo,
   valor,
   cor,
   Icon,
+  imagem,
   onClick,
 }) {
   return (
@@ -15,11 +15,15 @@ export default function Cards({
       onClick={onClick}
       style={{ cursor: onClick ? "pointer" : "default" }}
     >
-      {Icon && <Icon className={styles.iconCard} />}
+      {imagem ? (
+        <img src={imagem} alt={titulo} className={styles.imagemCard} />
+      ) : (
+        Icon && <Icon className={styles.iconCard} />
+      )}
 
       <h3>{titulo}</h3>
 
-      <span>{valor}</span>
+      <span className={styles.valorCard}>{valor}</span>
     </div>
   );
 }
