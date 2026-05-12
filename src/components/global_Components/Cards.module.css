@@ -84,3 +84,16 @@
 .orange .iconCard {
   color: #f39c12;
 }
+
+/*imagem*/
+.imagemCard {
+  width: 100%;
+  height: 60px;
+  object-fit: cover;
+}
+
+/*cor do valor*/
+
+.valorCard {
+  color: darkgreen;
+}

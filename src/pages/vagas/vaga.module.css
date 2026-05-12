@@ -35,6 +35,6 @@ button {
 
 .cards {
   display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 25px;
+  margin-top: 10px;
 }
