@@ -11,6 +11,14 @@
   align-items: column;
 }
 
+h1 {
+  color: #016630;
+}
+
+p {
+  color: #016630;
+}
+
 .tituloArea {
   display: flex;
   align-items: center;
