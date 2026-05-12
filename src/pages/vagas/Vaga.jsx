@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import Tabela from "../../components/global_Components/Tabela";
 import { useNavigate } from "react-router-dom";
-
+import { useState } from "react";
 import Cards from "../../components/global_Components/Cards.jsx";
 
 import styles from "./vaga.module.css";
@@ -20,6 +20,8 @@ import logofloresta from "../../assets/imagems/floresta.png"
 
 export default function Vaga() {
   const navigate = useNavigate();
+  const [filtroCurso, setFiltroCurso] = useState("");
+
   const vagas = [
     {
       id: 1,
@@ -82,7 +84,9 @@ export default function Vaga() {
       vagas: 7,
     },
   ];
-
+  const vagasFiltradas = filtroCurso
+    ? vagas.filter((vaga) => vaga.curso === filtroCurso)
+    : vagas;
   const colunas = [
     {
       label: "Empresa",
@@ -117,31 +121,35 @@ export default function Vaga() {
         </div>
 
         <div className={styles.cards}>
-          <Cards
-            imagem={logoinformtica}
-            titulo="informática"
-            valor="24"
+          <div onClick={() => setFiltroCurso("Informática")}>
+            <Cards
+              imagem={logoinformtica}
+              titulo="Informática"
+              valor="24"
+            />
+          </div>
 
-          />
+          <div onClick={() => setFiltroCurso("Química")}>
+            <Cards
+              imagem={logoQuimica}
+              titulo="Química"
+              valor="24"
+            />
+          </div>
 
-          <Cards
-            imagem={logoQuimica}
-            titulo="Química"
-            valor="24"
-          />
-
-          <Cards
-            imagem={logofloresta}
-            titulo={"Floresta"}
-            valor={"24"}
-          />
+          <div onClick={() => setFiltroCurso("Floresta")}>
+            <Cards
+              imagem={logofloresta}
+              titulo="Floresta"
+              valor="24"
+            />
+          </div>
         </div>
         <br></br>
 
         <Tabela
           colunas={colunas}
-          dados={vagas}
-        />
+          dados={vagasFiltradas} />
       </main>
     </div>
 
