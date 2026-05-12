@@ -12,12 +12,80 @@
   margin-bottom: 20px;
 }
 
+/* WRAPPER */
+.cardsWrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* CONTAINER COM SCROLL */
+.cardsContainer {
+  width: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding-bottom: 10px;
+
+  scroll-behavior: smooth;
+
+  scrollbar-width: none;
+}
+
+.cardsContainer::-webkit-scrollbar {
+  display: none;
+}
+
+/* CARDS */
 .cards {
   display: flex;
   gap: 15px;
-  flex-wrap: wrap;
+
+  flex-wrap: nowrap;
 }
 
+/* SETA */
+.setaScroll {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: #0f6d3a;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  padding: 0;
+  animation: pulse 1.5s infinite;
+  transition: background 0.3s ease;
+}
+
+.setaScroll:hover {
+  background: #0a4d29;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translateY(-50%) scale(1);
+  }
+
+  50% {
+    transform: translateY(-50%) scale(1.08);
+  }
+
+  100% {
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+/* ALERTAS */
 .alertas {
   width: 40%;
   margin-top: 30px;
