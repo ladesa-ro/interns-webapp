@@ -1,10 +1,10 @@
 import React from "react";
-import ImagemSvg from "../../assets/mascoteLogin.svg?react";
+import PainelSvg from "../../assets/icons/icon_Painel.svg?react";
 
-const Imagem = ({ width = "220", height = "auto", className = "" }) => {
+const Painel = ({ width = "220", height = "auto", className = "" }) => {
   return (
-    <ImagemSvg width={width} height={height} className={className} />
+    <PainelSvg width={width} height={height} className={className} />
   );
 };
 
-export default Imagem;
+export default Painel;
