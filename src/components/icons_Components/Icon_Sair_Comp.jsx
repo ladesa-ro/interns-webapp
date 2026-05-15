@@ -1,9 +1,9 @@
 import React from "react";
 import SairSvg from "../../assets/icons/icon_Sair.svg?react";
 
-const Sair = ({ width = "220", height = "auto", className = "" }) => {
+const Sair = ({ size = 24, className = "" }) => {
   return (
-    <SairSvg width={width} height={height} className={className} />
+    <SairSvg width={size} height={size} className={className} />
   );
 };
 

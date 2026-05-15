@@ -1,9 +1,9 @@
 import React from "react";
 import CadastrarVagaSvg from "../../assets/icons/icon_Cadastrar_Vaga.svg?react";
 
-const CadastrarVaga = ({ width = "220", height = "auto", className = "" }) => {
+const CadastrarVaga = ({ size = 24, className = "" }) => {
   return (
-    <CadastrarVagaSvg width={width} height={height} className={className} />
+    <CadastrarVagaSvg width={size} height={size} className={className} />
   );
 };
 

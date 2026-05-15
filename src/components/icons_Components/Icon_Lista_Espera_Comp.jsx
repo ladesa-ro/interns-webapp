@@ -1,9 +1,9 @@
 import React from "react";
 import ListaEsperaSvg from "../../assets/icons/icon_Lista_Espera.svg?react";
 
-const ListaEspera = ({ width = "220", height = "auto", className = "" }) => {
+const ListaEspera = ({ size = 24, className = "" }) => {
   return (
-    <ListaEsperaSvg width={width} height={height} className={className} />
+    <ListaEsperaSvg width={size} height={size} className={className} />
   );
 };
 
