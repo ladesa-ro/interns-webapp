@@ -1,10 +1,10 @@
 import React from "react";
-import ImagemSvg from "../../assets/mascoteLogin.svg?react";
+import EyeOpenSvg from "../../assets/icons/icon_EyeOpen.svg?react";
 
-const Imagem = ({ width = "220", height = "auto", className = "" }) => {
+const EyeOpen = ({ width = "220", height = "auto", className = "" }) => {
   return (
-    <ImagemSvg width={width} height={height} className={className} />
+    <EyeOpenSvg width={width} height={height} className={className} />
   );
 };
 
-export default Imagem;
+export default EyeOpen;

@@ -1,10 +1,10 @@
 import React from "react";
-import ImagemSvg from "../../assets/mascoteLogin.svg?react";
+import ListaEsperaSvg from "../../assets/icons/icon_Lista_Espera.svg?react";
 
-const Imagem = ({ width = "220", height = "auto", className = "" }) => {
+const ListaEspera = ({ width = "220", height = "auto", className = "" }) => {
   return (
-    <ImagemSvg width={width} height={height} className={className} />
+    <ListaEsperaSvg width={width} height={height} className={className} />
   );
 };
 
-export default Imagem;
+export default ListaEspera;

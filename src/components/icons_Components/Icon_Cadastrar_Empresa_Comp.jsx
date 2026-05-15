@@ -1,10 +1,10 @@
 import React from "react";
-import ImagemSvg from "../../assets/mascoteLogin.svg?react";
+import CadastrarEmpresaSvg from "../../assets/icon_Cadastrar_Empresa.svg?react";
 
-const Imagem = ({ width = "220", height = "auto", className = "" }) => {
+const CadastrarEmpresa = ({ width = "220", height = "auto", className = "" }) => {
   return (
-    <ImagemSvg width={width} height={height} className={className} />
+    <CadastrarEmpresaSvg width={width} height={height} className={className} />
   );
 };
 
-export default Imagem;
+export default CadastrarEmpresa;
