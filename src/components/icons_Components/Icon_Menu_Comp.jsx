@@ -1,9 +1,9 @@
 import React from "react";
 import MenuSvg from "../../assets/icons/icon_Menu.svg?react";
 
-const Menu = ({ width = "220", height = "auto", className = "" }) => {
+const Menu = ({ size = 24, className = "" }) => {
   return (
-    <MenuSvg width={width} height={height} className={className} />
+    <MenuSvg width={size} height={size} className={className} />
   );
 };
 

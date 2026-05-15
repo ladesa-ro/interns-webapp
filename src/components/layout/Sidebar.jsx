@@ -22,7 +22,7 @@ export default function Sidebar() {
 
       <nav>
         <Link to="/" className={location.pathname === "/" ? "active" : ""}>
-          <Painel size={18} />
+          <Painel size={24} />
           <span>Painel</span>
         </Link>
 
@@ -30,7 +30,7 @@ export default function Sidebar() {
           to="/empresa"
           className={location.pathname === "/empresa" ? "active" : ""}
         >
-          <CadastrarEmpresa size={18} />
+          <CadastrarEmpresa size={24}/>
           <span>Cadastrar Empresa</span>
         </Link>
 
@@ -38,7 +38,7 @@ export default function Sidebar() {
           to="/vaga"
           className={location.pathname === "/vaga" ? "active" : ""}
         >
-          <CadastrarVaga size={18} />
+          <CadastrarVaga size={24}/>
           <span>Cadastrar Vaga</span>
         </Link>
 
@@ -46,7 +46,7 @@ export default function Sidebar() {
           to="/lista"
           className={location.pathname === "/lista" ? "active" : ""}
         >
-          <ListaEspera size={18} />
+          <ListaEspera size={24}/>
           <span>Lista de espera</span>
         </Link>
 
@@ -54,13 +54,13 @@ export default function Sidebar() {
           to="/perfil"
           className={location.pathname === "/perfil" ? "active" : ""}
         >
-          <Perfil size={18} />
+          <Perfil size={24}/>
           <span>Perfil</span>
         </Link>
       </nav>
 
       <button className="logout" onClick={handleLogout}>
-        <Sair size={18} />
+        <Sair size={24}/>
         <span>Sair</span>
       </button>
     </div>
