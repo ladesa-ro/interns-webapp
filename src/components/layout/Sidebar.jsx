@@ -1,13 +1,11 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Titulo from "../icons_Components/Icon_Logo_Comp";
-import {
-  LayoutDashboard,
-  Building2,
-  Briefcase,
-  Clock,
-  User,
-  LogOut,
-} from "lucide-react";
+import Painel from "../icons_Components/Icon_Painel_Comp";
+import CadastrarEmpresa from "../icons_Components/Icon_Cadastrar_Empresa_Comp";
+import CadastrarVaga from "../icons_Components/Icon_Cadastrar_Vaga_Comp";
+import ListaEspera from "../icons_Components/Icon_Lista_Espera_Comp";
+import Perfil from "../icons_Components/Icon_Perfil_Comp";
+import Sair from "../icons_Components/Icon_Sair_Comp";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -24,7 +22,7 @@ export default function Sidebar() {
 
       <nav>
         <Link to="/" className={location.pathname === "/" ? "active" : ""}>
-          <LayoutDashboard size={18} />
+          <Painel size={18} />
           <span>Painel</span>
         </Link>
 
@@ -32,7 +30,7 @@ export default function Sidebar() {
           to="/empresa"
           className={location.pathname === "/empresa" ? "active" : ""}
         >
-          <Building2 size={18} />
+          <CadastrarEmpresa size={18} />
           <span>Cadastrar Empresa</span>
         </Link>
 
@@ -40,7 +38,7 @@ export default function Sidebar() {
           to="/vaga"
           className={location.pathname === "/vaga" ? "active" : ""}
         >
-          <Briefcase size={18} />
+          <CadastrarVaga size={18} />
           <span>Cadastrar Vaga</span>
         </Link>
 
@@ -48,7 +46,7 @@ export default function Sidebar() {
           to="/lista"
           className={location.pathname === "/lista" ? "active" : ""}
         >
-          <Clock size={18} />
+          <ListaEspera size={18} />
           <span>Lista de espera</span>
         </Link>
 
@@ -56,13 +54,13 @@ export default function Sidebar() {
           to="/perfil"
           className={location.pathname === "/perfil" ? "active" : ""}
         >
-          <User size={18} />
+          <Perfil size={18} />
           <span>Perfil</span>
         </Link>
       </nav>
 
       <button className="logout" onClick={handleLogout}>
-        <LogOut size={18} />
+        <Sair size={18} />
         <span>Sair</span>
       </button>
     </div>
