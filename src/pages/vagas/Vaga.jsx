@@ -32,7 +32,6 @@ export default function Vaga() {
 
       const data = await response.json();
 
-      console.log(data);
 
       const vagasFormatadas = data.data.map((item) => ({
         id: item.id,
@@ -49,7 +48,6 @@ export default function Vaga() {
       setVagas(vagasFormatadas);
 
     } catch (erro) {
-      console.log("Erro ao buscar vagas:", erro);
     }
   }
 
