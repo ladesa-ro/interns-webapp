@@ -132,4 +132,4 @@ export default function Vaga() {
       </main>
     </div>
   );
-} 0
+}
