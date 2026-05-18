@@ -1,0 +1,55 @@
+.layout {
+  display: flex;
+}
+
+.alunosContainer {
+  width: 100%;
+  padding: 20px;
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tituloArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+h1 {
+  color: #016630;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+p {
+  color: #016630;
+  font-size: 16px;
+}
+
+.voltar {
+  color: #016630;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+button {
+  background: none;
+}
+
+
+.cards {
+  display: flex;
+  gap: 25px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
