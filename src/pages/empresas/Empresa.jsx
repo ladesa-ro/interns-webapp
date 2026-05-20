@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import Tabela from "../../components/global_Components/Tabela";
-import Cards from "../../components/global_Components/cards";
+import Cards from "../../components/global_Components/Cards.jsx";
 
 export default function Empresas() {
   const navigate = useNavigate();
@@ -21,8 +21,8 @@ export default function Empresas() {
       .catch((error) => console.log(error));
   }, []);
 
-  {/*A lista do Fetch está vazia*/}
-  
+  {/*A lista do Fetch está vazia*/ }
+
   const colunas = [
     {
       label: "Empresa",
