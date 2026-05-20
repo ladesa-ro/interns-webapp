@@ -32,24 +32,23 @@ export default function Vaga() {
 
       const data = await response.json();
 
-      console.log(data);
+      const vagasFormatadas = data.data.map((item) => {
+        return {
 
-      const vagasFormatadas = data.data.map((item) => ({
-        id: item.id,
+          id: item.id,
 
-        empresa: item.empresa?.nome || "Empresa não informada",
+          empresa: item.empresa?.nome || "Empresa não informada",
 
-        curso:
-          item.estagiario?.curso ||
-          "Não informado",
+          curso:
+            item.CursoReferencia || "Não informado",
 
-        vagas: item.cargaHoraria,
-      }));
+          vagas: item.cargaHoraria,
+        };
+      });
 
       setVagas(vagasFormatadas);
 
     } catch (erro) {
-      console.log("Erro ao buscar vagas:", erro);
     }
   }
 
@@ -94,40 +93,44 @@ export default function Vaga() {
           </div>
         </div>
 
-        <div className={styles.cards}>
+        <div className={styles.conteudoCentral}>
 
-          <div onClick={() => setFiltroCurso("Informática")}>
-            <Cards
-              imagem={logoinformtica}
-              titulo="Informática"
-              valor="24"
-            />
+          <div className={styles.cards}>
+
+            <div onClick={() => setFiltroCurso("Informática")}>
+              <Cards
+                imagem={logoinformtica}
+                titulo="Informática"
+                valor="24"
+              />
+            </div>
+
+            <div onClick={() => setFiltroCurso("Química")}>
+              <Cards
+                imagem={logoQuimica}
+                titulo="Química"
+                valor="24"
+              />
+            </div>
+
+            <div onClick={() => setFiltroCurso("Floresta")}>
+              <Cards
+                imagem={logofloresta}
+                titulo="Floresta"
+                valor="24"
+              />
+            </div>
+
           </div>
 
-          <div onClick={() => setFiltroCurso("Química")}>
-            <Cards
-              imagem={logoQuimica}
-              titulo="Química"
-              valor="24"
-            />
-          </div>
-
-          <div onClick={() => setFiltroCurso("Floresta")}>
-            <Cards
-              imagem={logofloresta}
-              titulo="Floresta"
-              valor="24"
+          <div className={styles.tabelaContainer}>
+            <Tabela
+              colunas={colunas}
+              dados={vagasFiltradas}
             />
           </div>
 
         </div>
-
-        <br />
-
-        <Tabela
-          colunas={colunas}
-          dados={vagasFiltradas}
-        />
 
       </main>
     </div>

@@ -104,6 +104,7 @@ export default function Painel() {
               valor="42"
               cor="purple"
               Icon={Users}
+              onClick={() => navigate("/alunos-em-estagio")}
             />
 
             <Cards
