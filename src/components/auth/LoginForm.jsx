@@ -59,8 +59,8 @@ export default function LoginForm({ form, onChange, onSubmit }) {
       </div>
 
       <div className={styles.right}>
-        <Background />
-        <Mascote/>
+        <Background className={styles.background}/>
+        <Mascote className={styles.mascote}/>
       </div>
     </div>
   );
