@@ -25,10 +25,11 @@
   overflow-x: auto;
   overflow-y: hidden;
 
-  padding-bottom: 10px;
+  padding: 15px 12px;
+  margin-top: -15px;
+  margin-bottom: -15px;
 
   scroll-behavior: smooth;
-
   scrollbar-width: none;
 }
 
@@ -39,9 +40,10 @@
 /* CARDS */
 .cards {
   display: flex;
-  gap: 15px;
+  gap: 16px;
 
   flex-wrap: nowrap;
+  width: max-content;
 }
 
 /* SETA */
