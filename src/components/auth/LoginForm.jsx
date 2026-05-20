@@ -3,6 +3,7 @@ import styles from "./LoginForm.module.css";
 import Titulo from "../icons_Components/Icon_Logo_Comp";
 import Background from "../image_Components/Background_Login_Comp";
 import { Eye, EyeOff } from "lucide-react";
+import Mascote from "../image_Components/Mascote_Login_Comp";
 
 export default function LoginForm({ form, onChange, onSubmit }) {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -59,6 +60,7 @@ export default function LoginForm({ form, onChange, onSubmit }) {
 
       <div className={styles.right}>
         <Background />
+        <Mascote/>
       </div>
     </div>
   );
