@@ -5,19 +5,9 @@
   font-family: sans-serif;
 }
 
-.app {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-}
 
-.content {
-  flex: 1;
-  padding: 20px;
-  background: #f4f4f4;
-  margin-left: 220px;
-  height: 100vh;
-  overflow-y: auto;
+.sidebar, .content {
+  transition: all 0.3s ease;
 }
 
 .sidebar {
@@ -27,18 +17,31 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
-
   position: fixed;
   top: 0;
   left: 0;
-
   height: 100vh;
+  z-index: 1000;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
 }
 
 .logo {
   width: 100%;
   height: auto;
-  margin-bottom: 30px;
 }
 
 .sidebar nav {
@@ -51,27 +54,23 @@
   display: flex;
   align-items: center;
   gap: 10px;
-
   text-decoration: none;
   color: white;
-
   padding: 10px;
   border-radius: 6px;
-
   transition: 0.2s;
+  white-space: nowrap;
 }
 
-.sidebar a svg{
+.sidebar a svg, 
+.sidebar .logout svg {
+  min-width: 24px;
+  min-height: 24px;
   width: 24px;
   height: 24px;
-  flex-shrink: 0;
 }
 
-.sidebar a:hover {
-  background: #1c8f53;
-}
-
-.sidebar .active {
+.sidebar a:hover, .sidebar .active {
   background: #1c8f53;
 }
 
@@ -79,24 +78,49 @@
   display: flex;
   align-items: center;
   gap: 10px;
-
   margin-top: auto;
-
   padding: 10px;
-
   border: none;
   border-radius: 6px;
-
   background: #084c2a;
   color: white;
-
   cursor: pointer;
+  width: 100%;
 }
 
-.divider {
-  height: 1px;
+.sidebar.collapsed {
+  width: 70px;
+  padding: 20px 10px;
+}
 
-  margin: 20px 0;
+.sidebar.collapsed span, 
+.sidebar.collapsed .logo {
+  display: none;
+}
 
-  background: rgba(255, 255, 255, 0.4);
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
+}
+
+.sidebar.collapsed a, 
+.sidebar.collapsed .logout {
+  justify-content: center;
+}
+
+.sidebar.collapsed .logout {
+  background: transparent;
+}
+
+
+.content {
+  flex: 1;
+  padding: 20px;
+  background: #f4f4f4;
+  margin-left: 220px;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar.collapsed ~ .content {
+  margin-left: 70px;
 }
