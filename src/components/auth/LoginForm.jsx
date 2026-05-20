@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./LoginForm.module.css";
 import Titulo from "../icons_Components/Icon_Logo_Comp";
-import Imagem from "../image_Components/Image_Login_Comp";
+import Background from "../image_Components/Background_Login_Comp";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginForm({ form, onChange, onSubmit }) {
@@ -58,7 +58,7 @@ export default function LoginForm({ form, onChange, onSubmit }) {
       </div>
 
       <div className={styles.right}>
-        <Imagem />
+        <Background />
       </div>
     </div>
   );
