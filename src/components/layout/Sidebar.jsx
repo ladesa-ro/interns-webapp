@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Titulo from "../icons_Components/Icon_Logo_Comp";
 import Painel from "../icons_Components/Icon_Painel_Comp";
@@ -6,10 +7,12 @@ import CadastrarVaga from "../icons_Components/Icon_Cadastrar_Vaga_Comp";
 import ListaEspera from "../icons_Components/Icon_Lista_Espera_Comp";
 import Perfil from "../icons_Components/Icon_Perfil_Comp";
 import Sair from "../icons_Components/Icon_Sair_Comp";
+import { Menu } from "lucide-react"; {/*Teste*/}
 
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
 
   function handleLogout() {
     localStorage.removeItem("token");
@@ -17,9 +20,13 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="sidebar">
-      <Titulo className="logo" />
-
+    <div className={`sidebar ${isMenuOpen ? "" : "collapsed"}`}>
+      <div className="sidebar-header">
+        <button className="toggle-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <Menu size={24} color="white" />
+        </button>
+        {isMenuOpen && <Titulo className="logo" />}
+      </div>
       <nav>
         <Link to="/" className={location.pathname === "/" ? "active" : ""}>
           <Painel size={24} />
@@ -50,15 +57,17 @@ export default function Sidebar() {
           <span>Lista de espera</span>
         </Link>
 
-        <Link
+        {/*<Link
           to="/perfil"
           className={location.pathname === "/perfil" ? "active" : ""}
         >
           <Perfil size={24}/>
           <span>Perfil</span>
-        </Link>
+        </Link>*/}
       </nav>
 
+
+      
       <button className="logout" onClick={handleLogout}>
         <Sair size={24}/>
         <span>Sair</span>
