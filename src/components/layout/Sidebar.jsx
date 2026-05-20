@@ -5,7 +5,6 @@ import Painel from "../icons_Components/Icon_Painel_Comp";
 import CadastrarEmpresa from "../icons_Components/Icon_Cadastrar_Empresa_Comp";
 import CadastrarVaga from "../icons_Components/Icon_Cadastrar_Vaga_Comp";
 import ListaEspera from "../icons_Components/Icon_Lista_Espera_Comp";
-import Perfil from "../icons_Components/Icon_Perfil_Comp";
 import Sair from "../icons_Components/Icon_Sair_Comp";
 import { Menu } from "lucide-react"; {/*Teste*/}
 
