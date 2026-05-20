@@ -1,10 +1,10 @@
 import React from "react";
-import { ReactComponent as IconPerfilSvg } from 'src/assets/icons/icon_Perfil.svg';
+import PerfilSvg from "../../assets/icons/icon_Perfil.svg?react";
 
-const IconPerfil = ({ width = "30", height = "30", className = "" }) => {
+const Perfil = ({ size = 24, className = "" }) => {
   return (
-    <IconPerfilSvg width={width} height={height} className={className} />
+    <PerfilSvg width={size} height={size} className={className} />
   );
 };
 
-export default IconPerfil;
+export default Perfil;
