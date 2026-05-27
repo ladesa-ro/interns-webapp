@@ -94,18 +94,29 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.09);
 }
 
-.alert {
+.alertas h3{
+  color: #0f6d3a ;
+}
+
+.alertVermelho {
   margin-top: 15px;
   padding: 15px;
   border-radius: 8px;
+  border: 1px solid #FFC9C9;
 }
 
-.alert p {
-  font-weight: bold;
+.alertAmarelo {
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #FFF085;
 }
 
-.alert span {
-  font-size: 13px;
+.alertAzul {
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #BEDBFF;
 }
 
 .redAlert {
@@ -127,20 +138,45 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  
 }
 
 .icon {
   font-size: 20px;
 }
 
-.vermelho {
-  color: #c0392b;
+.vermelhoTitulo {
+  color: #A5151F;
+  font-weight: 600;
+  font-size: 1rem;
 }
 
-.amarelo {
-  color: #b7950b;
+.amareloTitulo {
+  color: #B38A53;
+  font-weight: 600;
+  font-size: 1rem;
 }
 
-.azul {
-  color: blue;
+.azulTitulo {
+  color: #2244BB;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.vermelhoSubtitulo {
+  color: #ED434B;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.amareloSubtitulo {
+  color: #E4BA64;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.azulSubtitulo {
+  color: #6293FD;
+  font-weight: 600;
+  font-size: 0.8rem;
 }
