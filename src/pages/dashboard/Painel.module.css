@@ -3,12 +3,9 @@
   color: #0f6d3a;
 }
 
-.painel p {
-  color: #0f6d3a;
-}
-
 .sub {
-  color: gray;
+  color: #4A5565;
+  font-weight: 600;
   margin-bottom: 20px;
 }
 
