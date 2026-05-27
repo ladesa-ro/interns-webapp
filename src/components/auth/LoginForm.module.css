@@ -185,6 +185,14 @@ input:focus {
   user-select: none;
 }*/
 
-@media (max-width: 1050px){
-  
+@media (max-width: 1040px){
+  .background{
+    display: none
+  }
+}
+
+@media (max-width: 750px){
+  .right{
+    display: none;
+  }
 }
