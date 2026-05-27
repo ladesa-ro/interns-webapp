@@ -1,9 +1,11 @@
 import React from "react";
 import BackgroundSvg from "../../assets/background.svg?react";
 
-const Background = ({ width = "220", height = "auto", className = "" }) => {
+const Background = ({className = "" }) => {
   return (
-    <BackgroundSvg width={width} height={height} className={className} />
+    <BackgroundSvg 
+    className={className}
+    preserveAspectRatio="xMidYMid slice" />
   );
 };
 
