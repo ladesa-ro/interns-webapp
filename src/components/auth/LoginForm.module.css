@@ -185,3 +185,9 @@ input:focus {
   cursor: pointer;
   user-select: none;
 }*/
+
+@media (max-width: 1050px){
+  .right{
+    display: none;
+  } 
+}
