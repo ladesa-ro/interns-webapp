@@ -141,55 +141,55 @@ export default function Painel() {
 
         <h3>Alertas e Pendências</h3>
 
-        <div className={`${styles.alert} ${styles.redAlert}`}>
+        <div className={`${styles.alertVermelho} ${styles.redAlert}`}>
           <div className={styles.alertContent}>
 
             <span className={styles.icon}>⚠</span>
 
             <div>
-              <p className={styles.vermelho}>
+              <p className={styles.vermelhoTitulo}>
                 8 alunos do 3° ano sem estágio
               </p>
 
-              <small>
+              <p className={styles.vermelhoSubtitulo}>
                 Requer atenção imediata
-              </small>
+              </p>
             </div>
 
           </div>
         </div>
 
-        <div className={`${styles.alert} ${styles.yellowAlert}`}>
+        <div className={`${styles.alertAmarelo} ${styles.yellowAlert}`}>
           <div className={styles.alertContent}>
 
             <span className={styles.icon}>⚠</span>
 
             <div>
-              <p className={styles.amarelo}>
+              <p className={styles.amareloTitulo}>
                 12 alunos na lista de espera
               </p>
 
-              <small>
+              <p className={styles.amareloSubtitulo}>
                 Verificar vagas disponíveis
-              </small>
+              </p>
             </div>
 
           </div>
         </div>
 
-        <div className={`${styles.alert} ${styles.blueAlert}`}>
+        <div className={`${styles.alertAzul} ${styles.blueAlert}`}>
           <div className={styles.alertContent}>
 
             <span className={styles.icon}>⚠</span>
 
             <div>
-              <p className={styles.azul}>
+              <p className={styles.azulTitulo}>
                 5 estágios terminam este mês
               </p>
 
-              <small>
+              <p className={styles.azulSubtitulo}>
                 Preparar documentação
-              </small>
+              </p>
             </div>
 
           </div>
