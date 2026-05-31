@@ -2,10 +2,17 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import {
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  useState,
+  useEffect,
+} from "react";
 
 import Tabela from "../../components/global_Components/Tabela";
+
 import Cards from "../../components/global_Components/Cards.jsx";
 
 import styles from "./vaga.module.css";
@@ -15,67 +22,193 @@ import logoinformtica from "../../assets/imagems/informatica.png";
 import logofloresta from "../../assets/imagems/floresta.png";
 
 export default function Vaga() {
+
   const navigate = useNavigate();
 
   const [filtroCurso, setFiltroCurso] = useState("");
+
   const [vagas, setVagas] = useState([]);
 
   useEffect(() => {
+
     buscarVagas();
+
   }, []);
 
   async function buscarVagas() {
+
     try {
-      const response = await fetch(
-        "https://dev.ladesa.com.br/api/v1/estagios?page=1&limit=10&search=null&sortBy="
+
+      // =========================
+      // BUSCA ESTÁGIOS
+      // =========================
+
+      const responseEstagios = await fetch(
+        "https://dev.ladesa.com.br/api/v1/estagios"
       );
 
-      const data = await response.json();
+      const dataEstagios =
+        await responseEstagios.json();
 
-      const vagasFormatadas = data.data.map((item) => {
-        return {
+      console.log(
+        "ESTÁGIOS:",
+        dataEstagios
+      );
 
-          id: item.id,
+      // =========================
+      // BUSCA EMPRESAS
+      // =========================
 
-          empresa: item.empresa?.nome || "Empresa não informada",
+      const responseEmpresas = await fetch(
+        "https://dev.ladesa.com.br/api/v1/empresas"
+      );
 
-          curso:
-            item.CursoReferencia || "Não informado",
+      const dataEmpresas =
+        await responseEmpresas.json();
 
-          vagas: item.cargaHoraria,
-        };
-      });
+      console.log(
+        "EMPRESAS:",
+        dataEmpresas
+      );
+
+      // =========================
+      // BUSCA CURSOS
+      // =========================
+
+      const responseCursos = await fetch(
+        "https://dev.ladesa.com.br/api/v1/cursos"
+      );
+
+      const dataCursos =
+        await responseCursos.json();
+
+      console.log(
+        "CURSOS:",
+        dataCursos
+      );
+
+      // =========================
+      // FORMATA DADOS
+      // =========================
+
+      const vagasFormatadas =
+        dataEstagios.data.map((item) => {
+
+          console.log(
+            "ITEM ESTÁGIO:",
+            item
+          );
+
+          // =========================
+          // EMPRESA
+          // =========================
+
+          const empresaEncontrada =
+            dataEmpresas.data.find(
+              (empresa) =>
+                empresa.id ===
+                item.empresa?.id
+            );
+
+          // =========================
+          // CURSO
+          // =========================
+
+          const cursoEncontrado =
+            dataCursos.data.find(
+              (curso) =>
+                curso.id ===
+                item.CursoReferencia?.id
+            );
+
+          return {
+
+            id: item.id,
+
+            empresa:
+              empresaEncontrada?.nomeFantasia ||
+              empresaEncontrada?.razaoSocial ||
+              "Empresa não informada",
+
+            curso:
+              cursoEncontrado?.nomeAbreviado ||
+              cursoEncontrado?.nome ||
+              "Curso não informado",
+
+            vagas:
+              item.cargaHoraria
+                ? `${item.cargaHoraria}h`
+                : "Não informado",
+
+          };
+
+        });
+
+      console.log(
+        "VAGAS FORMATADAS:",
+        vagasFormatadas
+      );
 
       setVagas(vagasFormatadas);
 
     } catch (erro) {
+
+      console.error(
+        "Erro ao buscar vagas:",
+        erro
+      );
+
     }
+
   }
 
-  const vagasFiltradas = filtroCurso
-    ? vagas.filter((vaga) => vaga.curso === filtroCurso)
-    : vagas;
+  // =========================
+  // FILTRO
+  // =========================
+
+  const vagasFiltradas =
+    filtroCurso
+      ? vagas.filter(
+        (vaga) =>
+          vaga.curso === filtroCurso
+      )
+      : vagas;
+
+  // =========================
+  // COLUNAS TABELA
+  // =========================
 
   const colunas = [
+
     {
       label: "Empresa",
       chave: "empresa",
     },
+
     {
       label: "Curso",
       chave: "curso",
     },
+
     {
-      label: "Vagas",
+      label: "Vaga",
       chave: "vagas",
     },
+
   ];
 
   return (
+
     <div className={styles.layout}>
+
       <main className={styles.vagaContainer}>
 
+        {/* ========================= */}
+        {/* TOPO */}
+        {/* ========================= */}
+
         <div className={styles.topo}>
+
           <div className={styles.tituloArea}>
 
             <button
@@ -86,18 +219,38 @@ export default function Vaga() {
             </button>
 
             <div>
+
               <h1>Painel CIEC</h1>
-              <p>Vagas Disponíveis</p>
+
+              <p>
+                Vagas Disponíveis
+              </p>
+
             </div>
 
           </div>
+
         </div>
+
+        {/* ========================= */}
+        {/* CONTEÚDO so pra sar commit */}
+        {/* ========================= */}
 
         <div className={styles.conteudoCentral}>
 
+          {/* ========================= */}
+          {/* CARDS */}
+          {/* ========================= */}
+
           <div className={styles.cards}>
 
-            <div onClick={() => setFiltroCurso("Informática")}>
+            <div
+              onClick={() =>
+                setFiltroCurso(
+                  "Informática"
+                )
+              }
+            >
               <Cards
                 imagem={logoinformtica}
                 titulo="Informática"
@@ -105,7 +258,13 @@ export default function Vaga() {
               />
             </div>
 
-            <div onClick={() => setFiltroCurso("Química")}>
+            <div
+              onClick={() =>
+                setFiltroCurso(
+                  "Química"
+                )
+              }
+            >
               <Cards
                 imagem={logoQuimica}
                 titulo="Química"
@@ -113,7 +272,13 @@ export default function Vaga() {
               />
             </div>
 
-            <div onClick={() => setFiltroCurso("Floresta")}>
+            <div
+              onClick={() =>
+                setFiltroCurso(
+                  "Floresta"
+                )
+              }
+            >
               <Cards
                 imagem={logofloresta}
                 titulo="Floresta"
@@ -123,16 +288,25 @@ export default function Vaga() {
 
           </div>
 
+          {/* ========================= */}
+          {/* TABELA */}
+          {/* ========================= */}
+
           <div className={styles.tabelaContainer}>
+
             <Tabela
               colunas={colunas}
               dados={vagasFiltradas}
             />
+
           </div>
 
         </div>
 
       </main>
+
     </div>
+
   );
+
 }
