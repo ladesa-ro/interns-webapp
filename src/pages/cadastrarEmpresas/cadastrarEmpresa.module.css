@@ -1,0 +1,16 @@
+.topContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.botaoCadastrar{
+    border-radius: 0.5rem;
+}
+
+.botaoCadastrar div{
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
