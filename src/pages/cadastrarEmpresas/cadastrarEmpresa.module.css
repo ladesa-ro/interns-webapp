@@ -1,3 +1,7 @@
+button{
+    border: none;
+}
+
 .topContainer{
     display: flex;
     align-items: center;
@@ -5,11 +9,14 @@
 }
 
 .botaoCadastrar{
+    background: #016630;
     border-radius: 0.5rem;
 }
 
 .botaoCadastrar div{
-    padding: 0.5rem;
+    color: #ffffff;
+
+    padding: 0.5rem 0.8rem 0.5rem 0.8rem;
     display: flex;
     align-items: center;
     justify-content: center;
