@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Titulo from "../icons_Components/Icon_Logo_Comp";
 import Painel from "../icons_Components/Icon_Painel_Comp";
-import CadastrarEmpresa from "../icons_Components/Icon_Cadastrar_Empresa_Comp";
+import CadastrarEmpresaIcon from "../icons_Components/Icon_Cadastrar_Empresa_Comp";
 import CadastrarVaga from "../icons_Components/Icon_Cadastrar_Vaga_Comp";
 import ListaEspera from "../icons_Components/Icon_Lista_Espera_Comp";
 import Sair from "../icons_Components/Icon_Sair_Comp";
-import { Menu } from "lucide-react"; {/*Teste*/}
+import { Menu } from "lucide-react"; 
 
 export default function Sidebar() {
   const location = useLocation();
@@ -33,10 +33,10 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          to="/empresa"
-          className={location.pathname === "/empresa" ? "active" : ""}
+          to="/cadastrarempresa"
+          className={location.pathname === "/cadastrarempresa" ? "active" : ""}
         >
-          <CadastrarEmpresa size={24}/>
+          <CadastrarEmpresaIcon size={24}/>
           <span>Cadastrar Empresa</span>
         </Link>
 
