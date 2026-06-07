@@ -1,4 +1,5 @@
 import React from 'react';
+import TabelaRegistros from '../../components/registerEmpresa_Components/tabelaRegistros';
 import Styles from '../cadastrarEmpresas/cadastrarEmpresa.module.css';
 import {Plus} from 'lucide-react';
 
@@ -14,6 +15,7 @@ export default function CadastrarEmpresa() {
         <div><Plus/> Nova Empresa</div>
       </button>
     </div>
+    <TabelaRegistros/>
     </div>
   );
 }
