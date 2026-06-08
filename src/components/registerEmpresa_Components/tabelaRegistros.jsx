@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-
+import Styles from '../../components/registerEmpresa_Components/tabelaRegistros.module.css';
 
 export default function TabelaRegistros() {
 
@@ -36,7 +36,7 @@ export default function TabelaRegistros() {
 
 
   return (
-    <div>
+    <div className={Styles.container}>
       <div>
           <div>
             <input
