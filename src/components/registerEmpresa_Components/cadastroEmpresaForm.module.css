@@ -1,0 +1,30 @@
+button{
+    border: none;
+}
+
+.botoes{
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.botaoCadastrar{
+    background: #016630;
+    border-radius: 0.5rem;
+    color: #ffffff;
+    padding: 0.5rem 0.8rem 0.5rem 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+
+.botaoCancelar {
+  padding: 0.5rem 0.8rem 0.5rem 0.8rem;
+  background: #E7040E;
+  color: #ffffff;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
