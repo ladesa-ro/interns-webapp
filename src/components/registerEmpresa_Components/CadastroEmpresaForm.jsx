@@ -7,27 +7,12 @@ export default function CadastroEmpresaForm() {
   const navigate = useNavigate();
 
   return (
+    <div>
+      <h2>Cadastrar Nova Empresa</h2>
     <div className={Styles.card}>
 
-      <h2>Cadastrar Nova Empresa</h2>
 
       <form className={Styles.form}>
-
-        <div className={Styles.campo}>
-          <label>Matrícula da Empresa</label>
-          <input
-            type="text"
-            placeholder="Matrícula da Empresa"
-          />
-        </div>
-
-        <div className={Styles.campo}>
-          <label>CNPJ</label>
-          <input
-            type="text"
-            placeholder="00.000.000/0000-00"
-          />
-        </div>
 
         <div className={Styles.campo}>
           <label>Razão Social</label>
@@ -46,10 +31,10 @@ export default function CadastroEmpresaForm() {
         </div>
 
         <div className={Styles.campo}>
-          <label>Responsável</label>
+          <label>CNPJ</label>
           <input
             type="text"
-            placeholder="Digite o nome do responsável"
+            placeholder="00.000.000/0000-00"
           />
         </div>
 
@@ -115,6 +100,7 @@ export default function CadastroEmpresaForm() {
         </button>
       </div>
 
+    </div>
     </div>
   );
 }
