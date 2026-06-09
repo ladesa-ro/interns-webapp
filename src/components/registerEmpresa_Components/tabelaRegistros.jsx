@@ -1,8 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import Styles from '../../components/registerEmpresa_Components/tabelaRegistros.module.css';
-
+import { useNavigate } from 'react-router-dom';
 export default function TabelaRegistros() {
 
+  const navigate = useNavigate();
   const [empresas, setEmpresas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState('');
@@ -67,7 +68,8 @@ export default function TabelaRegistros() {
                 <td>{empresa.email}</td>
                 <td>{empresa.endereco?.cidade?.nome}</td>
                 <td>
-                  <button title="Editar">✏️</button>
+                  <button title="Editar"
+                  onClick={() => navigate('/editar-empresa')}>✏️</button>
                   <button title="Excluir">🗑️</button>
                 </td>
               </tr>
