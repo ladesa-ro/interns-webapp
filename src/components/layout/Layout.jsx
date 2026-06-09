@@ -8,6 +8,8 @@ import ListaEspera from "../../pages/lista-espera/ListaEspera";
 import Perfil from "../../pages/perfil/Perfil";
 import AlunosEmEstagio from "../../pages/alunos-em-estagios/Alunos-em-estagio";
 import CadastrarEmpresa from "../../pages/cadastrarEmpresas/CadastrarEmpresa";
+import NovaEmpresa from "../../pages/novaEmpresa/NovaEmpresa";
+
 export default function Layout() {
   return (
     <div className="app">
@@ -19,7 +21,9 @@ export default function Layout() {
 
           <Route path="empresa" element={<Empresa />} />
 
-          <Route path="cadastrarempresa"  element={<CadastrarEmpresa />}/>
+          <Route path="cadastrarempresa" element={<CadastrarEmpresa />} />
+
+          <Route path="nova-empresa" element={<NovaEmpresa />} />
 
           <Route path="vaga" element={<Vaga />} />
 
