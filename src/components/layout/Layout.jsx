@@ -26,7 +26,7 @@ export default function Layout() {
 
           <Route path="nova-empresa" element={<NovaEmpresa />} />
 
-          <Route path="editar-empresa" element={<EditarEmpresa />}/>
+          <Route path="editar-empresa/:id" element={<EditarEmpresa />}/>
 
           <Route path="vaga" element={<Vaga />} />
 
