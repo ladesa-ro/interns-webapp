@@ -13,6 +13,9 @@ export default function TabelaRegistros() {
   const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState('');
 
+  const [modalAberto, setModalAberto] = useState(false);
+  const [empresaSelecionada, setEmpresaSelecionada] = useState(null);
+
   const empresasFiltradas = empresas.filter((empresa) =>
     (empresa.nomeFantasia || '')
       .toLowerCase()
@@ -40,18 +43,11 @@ export default function TabelaRegistros() {
       });
   }, []);
 
-  const excluirEmpresa = async (id) => {
-
-    const confirmar = window.confirm(
-      'Tem certeza que deseja excluir esta empresa?'
-    );
-
-    if (!confirmar) return;
-
+  const excluirEmpresa = async () => {
     try {
 
       const response = await fetch(
-        `https://dev.ladesa.com.br/api/v1/empresas/${id}`,
+        `https://dev.ladesa.com.br/api/v1/empresas/${empresaSelecionada.id}`,
         {
           method: 'DELETE',
         }
@@ -63,22 +59,15 @@ export default function TabelaRegistros() {
 
       setEmpresas((empresasAtuais) =>
         empresasAtuais.filter(
-          (empresa) => empresa.id !== id
+          (empresa) => empresa.id !== empresaSelecionada.id
         )
       );
 
-      alert('Empresa excluída com sucesso!');
+      setModalAberto(false);
+      setEmpresaSelecionada(null);
 
     } catch (error) {
-
-      console.error(
-        'Erro ao excluir empresa:',
-        error
-      );
-
-      alert(
-        'Não foi possível excluir a empresa.'
-      );
+      console.error('Erro ao excluir empresa:', error);
     }
   };
 
@@ -90,7 +79,7 @@ export default function TabelaRegistros() {
     <div className={Styles.container}>
 
       <div className={Styles.searchContainer}>
-        <Pesquisa size={45} />
+        <Pesquisa size={40} />
 
         <input
           type="text"
@@ -100,7 +89,7 @@ export default function TabelaRegistros() {
         />
       </div>
 
-      <table>
+      <table className={Styles.table}>
         <thead>
           <tr>
             <th>Nome Fantasia</th>
@@ -113,7 +102,6 @@ export default function TabelaRegistros() {
         </thead>
 
         <tbody>
-
           {empresasFiltradas.map((empresa) => (
             <tr key={empresa.id}>
               <td>{empresa.nomeFantasia}</td>
@@ -122,14 +110,12 @@ export default function TabelaRegistros() {
               <td>{empresa.email}</td>
               <td>{empresa.endereco?.cidade?.nome}</td>
 
-              <td>
+              <td className={Styles.actions}>
 
                 <button
                   title="Editar"
                   onClick={() =>
-                    navigate(
-                      `/editar-empresa/${empresa.id}`
-                    )
+                    navigate(`/editar-empresa/${empresa.id}`)
                   }
                 >
                   <Editar />
@@ -137,9 +123,10 @@ export default function TabelaRegistros() {
 
                 <button
                   title="Excluir"
-                  onClick={() =>
-                    excluirEmpresa(empresa.id)
-                  }
+                  onClick={() => {
+                    setEmpresaSelecionada(empresa);
+                    setModalAberto(true);
+                  }}
                 >
                   <Deletar />
                 </button>
@@ -155,9 +142,48 @@ export default function TabelaRegistros() {
               </td>
             </tr>
           )}
-
         </tbody>
       </table>
+
+      {modalAberto && (
+        <div className={Styles.overlay}>
+          <div className={Styles.modal}>
+
+            <h3>Excluir Empresa</h3>
+
+            <p>
+              Deseja realmente excluir a empresa
+              <strong>
+                {' '}
+                {empresaSelecionada?.nomeFantasia}
+              </strong>
+              ?
+            </p>
+
+            <div className={Styles.modalButtons}>
+
+              <button
+                className={Styles.cancelButton}
+                onClick={() => {
+                  setModalAberto(false);
+                  setEmpresaSelecionada(null);
+                }}
+              >
+                Cancelar
+              </button>
+
+              <button
+                className={Styles.deleteButton}
+                onClick={excluirEmpresa}
+              >
+                Excluir
+              </button>
+
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );
