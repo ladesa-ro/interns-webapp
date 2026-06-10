@@ -84,7 +84,7 @@ export default function TabelaRegistros() {
                 <div className={Styles.acoes}>
                   <button
                     title="Editar"
-                    onClick={() => navigate("/editar-empresa")}
+                    onClick={() => navigate(`/editar-empresa/${empresa.id}`)}
                   >
                     <Editar />
                   </button>
