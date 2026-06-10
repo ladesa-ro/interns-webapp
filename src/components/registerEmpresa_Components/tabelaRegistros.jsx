@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import Styles from '../../components/registerEmpresa_Components/tabelaRegistros.module.css';
+import Pesquisa from '../icons_Components/Icon_Pesquisa_Comp';
 import { useNavigate } from 'react-router-dom';
 export default function TabelaRegistros() {
 
@@ -39,7 +40,8 @@ export default function TabelaRegistros() {
   return (
     <div className={Styles.container}>
       <div>
-          <div>
+          <div className={Styles.searchContainer}>
+            <Pesquisa />
             <input
               type="text"
               placeholder="Buscar por nome ou CNPJ..."
