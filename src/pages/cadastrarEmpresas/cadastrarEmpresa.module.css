@@ -1,16 +1,17 @@
-
+h3{
+    color: #4A5565;
+    font-size: 1rem;
+}
 
 button{
     border: none;
 }
 
-.container{
-    
-}
 .topContainer{
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 1rem;
 }
 
 .botaoCadastrar{
