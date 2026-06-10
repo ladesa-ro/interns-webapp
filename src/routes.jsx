@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import ProtectedRoute from "./components/guards/ProtectedRoute";
-import Layout from "./components/layout/Layout";
+import LayoutAluno from "./components/layout/LayoutAluno";
 
 export default function AppRoutes() {
   return (
@@ -9,10 +9,10 @@ export default function AppRoutes() {
       <Route path="/login" element={<Login />} />
 
       <Route
-        path="/*"
+        path="/aluno/*"
         element={
           <ProtectedRoute>
-            <Layout />
+            <LayoutAluno />
           </ProtectedRoute>
         }
       />

@@ -1,0 +1,12 @@
+.layout-aluno {
+  display: flex;
+  min-height: 100vh;
+}
+
+.conteudo-aluno {
+  flex: 1;
+  margin-left: 280px;
+  padding: 20px;
+  background: #f4f4f4;
+  min-height: 100vh;
+}
