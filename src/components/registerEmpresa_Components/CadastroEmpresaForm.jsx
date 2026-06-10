@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Styles from './cadastroEmpresaForm.module.css';
+import CadastrarEmpresaIcon from '../icons_Components/Icon_Cadastrar_Empresa_Comp';
 
 export default function CadastroEmpresaForm() {
 
@@ -8,7 +9,13 @@ export default function CadastroEmpresaForm() {
 
   return (
     <div>
-      <h2>Cadastrar Nova Empresa</h2>
+      <div className={Styles.title}>
+        <CadastrarEmpresaIcon 
+        className={Styles.icone}
+        />      
+        <h2>Cadastrar Nova Empresa</h2>
+      </div>
+
     <div className={Styles.card}>
 
 
