@@ -30,71 +30,67 @@ export default function SolicitarEstagio() {
           </button>
         </div>
 
-        <form className="form-estagio">
-          {tipo === "externo" ? (
-            <>
-              <label>Nome da Empresa:</label>
-              <input
-                type="text"
-                placeholder="Digite o nome da empresa"
-              />
+        {tipo === "externo" ? (
+          <form className="form-estagio">
+            <label>Nome da Empresa:</label>
+            <input
+              type="text"
+              placeholder="Digite o nome da empresa"
+            />
 
-              <label>CNPJ:</label>
-              <input
-                type="text"
-                placeholder="Digite o CNPJ da empresa"
-              />
+            <label>CNPJ:</label>
+            <input
+              type="text"
+              placeholder="Digite o CNPJ da empresa"
+            />
 
-              <label>Email:</label>
-              <input
-                type="email"
-                placeholder="Digite o email da empresa"
-              />
+            <label>Email:</label>
+            <input
+              type="email"
+              placeholder="Digite o email da empresa"
+            />
 
-              <label>Telefone:</label>
-              <input
-                type="text"
-                placeholder="Digite o telefone"
-              />
+            <label>Telefone:</label>
+            <input
+              type="text"
+              placeholder="Digite o telefone"
+            />
 
-              <label>Supervisor:</label>
-              <input
-                type="text"
-                placeholder="Nome do supervisor"
-              />
-            </>
-          ) : (
-            <>
-              <label>Setor:</label>
-              <input
-                type="text"
-                placeholder="Informe o setor"
-              />
+            <label>Supervisor:</label>
+            <input
+              type="text"
+              placeholder="Nome do supervisor"
+            />
 
-              <label>Responsável:</label>
-              <input
-                type="text"
-                placeholder="Nome do responsável"
-              />
+            <button type="submit" className="btn-enviar">
+              Solicitar Estágio
+            </button>
+          </form>
+        ) : (
+          <form className="form-estagio">
+            <label>Professor Conselheiro:</label>
+            <input
+              type="text"
+              placeholder="Digite o nome do professor"
+            />
 
-              <label>Horário:</label>
-              <input
-                type="text"
-                placeholder="Ex: 13:00 às 17:00"
-              />
+            <label>Local do Estágio:</label>
+            <input
+              type="text"
+              placeholder="Ex: Laboratório de Informática"
+            />
 
-              <label>Observações:</label>
-              <input
-                type="text"
-                placeholder="Observações"
-              />
-            </>
-          )}
+            <label>Descrição:</label>
+            <textarea
+              placeholder="Descreva onde deseja estagiar e quais atividades pretende realizar"
+              rows="5"
+            />
 
-          <button type="submit" className="btn-enviar">
-            Solicitar Estágio
-          </button>
-        </form>
+            <button type="submit" className="btn-enviar">
+              Solicitar Estágio
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
