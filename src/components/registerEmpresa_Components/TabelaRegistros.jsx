@@ -5,6 +5,7 @@ import Editar from '../icons_Components/Icon_Editar_Comp';
 import Deletar from '../icons_Components/Icon_Deletar_Comp';
 import { useNavigate } from 'react-router-dom';
 
+
 export default function TabelaRegistros() {
 
   const navigate = useNavigate();
@@ -13,63 +14,34 @@ export default function TabelaRegistros() {
   const [empresas, setEmpresas] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
   const [busca, setBusca] = useState('');
 
 
-  // PAGINAÇÃO
   const [pagina, setPagina] = useState(1);
-  const [totalPaginas, setTotalPaginas] = useState(1);
+
 
   const limite = 20;
 
-  const [modalAberto, setModalAberto] = useState(false);
 
-  const [empresaSelecionada, setEmpresaSelecionada] = useState(null);
 
-  const empresasFiltradas = empresas.filter((empresa) =>
-    (empresa.nomeFantasia || '')
-      .toLowerCase()
-      .includes(busca.toLowerCase()) ||
-
-    (empresa.cnpj || '')
-      .includes(busca)
-
-  );
+  const [modalAberto,setModalAberto] = useState(false);
+  const [empresaSelecionada,setEmpresaSelecionada] = useState(null);
 
 
 
-  useEffect(() => {
+  // BUSCA TODAS AS EMPRESAS UMA VEZ
 
-
-    setLoading(true);
+  useEffect(()=>{
 
 
     fetch(
-      `https://dev.ladesa.com.br/api/v1/empresas?page=${pagina}&limit=${limite}`
+      "https://dev.ladesa.com.br/api/v1/empresas?limit=200"
     )
 
-    .then((response)=>{
+    .then(res=>res.json())
 
-
-      if(!response.ok){
-
-        throw new Error(
-          `Erro HTTP: ${response.status}`
-        );
-
-      }
-
-
-      return response.json();
-
-
-    })
-
-
-    .then((dados)=>{
-
-
-      console.log(dados);
+    .then(dados=>{
 
 
       setEmpresas(
@@ -77,115 +49,79 @@ export default function TabelaRegistros() {
       );
 
 
-      if(dados.meta){
-
-
-        setTotalPaginas(
-
-          Math.ceil(
-            dados.meta.totalPages
-          )
-
-        );
-
-      }
-
-
       setLoading(false);
-
 
 
     })
 
 
-    .catch((error)=>{
+    .catch(error=>{
 
-
-      console.error(
-        "Erro ao buscar empresas:",
-        error
-      );
-
-
-      setEmpresas([]);
+      console.error(error);
 
       setLoading(false);
 
-
-    });
-
+    })
 
 
-  },[pagina]);
+  },[]);
 
 
 
 
 
-  const excluirEmpresa = async () => {
+  // FILTRO LOCAL
+
+  const empresasFiltradas = empresas.filter((empresa)=>{
 
 
-    try {
+    const nome =
+    empresa.nomeFantasia?.toLowerCase() || "";
 
 
-      const response = await fetch(
-
-        `https://dev.ladesa.com.br/api/v1/empresas/${empresaSelecionada.id}`,
-
-        {
-
-          method:'DELETE'
-
-        }
-
-      );
+    const cnpj =
+    empresa.cnpj || "";
 
 
 
-      if(!response.ok){
+    return (
 
-        throw new Error(
-          `Erro HTTP: ${response.status}`
-        );
+      nome.includes(
+        busca.toLowerCase()
+      )
 
-      }
+      ||
+
+      cnpj.includes(busca)
+
+    );
 
 
-
-      setEmpresas(
-
-        empresas.filter(
-
-          empresa =>
-          empresa.id !== empresaSelecionada.id
-
-        )
-
-      );
+  });
 
 
 
-      setModalAberto(false);
-
-      setEmpresaSelecionada(null);
 
 
-
-    }
-
-    catch(error){
+  // PAGINAÇÃO LOCAL
 
 
-      console.error(
-        "Erro ao excluir:",
-        error
-      );
+  const totalPaginas = Math.ceil(
+    empresasFiltradas.length / limite
+  );
 
 
-    }
+
+  const inicio = 
+  (pagina - 1) * limite;
 
 
-  };
+
+  const empresasPagina =
+  empresasFiltradas.slice(
+    inicio,
+    inicio + limite
+  );
 
 
 
@@ -201,311 +137,196 @@ export default function TabelaRegistros() {
 
 
 
-  return (
+return (
 
-    <div className={Styles.container}>
+<div className={Styles.container}>
 
 
-      <div className={Styles.searchContainer}>
+<div className={Styles.searchContainer}>
 
 
-        <Pesquisa size={40}/>
+<Pesquisa size={40}/>
 
 
-        <input
+<input
 
-          type="text"
+type="text"
 
-          placeholder="Buscar por nome ou CNPJ..."
+placeholder="Buscar por nome ou CNPJ..."
 
-          value={busca}
+value={busca}
 
-          onChange={(e)=>
-            setBusca(e.target.value)
-          }
 
-        />
+onChange={(e)=>{
 
+setBusca(e.target.value);
 
-      </div>
+setPagina(1);
 
+}}
 
 
+/>
 
 
-      <table className={Styles.table}>
+</div>
 
 
-        <thead>
 
 
-          <tr>
 
-            <th>Nome Fantasia</th>
+<table className={Styles.table}>
 
-            <th>CNPJ</th>
 
-            <th>Telefone</th>
+<thead>
 
-            <th>Email</th>
+<tr>
 
-            <th>Cidade</th>
+<th>Nome Fantasia</th>
+<th>CNPJ</th>
+<th>Telefone</th>
+<th>Email</th>
+<th>Cidade</th>
+<th>Ações</th>
 
-            <th>Ações</th>
 
+</tr>
 
-          </tr>
+</thead>
 
 
-        </thead>
 
 
+<tbody>
 
 
-        <tbody>
+{
 
+empresasPagina.map((empresa)=>(
 
-        {
 
-        empresasFiltradas.map((empresa)=>(
+<tr key={empresa.id}>
 
 
-          <tr key={empresa.id}>
+<td>{empresa.nomeFantasia}</td>
 
+<td>{empresa.cnpj}</td>
 
-            <td>
-              {empresa.nomeFantasia}
-            </td>
+<td>{empresa.telefone}</td>
 
+<td>{empresa.email}</td>
 
-            <td>
-              {empresa.cnpj}
-            </td>
+<td>
+{empresa.endereco?.cidade?.nome}
+</td>
 
 
-            <td>
-              {empresa.telefone}
-            </td>
+<td className={Styles.actions}>
 
 
-            <td>
-              {empresa.email}
-            </td>
+<button
+onClick={()=>navigate(
+`/editar-empresa/${empresa.id}`
+)}
+>
 
+<Editar/>
 
-            <td>
-              {empresa.endereco?.cidade?.nome}
-            </td>
+</button>
 
 
 
-            <td className={Styles.actions}>
+<button
 
+onClick={()=>{
 
-              <button
+setEmpresaSelecionada(empresa);
 
-                title="Editar"
+setModalAberto(true);
 
-                onClick={()=>
+}}
 
-                  navigate(
-                    `/editar-empresa/${empresa.id}`
-                  )
+>
 
-                }
+<Deletar/>
 
-              >
+</button>
 
-                <Editar/>
 
-              </button>
+</td>
 
 
+</tr>
 
 
-              <button
+))
 
-                title="Excluir"
 
-                onClick={()=>{
+}
 
-                  setEmpresaSelecionada(empresa);
 
-                  setModalAberto(true);
 
-                }}
+</tbody>
 
-              >
 
-                <Deletar/>
+</table>
 
-              </button>
 
 
-            </td>
 
 
-          </tr>
+<div className={Styles.pagination}>
 
 
-        ))
+<button
 
-        }
+disabled={pagina===1}
 
+onClick={()=>setPagina(pagina-1)}
 
+>
 
+Anterior
 
-        </tbody>
+</button>
 
 
-      </table>
 
 
+<span>
 
+Página {pagina} de {totalPaginas}
 
+</span>
 
-      {/* PAGINAÇÃO */}
 
-      <div className={Styles.pagination}>
 
 
-        <button
 
-          disabled={pagina === 1}
+<button
 
-          onClick={()=>setPagina(pagina - 1)}
+disabled={pagina===totalPaginas}
 
-        >
+onClick={()=>setPagina(pagina+1)}
 
-          Anterior
+>
 
-        </button>
+Próxima
 
+</button>
 
 
 
-        <span>
+</div>
 
-          Página {pagina} de {totalPaginas}
 
-        </span>
 
 
 
+</div>
 
-        <button
 
-          disabled={pagina === totalPaginas}
-
-          onClick={()=>setPagina(pagina + 1)}
-
-        >
-
-          Próxima
-
-        </button>
-
-
-      </div>
-
-
-
-
-
-
-
-      {/* MODAL DELETE */}
-
-
-
-      {modalAberto && (
-
-
-        <div className={Styles.overlay}>
-
-
-          <div className={Styles.modal}>
-
-
-            <h3>
-              Excluir Empresa
-            </h3>
-
-
-
-            <p>
-
-              Deseja realmente excluir a empresa
-
-              <strong>
-
-                {' '}
-
-                {empresaSelecionada?.nomeFantasia}
-
-              </strong>
-
-              ?
-
-            </p>
-
-
-
-
-            <div className={Styles.modalButtons}>
-
-
-              <button
-
-                className={Styles.cancelButton}
-
-                onClick={()=>{
-
-                  setModalAberto(false);
-
-                  setEmpresaSelecionada(null);
-
-                }}
-
-              >
-
-                Cancelar
-
-              </button>
-
-
-
-
-              <button
-
-                className={Styles.deleteButton}
-
-                onClick={excluirEmpresa}
-
-              >
-
-                Excluir
-
-              </button>
-
-
-
-            </div>
-
-
-          </div>
-
-
-        </div>
-
-
-      )}
-
-
-
-    </div>
-
-  );
+)
 
 
 }
