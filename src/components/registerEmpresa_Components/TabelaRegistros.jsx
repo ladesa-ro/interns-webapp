@@ -9,182 +9,503 @@ export default function TabelaRegistros() {
 
   const navigate = useNavigate();
 
+
   const [empresas, setEmpresas] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [busca, setBusca] = useState('');
 
+
+  // PAGINAÇÃO
+  const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
+
+  const limite = 20;
+
   const [modalAberto, setModalAberto] = useState(false);
+
   const [empresaSelecionada, setEmpresaSelecionada] = useState(null);
 
   const empresasFiltradas = empresas.filter((empresa) =>
     (empresa.nomeFantasia || '')
       .toLowerCase()
       .includes(busca.toLowerCase()) ||
-    (empresa.cnpj || '').includes(busca)
+
+    (empresa.cnpj || '')
+      .includes(busca)
+
   );
 
+
+
   useEffect(() => {
-    fetch('https://dev.ladesa.com.br/api/v1/empresas')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Erro HTTP: ${response.status}`);
-        }
 
-        return response.json();
-      })
-      .then((dados) => {
-        setEmpresas(dados.data || []);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Erro ao buscar empresas:', error);
-        setEmpresas([]);
-        setLoading(false);
-      });
-  }, []);
 
-  const excluirEmpresa = async () => {
-    try {
+    setLoading(true);
 
-      const response = await fetch(
-        `https://dev.ladesa.com.br/api/v1/empresas/${empresaSelecionada.id}`,
-        {
-          method: 'DELETE',
-        }
-      );
 
-      if (!response.ok) {
-        throw new Error(`Erro HTTP: ${response.status}`);
+    fetch(
+      `https://dev.ladesa.com.br/api/v1/empresas?page=${pagina}&limit=${limite}`
+    )
+
+    .then((response)=>{
+
+
+      if(!response.ok){
+
+        throw new Error(
+          `Erro HTTP: ${response.status}`
+        );
+
       }
 
-      setEmpresas((empresasAtuais) =>
-        empresasAtuais.filter(
-          (empresa) => empresa.id !== empresaSelecionada.id
-        )
+
+      return response.json();
+
+
+    })
+
+
+    .then((dados)=>{
+
+
+      console.log(dados);
+
+
+      setEmpresas(
+        dados.data || []
       );
 
+
+      if(dados.meta){
+
+
+        setTotalPaginas(
+
+          Math.ceil(
+            dados.meta.totalPages
+          )
+
+        );
+
+      }
+
+
+      setLoading(false);
+
+
+
+    })
+
+
+    .catch((error)=>{
+
+
+      console.error(
+        "Erro ao buscar empresas:",
+        error
+      );
+
+
+      setEmpresas([]);
+
+      setLoading(false);
+
+
+    });
+
+
+
+  },[pagina]);
+
+
+
+
+
+  const excluirEmpresa = async () => {
+
+
+    try {
+
+
+      const response = await fetch(
+
+        `https://dev.ladesa.com.br/api/v1/empresas/${empresaSelecionada.id}`,
+
+        {
+
+          method:'DELETE'
+
+        }
+
+      );
+
+
+
+      if(!response.ok){
+
+        throw new Error(
+          `Erro HTTP: ${response.status}`
+        );
+
+      }
+
+
+
+      setEmpresas(
+
+        empresas.filter(
+
+          empresa =>
+          empresa.id !== empresaSelecionada.id
+
+        )
+
+      );
+
+
+
       setModalAberto(false);
+
       setEmpresaSelecionada(null);
 
-    } catch (error) {
-      console.error('Erro ao excluir empresa:', error);
+
+
     }
+
+    catch(error){
+
+
+      console.error(
+        "Erro ao excluir:",
+        error
+      );
+
+
+    }
+
+
   };
 
-  if (loading) {
+
+
+
+
+  if(loading){
+
     return <p>Carregando empresas...</p>;
+
   }
 
+
+
+
+
   return (
+
     <div className={Styles.container}>
 
+
       <div className={Styles.searchContainer}>
-        <Pesquisa size={40} />
+
+
+        <Pesquisa size={40}/>
+
 
         <input
+
           type="text"
+
           placeholder="Buscar por nome ou CNPJ..."
+
           value={busca}
-          onChange={(e) => setBusca(e.target.value)}
+
+          onChange={(e)=>
+            setBusca(e.target.value)
+          }
+
         />
+
+
       </div>
 
+
+
+
+
       <table className={Styles.table}>
+
+
         <thead>
+
+
           <tr>
+
             <th>Nome Fantasia</th>
+
             <th>CNPJ</th>
+
             <th>Telefone</th>
+
             <th>Email</th>
+
             <th>Cidade</th>
+
             <th>Ações</th>
+
+
           </tr>
+
+
         </thead>
 
+
+
+
         <tbody>
-          {empresasFiltradas.map((empresa) => (
-            <tr key={empresa.id}>
-              <td>{empresa.nomeFantasia}</td>
-              <td>{empresa.cnpj}</td>
-              <td>{empresa.telefone}</td>
-              <td>{empresa.email}</td>
-              <td>{empresa.endereco?.cidade?.nome}</td>
 
-              <td className={Styles.actions}>
 
-                <button
-                  title="Editar"
-                  onClick={() =>
-                    navigate(`/editar-empresa/${empresa.id}`)
-                  }
-                >
-                  <Editar />
-                </button>
+        {
 
-                <button
-                  title="Excluir"
-                  onClick={() => {
-                    setEmpresaSelecionada(empresa);
-                    setModalAberto(true);
-                  }}
-                >
-                  <Deletar />
-                </button>
+        empresasFiltradas.map((empresa)=>(
 
-              </td>
-            </tr>
-          ))}
 
-          {empresasFiltradas.length === 0 && (
-            <tr>
-              <td colSpan="6">
-                Nenhuma empresa encontrada.
-              </td>
-            </tr>
-          )}
+          <tr key={empresa.id}>
+
+
+            <td>
+              {empresa.nomeFantasia}
+            </td>
+
+
+            <td>
+              {empresa.cnpj}
+            </td>
+
+
+            <td>
+              {empresa.telefone}
+            </td>
+
+
+            <td>
+              {empresa.email}
+            </td>
+
+
+            <td>
+              {empresa.endereco?.cidade?.nome}
+            </td>
+
+
+
+            <td className={Styles.actions}>
+
+
+              <button
+
+                title="Editar"
+
+                onClick={()=>
+
+                  navigate(
+                    `/editar-empresa/${empresa.id}`
+                  )
+
+                }
+
+              >
+
+                <Editar/>
+
+              </button>
+
+
+
+
+              <button
+
+                title="Excluir"
+
+                onClick={()=>{
+
+                  setEmpresaSelecionada(empresa);
+
+                  setModalAberto(true);
+
+                }}
+
+              >
+
+                <Deletar/>
+
+              </button>
+
+
+            </td>
+
+
+          </tr>
+
+
+        ))
+
+        }
+
+
+
+
         </tbody>
+
+
       </table>
 
+
+
+
+
+      {/* PAGINAÇÃO */}
+
+      <div className={Styles.pagination}>
+
+
+        <button
+
+          disabled={pagina === 1}
+
+          onClick={()=>setPagina(pagina - 1)}
+
+        >
+
+          Anterior
+
+        </button>
+
+
+
+
+        <span>
+
+          Página {pagina} de {totalPaginas}
+
+        </span>
+
+
+
+
+        <button
+
+          disabled={pagina === totalPaginas}
+
+          onClick={()=>setPagina(pagina + 1)}
+
+        >
+
+          Próxima
+
+        </button>
+
+
+      </div>
+
+
+
+
+
+
+
+      {/* MODAL DELETE */}
+
+
+
       {modalAberto && (
+
+
         <div className={Styles.overlay}>
+
+
           <div className={Styles.modal}>
 
-            <h3>Excluir Empresa</h3>
+
+            <h3>
+              Excluir Empresa
+            </h3>
+
+
 
             <p>
+
               Deseja realmente excluir a empresa
+
               <strong>
+
                 {' '}
+
                 {empresaSelecionada?.nomeFantasia}
+
               </strong>
+
               ?
+
             </p>
+
+
+
 
             <div className={Styles.modalButtons}>
 
-              <button
-                className={Styles.cancelButton}
-                onClick={() => {
-                  setModalAberto(false);
-                  setEmpresaSelecionada(null);
-                }}
-              >
-                Cancelar
-              </button>
 
               <button
-                className={Styles.deleteButton}
-                onClick={excluirEmpresa}
+
+                className={Styles.cancelButton}
+
+                onClick={()=>{
+
+                  setModalAberto(false);
+
+                  setEmpresaSelecionada(null);
+
+                }}
+
               >
-                Excluir
+
+                Cancelar
+
               </button>
+
+
+
+
+              <button
+
+                className={Styles.deleteButton}
+
+                onClick={excluirEmpresa}
+
+              >
+
+                Excluir
+
+              </button>
+
+
 
             </div>
 
+
           </div>
+
+
         </div>
+
+
       )}
 
+
+
     </div>
+
   );
+
+
 }

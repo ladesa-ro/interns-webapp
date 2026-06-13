@@ -141,3 +141,54 @@
 .deleteButton:hover{
     background: #b91c1c;
 }
+
+.pagination{
+
+    margin-top: 25px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+
+.pagination button{
+
+    border:none;
+
+    background:#016630;
+
+    color:white;
+
+    padding:10px 20px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+
+
+.pagination button:disabled{
+
+    background:#bdbdbd;
+
+    cursor:not-allowed;
+
+}
+
+
+
+.pagination span{
+
+    font-weight:500;
+
+    color:#374151;
+
+}
