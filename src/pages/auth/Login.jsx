@@ -37,7 +37,7 @@ export default function Login() {
 
       if (data.access_token) {
         localStorage.setItem("token", data.access_token);
-        navigate("/");
+        navigate("/aluno");
       } else {
         alert("Login inválido");
       }
