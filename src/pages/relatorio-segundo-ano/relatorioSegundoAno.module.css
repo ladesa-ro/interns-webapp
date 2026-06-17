@@ -1,0 +1,60 @@
+.layout {
+  display: flex;
+}
+
+.container {
+  width: 100%;
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.tituloArea h1 {
+  color: #016630 !important;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.tituloArea p {
+  color: #016630;
+  margin: 0;
+  font-size: 14px;
+}
+
+.tituloArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.voltar {
+  color: #016630;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.tituloArea h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.tituloArea p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.cards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}

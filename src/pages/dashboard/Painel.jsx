@@ -112,6 +112,7 @@ export default function Painel() {
               valor="8"
               cor="red"
               Icon={AlertCircle}
+              onClick={() => navigate("/alunos-sem-estagio")}
             />
 
             <Cards
@@ -119,6 +120,7 @@ export default function Painel() {
               valor="8"
               cor="orange"
               Icon={FileText}
+              onClick={() => navigate("/relatorio-segundo-ano")}
             />
 
           </div>
