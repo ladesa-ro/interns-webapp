@@ -94,34 +94,60 @@ export default function Vaga() {
       const vagasFormatadas =
         dataEstagios.data.map((item) => {
 
+          console.log("================================");
+          console.log("ESTÁGIO:", item);
+          console.log("EMPRESA ID:", item.empresa?.id);
+          console.log("CURSO:", item.CursoReferencia);
           console.log(
-            "ITEM ESTÁGIO:",
-            item
+            "OBJETO EMPRESA DO ESTÁGIO:",
+            item.empresa
+          );
+          const empresaExiste =
+            dataEmpresas.data.some(
+              (empresa) =>
+                empresa.id === item.empresa?.id
+            );
+          console.log(
+            "TOTAL EMPRESAS:",
+            dataEmpresas.data.length
           );
 
-          // =========================
-          // EMPRESA
-          // =========================
+          console.log(
+            "ULTIMA EMPRESA:",
+            dataEmpresas.data[dataEmpresas.data.length - 1]
+          );
+          console.log(
+            "EMPRESA EXISTE?",
+            empresaExiste
+          );
+          console.log(
+            "PRIMEIRA EMPRESA:",
+            dataEmpresas.data[0]
+          );
 
           const empresaEncontrada =
             dataEmpresas.data.find(
               (empresa) =>
-                empresa.id ===
-                item.empresa?.id
+                empresa.id === item.empresa?.id
             );
 
-          // =========================
-          // CURSO
-          // =========================
+          console.log(
+            "EMPRESA ENCONTRADA:",
+            empresaEncontrada
+          );
 
           const cursoEncontrado =
             dataCursos.data.find(
               (curso) =>
-                curso.id ===
-                item.CursoReferencia?.id
+                curso.id === item.CursoReferencia?.id
             );
 
-          return {
+          console.log(
+            "CURSO ENCONTRADO:",
+            cursoEncontrado
+          );
+
+          const vagaFormatada = {
 
             id: item.id,
 
@@ -142,12 +168,14 @@ export default function Vaga() {
 
           };
 
-        });
+          console.log(
+            "VAGA FORMATADA:",
+            vagaFormatada
+          );
 
-      console.log(
-        "VAGAS FORMATADAS:",
-        vagasFormatadas
-      );
+          return vagaFormatada;
+
+        });
 
       setVagas(vagasFormatadas);
 
