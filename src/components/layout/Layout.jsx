@@ -7,6 +7,8 @@ import Vaga from "../../pages/vagas/Vaga";
 import ListaEspera from "../../pages/lista-espera/ListaEspera";
 import Perfil from "../../pages/perfil/Perfil";
 import AlunosEmEstagio from "../../pages/alunos-em-estagios/Alunos-em-estagio";
+import AlunosSemEstagio from "../../pages/alunos-do-3ano/AlunosSemEStagio";
+
 
 export default function Layout() {
   return (
@@ -28,6 +30,11 @@ export default function Layout() {
           <Route
             path="alunos-em-estagio"
             element={<AlunosEmEstagio />}
+          />
+
+          <Route
+            path="alunos-sem-estagio"
+            element={<AlunosSemEstagio />}
           />
 
         </Routes>
