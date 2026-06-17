@@ -8,6 +8,7 @@ import ListaEspera from "../../pages/lista-espera/ListaEspera";
 import Perfil from "../../pages/perfil/Perfil";
 import AlunosEmEstagio from "../../pages/alunos-em-estagios/Alunos-em-estagio";
 import AlunosSemEstagio from "../../pages/alunos-do-3ano/AlunosSemEStagio";
+import RelatorioSegundoAno from "../../pages/relatorio-segundo-ano/RelatorioDoSegundoAno";
 
 
 export default function Layout() {
@@ -37,6 +38,10 @@ export default function Layout() {
             element={<AlunosSemEstagio />}
           />
 
+          <Route
+            path="relatorio-segundo-ano"
+            element={<RelatorioSegundoAno />}
+          />
         </Routes>
       </div>
     </div>
