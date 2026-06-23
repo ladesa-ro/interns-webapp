@@ -1,0 +1,36 @@
+.layout {
+  display: flex;
+}
+
+.alunosContainer {
+  width: 100%;
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.tituloArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.voltar {
+  color: #016630;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.cards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}

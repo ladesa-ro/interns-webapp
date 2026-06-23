@@ -39,6 +39,15 @@ export default function Layout() {
             element={<AlunosEmEstagio />}
           />
 
+          <Route
+            path="alunos-sem-estagio"
+            element={<AlunosSemEstagio />}
+          />
+
+          <Route
+            path="relatorio-segundo-ano"
+            element={<RelatorioSegundoAno />}
+          />
         </Routes>
       </div>
     </div>
