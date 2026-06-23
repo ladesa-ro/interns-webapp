@@ -53,3 +53,14 @@ button {
   margin-top: 20px;
   margin-bottom: 20px;
 }
+
+.semDados {
+  background: white;
+  padding: 30px;
+  margin-top: 20px;
+  border-radius: 10px;
+  text-align: center;
+  color: #666;
+  font-size: 18px;
+  font-weight: 500;
+}
