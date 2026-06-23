@@ -9,6 +9,7 @@ export default function CadastroEmpresaForm({ modo }) {
   const { id } = useParams();
 
   // EMPRESA
+
   const [razaoSocial, setRazaoSocial] = useState("");
   const [nomeFantasia, setNomeFantasia] = useState("");
   const [cnpj, setCnpj] = useState("");
@@ -16,13 +17,18 @@ export default function CadastroEmpresaForm({ modo }) {
   const [telefone, setTelefone] = useState("");
 
   // ENDEREÇO
+
   const [cep, setCep] = useState("");
   const [logradouro, setLogradouro] = useState("");
   const [numero, setNumero] = useState("");
   const [bairro, setBairro] = useState("");
   const [complemento, setComplemento] = useState("");
   const [pontoReferencia, setPontoReferencia] = useState("");
-  const [cidade, setCidade] = useState(1);
+
+  const [cidade, setCidade] = useState("");
+  const [estado, setEstado] = useState("");
+
+  // EDITAR EMPRESA
 
   useEffect(() => {
     if (modo !== "editar") return;
@@ -30,14 +36,54 @@ export default function CadastroEmpresaForm({ modo }) {
     fetch(`https://dev.ladesa.com.br/api/v1/empresas/${id}`)
       .then((response) => response.json())
 
-      .then((empresa) => {
-        setRazaoSocial(empresa.razaoSocial || "");
-        setNomeFantasia(empresa.nomeFantasia || "");
-        setCnpj(empresa.cnpj || "");
-        setEmail(empresa.email || "");
-        setTelefone(empresa.telefone || "");
+      .then((dados) => {
+        setRazaoSocial(dados.razaoSocial || "");
+
+        setNomeFantasia(dados.nomeFantasia || "");
+
+        setCnpj(dados.cnpj || "");
+
+        setEmail(dados.email || "");
+
+        setTelefone(dados.telefone || "");
       });
   }, [id, modo]);
+
+  // BUSCAR CEP
+
+  const buscarCep = async () => {
+    const cepLimpo = cep.replace(/\D/g, "");
+
+    if (cepLimpo.length !== 8) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://viacep.com.br/ws/${cepLimpo}/json/`,
+      );
+
+      const dados = await response.json();
+
+      if (dados.erro) {
+        alert("CEP não encontrado");
+
+        return;
+      }
+
+      setLogradouro(dados.logradouro);
+
+      setBairro(dados.bairro);
+
+      setCidade(dados.localidade);
+
+      setEstado(dados.uf);
+    } catch (error) {
+      console.error("Erro ViaCEP:", error);
+    }
+  };
+
+  // SALVAR
 
   const salvarEmpresa = async (e) => {
     e.preventDefault();
@@ -56,13 +102,16 @@ export default function CadastroEmpresaForm({ modo }) {
       pontoReferencia,
 
       cidade: {
-        id: cidade,
+        id: 1,
       },
     };
+
+    console.log(endereco);
 
     try {
       const response = await fetch(
         "https://dev.ladesa.com.br/api/v1/enderecos",
+
         {
           method: "POST",
 
@@ -78,7 +127,7 @@ export default function CadastroEmpresaForm({ modo }) {
 
       console.log("Endereço criado:", dados);
     } catch (error) {
-      console.error("Erro ao cadastrar endereço", error);
+      console.error(error);
     }
   };
 
@@ -94,8 +143,6 @@ export default function CadastroEmpresaForm({ modo }) {
 
       <div className={Styles.card}>
         <form className={Styles.form} onSubmit={salvarEmpresa}>
-          {/* EMPRESA */}
-
           <div className={Styles.campo}>
             <label>Razão Social</label>
 
@@ -148,6 +195,7 @@ export default function CadastroEmpresaForm({ modo }) {
               placeholder="76820-123"
               value={cep}
               onChange={(e) => setCep(e.target.value)}
+              onBlur={buscarCep}
             />
           </div>
 
@@ -155,7 +203,6 @@ export default function CadastroEmpresaForm({ modo }) {
             <label>Logradouro</label>
 
             <input
-              placeholder="Rua das Flores"
               value={logradouro}
               onChange={(e) => setLogradouro(e.target.value)}
             />
@@ -178,10 +225,21 @@ export default function CadastroEmpresaForm({ modo }) {
           </div>
 
           <div className={Styles.campo}>
+            <label>Cidade</label>
+
+            <input value={cidade} disabled />
+          </div>
+
+          <div className={Styles.campo}>
+            <label>Estado</label>
+
+            <input value={estado} disabled />
+          </div>
+
+          <div className={Styles.campo}>
             <label>Complemento</label>
 
             <input
-              placeholder="Apto 45"
               value={complemento}
               onChange={(e) => setComplemento(e.target.value)}
             />
@@ -191,19 +249,8 @@ export default function CadastroEmpresaForm({ modo }) {
             <label>Ponto de Referência</label>
 
             <input
-              placeholder="Perto do mercado"
               value={pontoReferencia}
               onChange={(e) => setPontoReferencia(e.target.value)}
-            />
-          </div>
-
-          <div className={Styles.campo}>
-            <label>Cidade ID</label>
-
-            <input
-              type="number"
-              value={cidade}
-              onChange={(e) => setCidade(e.target.value)}
             />
           </div>
         </form>
@@ -217,7 +264,7 @@ export default function CadastroEmpresaForm({ modo }) {
           </button>
 
           <button className={Styles.botaoCadastrar} onClick={salvarEmpresa}>
-            Salvar Empresa
+            {modo === "editar" ? "Salvar Alterações" : "Salvar Empresa"}
           </button>
         </div>
       </div>
