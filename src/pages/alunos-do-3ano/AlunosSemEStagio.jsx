@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./alunosSemEstagio.module.css";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -9,38 +9,78 @@ import Tabela from "../../components/global_Components/Tabela";
 export default function AlunosSemEstagio() {
   const navigate = useNavigate();
 
-  const [alunos] = useState([
-    {
-      matricula: "2024102020039",
-      nome: "Carla Mendes",
-      turma: "3º B Química",
-    },
-    {
-      matricula: "2024102020040",
-      nome: "Eduardo Alves Souza",
-      turma: "3º A Floresta",
-    },
-    {
-      matricula: "2024102020041",
-      nome: "Gabriela Ferreira Costa",
-      turma: "3º A Floresta",
-    },
-    {
-      matricula: "2024102020042",
-      nome: "João Pedro Gomes",
-      turma: "3º A Informática",
-    },
-    {
-      matricula: "2024102020043",
-      nome: "Miguel Cabral",
-      turma: "3º A Informática",
-    },
-    {
-      matricula: "2024102020044",
-      nome: "Luís Maciel",
-      turma: "3º A Química",
-    },
-  ]);
+  const [alunos, setAlunos] = useState([]);
+  const [emAndamento, setEmAndamento] = useState(0);
+  const [concluidos, setConcluidos] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function carregarDados() {
+      try {
+        const [resEstagiarios, resEstagios] = await Promise.all([
+          fetch(
+            "https://dev.ladesa.com.br/api/v1/estagiarios?page=1&limit=1000"
+          ),
+          fetch(
+            "https://dev.ladesa.com.br/api/v1/estagios?page=1&limit=1000"
+          ),
+        ]);
+
+        const estagiariosJson = await resEstagiarios.json();
+        const estagiosJson = await resEstagios.json();
+
+        const estagios = estagiosJson.data || [];
+
+        console.log(
+          "STATUS ENCONTRADOS:",
+          [...new Set(estagios.map((e) => e.status))]
+        );
+
+        const idsComEstagio = new Set(
+          estagios.map((e) => e.estagiario?.id)
+        );
+
+        const qtdEmAndamento = estagios.filter(
+          (e) => e.status === "EM_ANDAMENTO"
+        ).length;
+
+        const qtdConcluidos = estagios.filter(
+          (e) => e.status === "ENCERRADO"
+        ).length;
+
+        setEmAndamento(qtdEmAndamento);
+        setConcluidos(qtdConcluidos);
+
+        const alunosSemEstagio = (estagiariosJson.data || [])
+          .filter((aluno) => {
+            const periodo = Number(aluno.periodo);
+
+            return (
+              periodo === 3 &&
+              !idsComEstagio.has(aluno.id)
+            );
+          })
+          .map((aluno) => ({
+            matricula:
+              aluno.perfil?.usuario?.matricula || "-",
+            nome:
+              aluno.perfil?.usuario?.nome || "-",
+            turma:
+              aluno.curso?.nomeAbreviado ||
+              aluno.curso?.nome ||
+              "-",
+          }));
+
+        setAlunos(alunosSemEstagio);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    carregarDados();
+  }, []);
 
   const colunas = [
     {
@@ -80,32 +120,41 @@ export default function AlunosSemEstagio() {
           <Cards
             titulo="Total de alunos"
             valor={alunos.length}
-            cor="blue"
-          />
-
-          <Cards
-            titulo="Estágios concluídos"
-            valor="24"
-            cor="green"
+            cor="red"
           />
 
           <Cards
             titulo="Em andamento"
-            valor="24"
+            valor={emAndamento}
             cor="orange"
           />
 
           <Cards
-            titulo="Não realizado"
-            valor={alunos.length}
-            cor="red"
+            titulo="Estágios concluídos"
+            valor={concluidos}
+            cor="green"
           />
         </div>
 
-        <Tabela
-          colunas={colunas}
-          dados={alunos}
-        />
+        {loading ? (
+          <p>Carregando...</p>
+        ) : alunos.length > 0 ? (
+          <Tabela
+            colunas={colunas}
+            dados={alunos}
+          />
+        ) : (
+          <div
+            style={{
+              background: "#fff",
+              padding: "30px",
+              borderRadius: "10px",
+              textAlign: "center",
+            }}
+          >
+            Nenhum aluno do 3º ano sem estágio encontrado.
+          </div>
+        )}
       </main>
     </div>
   );

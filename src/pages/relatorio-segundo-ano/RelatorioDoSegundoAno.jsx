@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./relatorioSegundoAno.module.css";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -9,44 +9,91 @@ import Tabela from "../../components/global_Components/Tabela";
 export default function RelatorioSegundoAno() {
   const navigate = useNavigate();
 
-  const [alunos] = useState([
-    {
-      matricula: "2025102020039",
-      nome: "Ana Beatriz Souza",
-      turma: "2º B Informática",
-      status: "Não Realizado",
-    },
-    {
-      matricula: "2025102020040",
-      nome: "Lucas Pereira",
-      turma: "2º B Química",
-      status: "Não Realizado",
-    },
-    {
-      matricula: "2025102020041",
-      nome: "Marina Alvez",
-      turma: "2º A Química",
-      status: "Em Andamento",
-    },
-    {
-      matricula: "2025102020042",
-      nome: "Gabriel Martins",
-      turma: "2º B Química",
-      status: "Concluído",
-    },
-    {
-      matricula: "2025102020043",
-      nome: "Juliana Rodrigues",
-      turma: "2º A Informática",
-      status: "Concluído",
-    },
-    {
-      matricula: "2025102020044",
-      nome: "Rafael Gomes",
-      turma: "2º B Química",
-      status: "Em Andamento",
-    },
-  ]);
+  const [alunos, setAlunos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [concluidos, setConcluidos] = useState(0);
+  const [andamento, setAndamento] = useState(0);
+  const [naoRealizado, setNaoRealizado] = useState(0);
+
+  useEffect(() => {
+    async function carregarDados() {
+      try {
+        const [resEstagiarios, resEstagios] = await Promise.all([
+          fetch(
+            "https://dev.ladesa.com.br/api/v1/estagiarios?page=1&limit=1000"
+          ),
+          fetch(
+            "https://dev.ladesa.com.br/api/v1/estagios?page=1&limit=1000"
+          ),
+        ]);
+
+        const estagiariosJson = await resEstagiarios.json();
+        const estagiosJson = await resEstagios.json();
+
+        const estagiarios = estagiariosJson.data || [];
+        const estagios = estagiosJson.data || [];
+
+        const alunosSegundoAno = estagiarios.filter(
+          (aluno) => Number(aluno.periodo) === 2
+        );
+
+        const dadosTabela = alunosSegundoAno.map((aluno) => {
+          const estagio = estagios.find(
+            (e) => e.estagiario?.id === aluno.id
+          );
+
+          let status = "Não Realizado";
+
+          if (estagio?.status === "EM_ANDAMENTO") {
+            status = "Em Andamento";
+          }
+
+          if (estagio?.status === "ENCERRADO") {
+            status = "Concluído";
+          }
+
+          return {
+            matricula:
+              aluno.perfil?.usuario?.matricula || "-",
+            nome:
+              aluno.perfil?.usuario?.nome || "-",
+            turma:
+              aluno.curso?.nomeAbreviado ||
+              aluno.curso?.nome ||
+              "-",
+            status,
+          };
+        });
+
+        setAlunos(dadosTabela);
+
+        setConcluidos(
+          dadosTabela.filter(
+            (a) => a.status === "Concluído"
+          ).length
+        );
+
+        setAndamento(
+          dadosTabela.filter(
+            (a) => a.status === "Em Andamento"
+          ).length
+        );
+
+        setNaoRealizado(
+          dadosTabela.filter(
+            (a) => a.status === "Não Realizado"
+          ).length
+        );
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    carregarDados();
+  }, []);
 
   const colunas = [
     {
@@ -66,18 +113,6 @@ export default function RelatorioSegundoAno() {
       chave: "status",
     },
   ];
-
-  const concluidos = alunos.filter(
-    (a) => a.status === "Concluído"
-  ).length;
-
-  const andamento = alunos.filter(
-    (a) => a.status === "Em Andamento"
-  ).length;
-
-  const naoRealizado = alunos.filter(
-    (a) => a.status === "Não Realizado"
-  ).length;
 
   return (
     <div className={styles.layout}>
@@ -124,10 +159,14 @@ export default function RelatorioSegundoAno() {
           />
         </div>
 
-        <Tabela
-          colunas={colunas}
-          dados={alunos}
-        />
+        {loading ? (
+          <p>Carregando...</p>
+        ) : (
+          <Tabela
+            colunas={colunas}
+            dados={alunos}
+          />
+        )}
       </main>
     </div>
   );
