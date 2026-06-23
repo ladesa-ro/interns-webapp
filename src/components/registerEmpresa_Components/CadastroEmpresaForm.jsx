@@ -1,142 +1,226 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-import Styles from './cadastroEmpresaForm.module.css';
-import CadastrarEmpresaIcon from '../icons_Components/Icon_Cadastrar_Empresa_Comp';
+import Styles from "./cadastroEmpresaForm.module.css";
+import CadastrarEmpresaIcon from "../icons_Components/Icon_Cadastrar_Empresa_Comp";
 
 export default function CadastroEmpresaForm({ modo }) {
-
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [razaoSocial, setRazaoSocial] = useState('');
-  const [nomeFantasia, setNomeFantasia] = useState('');
-  const [cnpj, setCnpj] = useState('');
-  const [email, setEmail] = useState('');
-  const [telefone, setTelefone] = useState('');
+  // EMPRESA
+  const [razaoSocial, setRazaoSocial] = useState("");
+  const [nomeFantasia, setNomeFantasia] = useState("");
+  const [cnpj, setCnpj] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefone, setTelefone] = useState("");
+
+  // ENDEREÇO
+  const [cep, setCep] = useState("");
+  const [logradouro, setLogradouro] = useState("");
+  const [numero, setNumero] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [complemento, setComplemento] = useState("");
+  const [pontoReferencia, setPontoReferencia] = useState("");
+  const [cidade, setCidade] = useState(1);
 
   useEffect(() => {
-
     if (modo !== "editar") return;
 
     fetch(`https://dev.ladesa.com.br/api/v1/empresas/${id}`)
       .then((response) => response.json())
+
       .then((empresa) => {
-
-        setRazaoSocial(empresa.razaoSocial || '');
-        setNomeFantasia(empresa.nomeFantasia || '');
-        setCnpj(empresa.cnpj || '');
-        setEmail(empresa.email || '');
-        setTelefone(empresa.telefone || '');
-
-      })
-      .catch((error) => {
-        console.error(error);
+        setRazaoSocial(empresa.razaoSocial || "");
+        setNomeFantasia(empresa.nomeFantasia || "");
+        setCnpj(empresa.cnpj || "");
+        setEmail(empresa.email || "");
+        setTelefone(empresa.telefone || "");
       });
-
   }, [id, modo]);
+
+  const salvarEmpresa = async (e) => {
+    e.preventDefault();
+
+    const endereco = {
+      cep,
+
+      logradouro,
+
+      numero: Number(numero),
+
+      bairro,
+
+      complemento,
+
+      pontoReferencia,
+
+      cidade: {
+        id: cidade,
+      },
+    };
+
+    try {
+      const response = await fetch(
+        "https://dev.ladesa.com.br/api/v1/enderecos",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify(endereco),
+        },
+      );
+
+      const dados = await response.json();
+
+      console.log("Endereço criado:", dados);
+    } catch (error) {
+      console.error("Erro ao cadastrar endereço", error);
+    }
+  };
 
   return (
     <div>
-
       <div className={Styles.title}>
-        <CadastrarEmpresaIcon
-          className={Styles.icone}
-        />
+        <CadastrarEmpresaIcon className={Styles.icone} />
 
         <h2>
-          {modo === "editar"
-            ? "Editar Empresa"
-            : "Cadastrar Nova Empresa"}
+          {modo === "editar" ? "Editar Empresa" : "Cadastrar Nova Empresa"}
         </h2>
       </div>
 
       <div className={Styles.card}>
-
-        <form className={Styles.form}>
+        <form className={Styles.form} onSubmit={salvarEmpresa}>
+          {/* EMPRESA */}
 
           <div className={Styles.campo}>
             <label>Razão Social</label>
+
             <input
-              type="text"
               value={razaoSocial}
-              onChange={(e) =>
-                setRazaoSocial(e.target.value)
-              }
+              onChange={(e) => setRazaoSocial(e.target.value)}
             />
           </div>
 
           <div className={Styles.campo}>
             <label>Nome Fantasia</label>
+
             <input
-              type="text"
               value={nomeFantasia}
-              onChange={(e) =>
-                setNomeFantasia(e.target.value)
-              }
+              onChange={(e) => setNomeFantasia(e.target.value)}
             />
           </div>
 
           <div className={Styles.campo}>
             <label>CNPJ</label>
-            <input
-              type="text"
-              value={cnpj}
-              onChange={(e) =>
-                setCnpj(e.target.value)
-              }
-            />
+
+            <input value={cnpj} onChange={(e) => setCnpj(e.target.value)} />
           </div>
 
           <div className={Styles.campo}>
             <label>E-mail</label>
+
             <input
               type="email"
               value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
           <div className={Styles.campo}>
             <label>Telefone</label>
+
             <input
-              type="text"
               value={telefone}
-              onChange={(e) =>
-                setTelefone(e.target.value)
-              }
+              onChange={(e) => setTelefone(e.target.value)}
             />
           </div>
 
+          {/* ENDEREÇO */}
+
+          <div className={Styles.campo}>
+            <label>CEP</label>
+
+            <input
+              placeholder="76820-123"
+              value={cep}
+              onChange={(e) => setCep(e.target.value)}
+            />
+          </div>
+
+          <div className={Styles.campo}>
+            <label>Logradouro</label>
+
+            <input
+              placeholder="Rua das Flores"
+              value={logradouro}
+              onChange={(e) => setLogradouro(e.target.value)}
+            />
+          </div>
+
+          <div className={Styles.campo}>
+            <label>Número</label>
+
+            <input
+              type="number"
+              value={numero}
+              onChange={(e) => setNumero(e.target.value)}
+            />
+          </div>
+
+          <div className={Styles.campo}>
+            <label>Bairro</label>
+
+            <input value={bairro} onChange={(e) => setBairro(e.target.value)} />
+          </div>
+
+          <div className={Styles.campo}>
+            <label>Complemento</label>
+
+            <input
+              placeholder="Apto 45"
+              value={complemento}
+              onChange={(e) => setComplemento(e.target.value)}
+            />
+          </div>
+
+          <div className={Styles.campo}>
+            <label>Ponto de Referência</label>
+
+            <input
+              placeholder="Perto do mercado"
+              value={pontoReferencia}
+              onChange={(e) => setPontoReferencia(e.target.value)}
+            />
+          </div>
+
+          <div className={Styles.campo}>
+            <label>Cidade ID</label>
+
+            <input
+              type="number"
+              value={cidade}
+              onChange={(e) => setCidade(e.target.value)}
+            />
+          </div>
         </form>
 
         <div className={Styles.botoes}>
-
           <button
-            type="button"
             className={Styles.botaoCancelar}
-            onClick={() =>
-              navigate('/cadastrarempresa')
-            }
+            onClick={() => navigate("/cadastrarempresa")}
           >
             Cancelar
           </button>
 
-          <button
-            type="submit"
-            className={Styles.botaoCadastrar}
-          >
-            {modo === "editar"
-              ? "Salvar Alterações"
-              : "Salvar Empresa"}
+          <button className={Styles.botaoCadastrar} onClick={salvarEmpresa}>
+            Salvar Empresa
           </button>
-
         </div>
-
       </div>
-
     </div>
   );
 }
