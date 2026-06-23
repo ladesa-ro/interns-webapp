@@ -39,7 +39,7 @@ export default function Layout() {
             element={<AlunosEmEstagio />}
           />
 
-          <Route
+          {/*<Route
             path="alunos-sem-estagio"
             element={<AlunosSemEstagio />}
           />
@@ -47,7 +47,7 @@ export default function Layout() {
           <Route
             path="relatorio-segundo-ano"
             element={<RelatorioSegundoAno />}
-          />
+          />*/}
         </Routes>
       </div>
     </div>
