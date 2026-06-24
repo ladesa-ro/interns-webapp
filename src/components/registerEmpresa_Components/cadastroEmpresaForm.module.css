@@ -1,0 +1,103 @@
+h2{
+    color: #066436;
+    font-size: 18px;
+}
+
+.icone{
+    color: #066436;
+}
+
+.title{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.card{
+    background: #FFFFFF;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    width: 100%;
+}
+
+.card h2{
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.form{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1.5rem;
+    row-gap: 1.5rem;
+}
+
+.campo{
+    display: flex;
+    flex-direction: column;
+}
+
+.campo label{
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #444;
+}
+
+.campo input,
+.campo select{
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.85rem;
+    border: 1px solid #D0D5DD;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    outline: none;
+    transition: 0.2s;
+}
+
+.campo input:focus,
+.campo select:focus{
+    border-color: #016630;
+    box-shadow: 0 0 0 3px rgba(1,102,48,.15);
+}
+
+.botoes{
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.botaoCadastrar,
+.botaoCancelar{
+    border: none;
+    min-width: 140px;
+    height: 42px;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.botaoCadastrar{
+    background: #016630;
+    color: #FFFFFF;
+}
+
+.botaoCadastrar:hover{
+    background: #014d24;
+}
+
+.botaoCancelar{
+    background: #E7040E;
+    color: #FFFFFF;
+}
+
+.botaoCancelar:hover{
+    background: #c9030c;
+}

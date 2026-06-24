@@ -7,9 +7,9 @@ import Vaga from "../../pages/vagas/Vaga";
 import ListaEspera from "../../pages/lista-espera/ListaEspera";
 import Perfil from "../../pages/perfil/Perfil";
 import AlunosEmEstagio from "../../pages/alunos-em-estagios/Alunos-em-estagio";
-import AlunosSemEstagio from "../../pages/alunos-do-3ano/AlunosSemEStagio";
-import RelatorioSegundoAno from "../../pages/relatorio-segundo-ano/RelatorioDoSegundoAno";
-
+import CadastrarEmpresa from "../../pages/cadastrarEmpresas/CadastrarEmpresa";
+import NovaEmpresa from "../../pages/novaEmpresa/NovaEmpresa";
+import EditarEmpresa from "../../pages/editarEmpresa/EditarEmpresa";
 
 export default function Layout() {
   return (
@@ -22,6 +22,12 @@ export default function Layout() {
 
           <Route path="empresa" element={<Empresa />} />
 
+          <Route path="cadastrarempresa" element={<CadastrarEmpresa />} />
+
+          <Route path="nova-empresa" element={<NovaEmpresa />} />
+
+          <Route path="editar-empresa/:id" element={<EditarEmpresa />}/>
+
           <Route path="vaga" element={<Vaga />} />
 
           <Route path="lista" element={<ListaEspera />} />
@@ -33,7 +39,7 @@ export default function Layout() {
             element={<AlunosEmEstagio />}
           />
 
-          <Route
+          {/*<Route
             path="alunos-sem-estagio"
             element={<AlunosSemEstagio />}
           />
@@ -41,7 +47,7 @@ export default function Layout() {
           <Route
             path="relatorio-segundo-ano"
             element={<RelatorioSegundoAno />}
-          />
+          />*/}
         </Routes>
       </div>
     </div>

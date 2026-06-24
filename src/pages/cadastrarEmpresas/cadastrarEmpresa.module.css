@@ -1,0 +1,29 @@
+h3{
+    color: #4A5565;
+    font-size: 1rem;
+}
+
+button{
+    border: none;
+}
+
+.topContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.botaoCadastrar{
+    background: #016630;
+    border-radius: 0.5rem;
+}
+
+.botaoCadastrar div{
+    color: #ffffff;
+
+    padding: 0.5rem 0.8rem 0.5rem 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
