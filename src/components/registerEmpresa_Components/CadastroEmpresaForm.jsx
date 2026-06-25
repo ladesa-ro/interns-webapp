@@ -76,7 +76,7 @@ export default function CadastroEmpresaForm() {
 
   // SALVAR REGISTROS
   async function salvar(e) {
-    e.preventDefault(); // Evita o comportamento padrão do form
+    e.preventDefault();
 
     if (!cidadeId) {
       alert("Por favor, digite um CEP válido e aguarde a validação da cidade antes de salvar.");
@@ -93,7 +93,7 @@ export default function CadastroEmpresaForm() {
         body: JSON.stringify({
           cep,
           logradouro,
-          numero: String(numero), // Convertido para String baseado no GET da API
+          numero: String(numero),
           bairro,
           complemento: complemento || null,
           pontoReferencia: pontoReferencia || null,
@@ -112,7 +112,7 @@ export default function CadastroEmpresaForm() {
       const enderecoCriado = await enderecoResponse.json();
       console.log("Endereço criado com sucesso:", enderecoCriado);
 
-      // Garante que enviamos apenas os números do CNPJ para a API externa
+      // Limpa os caracteres do CNPJ
       const cnpjApenasNumeros = cnpj.replace(/\D/g, "");
 
       // 2 - CRIA EMPRESA
@@ -133,20 +133,21 @@ export default function CadastroEmpresaForm() {
         }),
       });
 
-      // TRATAMENTO DO ERRO 422: Captura o que a API Ladesa está rejeitando
       if (!empresaResponse.ok) {
         const dadosDoErro = await empresaResponse.json().catch(() => null);
-        console.error("Detalhes do Erro 422 da API Ladesa:", dadosDoErro);
+        console.error("Detalhes do Erro da API Ladesa:", dadosDoErro);
         
-        // Se a API retornou um array/objeto de validações (comum em erros 422), tenta expor
         if (dadosDoErro && (dadosDoErro.message || dadosDoErro.mensagem)) {
           throw new Error(dadosDoErro.message || dadosDoErro.mensagem);
         }
         
-        throw new Error("Erro de validação (422) ao criar a empresa. Verifique o console.");
+        throw new Error("A API recusou o cadastro desta empresa. Verifique se o CNPJ ou E-mail já estão em uso.");
       }
 
-      alert("Empresa cadastrada com sucesso!");
+      const empresaCriadaObjeto = await empresaResponse.json();
+      console.log("EMPRESA CRIADA NO BANCO COM SUCESSO:", empresaCriadaObjeto);
+
+      alert(`Empresa "${empresaCriadaObjeto.nomeFantasia || nomeFantasia}" cadastrada com sucesso!`);
       navigate("/cadastrarempresa");
     } catch (error) {
       console.error(error);
