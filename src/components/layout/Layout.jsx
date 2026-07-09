@@ -10,6 +10,9 @@ import AlunosEmEstagio from "../../pages/alunos-em-estagios/Alunos-em-estagio";
 import CadastrarEmpresa from "../../pages/cadastrarEmpresas/CadastrarEmpresa";
 import NovaEmpresa from "../../pages/novaEmpresa/NovaEmpresa";
 import EditarEmpresa from "../../pages/editarEmpresa/EditarEmpresa";
+import CadastrarVaga from "../../pages/cadastrarVaga/CadastrarVaga";
+import NovaVaga from "../../pages/novaVaga/NovaVaga";
+import EditarVaga from "../../pages/editarVaga/EditarVaga";
 
 export default function Layout() {
   return (
@@ -29,6 +32,12 @@ export default function Layout() {
           <Route path="editar-empresa/:id" element={<EditarEmpresa />}/>
 
           <Route path="vaga" element={<Vaga />} />
+
+          <Route path="cadastrar-vaga" element={<CadastrarVaga />} />
+
+          <Route path="nova-vaga" element={<NovaVaga />} />
+
+          <Route path="editar-vaga/:id" element={<EditarVaga />}/>
 
           <Route path="lista" element={<ListaEspera />} />
 
