@@ -35,10 +35,13 @@ export default function Layout() {
 
           <Route path="vaga" element={<Vaga />} />
 
+          <Route path="vagas" element={<CadastrarVaga />} />
           <Route path="cadastrarvaga" element={<CadastrarVaga />} />
 
+          <Route path="vagas/nova" element={<NovaVaga />} />
           <Route path="nova-vaga" element={<NovaVaga />} />
 
+          <Route path="vagas/editar/:id" element={<EditarVaga />} />
           <Route path="editar-vaga/:id" element={<EditarVaga />}/>
 
           <Route path="lista" element={<ListaEspera />} />
