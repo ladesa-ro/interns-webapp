@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import Titulo from "../icons_Components/Icon_Logo_Comp";
 import Painel from "../icons_Components/Icon_Painel_Comp";
 import CadastrarEmpresaIcon from "../icons_Components/Icon_Cadastrar_Empresa_Comp";
@@ -13,8 +14,10 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(true);
 
+  const { logout } = useAuth();
+
   function handleLogout() {
-    localStorage.removeItem("token");
+    logout();
     navigate("/login", { replace: true });
   }
 
@@ -41,8 +44,8 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          to="/vaga"
-          className={location.pathname === "/vaga" ? "active" : ""}
+          to="/cadastrarvaga"
+          className={location.pathname === "/cadastrarvaga" ? "active" : ""}
         >
           <CadastrarVaga size={24}/>
           <span>Cadastrar Vaga</span>

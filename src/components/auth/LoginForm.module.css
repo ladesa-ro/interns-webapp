@@ -177,13 +177,14 @@ input:focus {
 }
 
 
-/*.iconEye {
+.iconEye {
   position: absolute;
   right: 0.5rem;
-  top: 0.4rem;
+  top: 1.15rem; /* Ajustado para alinhar verticalmente no meio do input */
   cursor: pointer;
   user-select: none;
-}*/
+  z-index: 3;
+}
 
 @media (max-width: 1040px){
   .background{

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   Menu,
   House,
@@ -16,8 +17,10 @@ export default function SidebarAluno() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(true);
 
+  const { logout } = useAuth();
+
   function handleLogout() {
-    localStorage.removeItem("token");
+    logout();
     navigate("/login", { replace: true });
   }
 
