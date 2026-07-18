@@ -13,6 +13,8 @@ import EditarEmpresa from "../../pages/editarEmpresa/EditarEmpresa";
 import CadastrarVaga from "../../pages/cadastrarVaga/CadastrarVaga";
 import NovaVaga from "../../pages/novaVaga/NovaVaga";
 import EditarVaga from "../../pages/editarVaga/EditarVaga";
+import AlunosSemEstagio from "../../pages/alunos-do-3ano/AlunosSemEStagio";
+import RelatorioSegundoAno from "../../pages/relatorio-segundo-ano/RelatorioDoSegundoAno";
 
 export default function Layout() {
   return (
@@ -33,7 +35,7 @@ export default function Layout() {
 
           <Route path="vaga" element={<Vaga />} />
 
-          <Route path="cadastrar-vaga" element={<CadastrarVaga />} />
+          <Route path="cadastrarvaga" element={<CadastrarVaga />} />
 
           <Route path="nova-vaga" element={<NovaVaga />} />
 
@@ -48,7 +50,7 @@ export default function Layout() {
             element={<AlunosEmEstagio />}
           />
 
-          {/*<Route
+          <Route
             path="alunos-sem-estagio"
             element={<AlunosSemEstagio />}
           />
@@ -56,7 +58,7 @@ export default function Layout() {
           <Route
             path="relatorio-segundo-ano"
             element={<RelatorioSegundoAno />}
-          />*/}
+          />
         </Routes>
       </div>
     </div>

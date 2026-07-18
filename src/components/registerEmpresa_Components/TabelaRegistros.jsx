@@ -4,6 +4,7 @@ import Pesquisa from '../icons_Components/Icon_Pesquisa_Comp';
 import Editar from '../icons_Components/Icon_Editar_Comp';
 import Deletar from '../icons_Components/Icon_Deletar_Comp';
 import { useNavigate } from 'react-router-dom';
+import apiFetch from '../../utils/api';
 
 export default function TabelaRegistros() {
   const navigate = useNavigate();
@@ -19,35 +20,65 @@ export default function TabelaRegistros() {
 
   // BUSCA AS EMPRESAS DIRETO NA API REAGINDO À BUSCA E À PÁGINA
   useEffect(() => {
-    setLoading(true);
+    // Constrói a URL passando a página atual
+    let url = `/empresas?page=${pagina}`;
 
-    // Constrói a URL passando a página atual e o termo de pesquisa formatado
-    let url = `https://dev.ladesa.com.br/api/v1/empresas?page=${pagina}`;
-    
     if (busca.trim() !== '') {
       url += `&search=${encodeURIComponent(busca.trim())}`;
     }
 
-    fetch(url)
-      .then((res) => res.json())
-      .then((dados) => {
-        // Armazena as empresas da página atual
-        setEmpresas(dados.data || []);
-        
-        // Atualiza o total de páginas vindo dos metadados reais da API
-        if (dados.meta && dados.meta.totalPages) {
-          setTotalPaginas(dados.meta.totalPages);
-        } else {
-          setTotalPaginas(1);
+    async function fetchEmpresas() {
+      setLoading(true);
+      try {
+        const res = await apiFetch(url);
+        if (!res.ok) {
+          throw new Error("Erro ao carregar empresas.");
         }
-        
-        setLoading(false);
-      })
-      .catch((error) => {
+        const dados = await res.json();
+        setEmpresas(dados.data || []);
+        setTotalPaginas(dados.meta?.totalPages || 1);
+      } catch (error) {
         console.error("Erro ao buscar empresas:", error);
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+
+    fetchEmpresas();
   }, [pagina, busca]); // O useEffect roda novamente sempre que a página ou a busca mudarem
+
+  // DELETA A EMPRESA SELECIONADA
+  async function handleDeletar() {
+    if (!empresaSelecionada) return;
+
+    try {
+      const response = await apiFetch(`/empresas/${empresaSelecionada.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const erroDados = await response.json().catch(() => null);
+        throw new Error(erroDados?.message || erroDados?.mensagem || "Não foi possível excluir a empresa.");
+      }
+
+      alert("Empresa excluída com sucesso!");
+      
+      // Remove localmente a empresa excluída
+      setEmpresas(empresas.filter(emp => emp.id !== empresaSelecionada.id));
+      setModalAberto(false);
+      setEmpresaSelecionada(null);
+
+      // Trata transição de página vazia
+      if (empresas.length === 1 && pagina > 1) {
+        setPagina(pagina - 1);
+      }
+    } catch (error) {
+      console.error("Erro ao excluir empresa:", error);
+      alert(error.message || "Ocorreu um erro ao tentar excluir a empresa.");
+      setModalAberto(false);
+      setEmpresaSelecionada(null);
+    }
+  }
 
   return (
     <div className={Styles.container}>
@@ -135,6 +166,36 @@ export default function TabelaRegistros() {
             </button>
           </div>
         </>
+      )}
+
+      {/* MODAL VISUAL DE CONFIRMAÇÃO DE EXCLUSÃO */}
+      {modalAberto && (
+        <div className={Styles.overlay}>
+          <div className={Styles.modal}>
+            <h3>Confirmar Exclusão</h3>
+            <p>
+              Tem certeza de que deseja excluir a empresa{" "}
+              <strong>{empresaSelecionada?.nomeFantasia || empresaSelecionada?.razaoSocial}</strong>? Esta ação é irreversível.
+            </p>
+            <div className={Styles.modalButtons}>
+              <button
+                className={Styles.cancelButton}
+                onClick={() => {
+                  setModalAberto(false);
+                  setEmpresaSelecionada(null);
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                className={Styles.deleteButton}
+                onClick={handleDeletar}
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
