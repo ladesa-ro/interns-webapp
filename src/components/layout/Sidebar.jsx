@@ -44,8 +44,8 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          to="/cadastrarvaga"
-          className={location.pathname === "/cadastrarvaga" ? "active" : ""}
+          to="/vagas"
+          className={location.pathname === "/vagas" || location.pathname === "/cadastrarvaga" ? "active" : ""}
         >
           <CadastrarVaga size={24}/>
           <span>Cadastrar Vaga</span>

@@ -1,9 +1,6 @@
-import React from 'react';
+import React from "react";
+import CadastroVagaForm from "../../components/registerVaga_Components/CadastroVagaForm";
 
 export default function EditarVaga() {
-  return (
-    <div>
-      
-    </div>
-  );
+  return <CadastroVagaForm modo="editar" />;
 }
