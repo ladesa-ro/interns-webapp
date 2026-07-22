@@ -9,38 +9,58 @@ export default function CadastroVagaForm({ modo = "novo" }) {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // Estados dos campos do formulário
-  const [codigo, setCodigo] = useState("");
+  // Estados dos campos do formulário para a API /estagios
+  const [campusId, setCampusId] = useState("");
   const [empresaId, setEmpresaId] = useState("");
-  const [titulo, setTitulo] = useState("");
-  const [descricao, setDescricao] = useState("");
-  const [areaId, setAreaId] = useState("");
-  const [numeroVagas, setNumeroVagas] = useState(1);
+  const [areaId, setAreaId] = useState(""); // CursoReferencia
+  const [cargaHoraria, setCargaHoraria] = useState(1);
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
   const [status, setStatus] = useState("DISPONIVEL");
+  const [nomeSupervisor, setNomeSupervisor] = useState("");
+  const [emailSupervisor, setEmailSupervisor] = useState("");
+  const [telefoneSupervisor, setTelefoneSupervisor] = useState("");
+  const [aditivo, setAditivo] = useState(false);
+  const [tipoAditivo, setTipoAditivo] = useState("");
+  const [horariosEstagio, setHorariosEstagio] = useState([]);
 
   // Estados para dados auxiliares e UX
+  const [campi, setCampi] = useState([]);
   const [empresas, setEmpresas] = useState([]);
   const [cursos, setCursos] = useState([]);
   const [carregandoDados, setCarregandoDados] = useState(false);
   const [submetendo, setSubmetendo] = useState(false);
 
-  // Carrega lista de empresas e cursos para preencher os selects
+  const diasDaSemana = [
+    { valor: 0, label: "Domingo" },
+    { valor: 1, label: "Segunda-feira" },
+    { valor: 2, label: "Terça-feira" },
+    { valor: 3, label: "Quarta-feira" },
+    { valor: 4, label: "Quinta-feira" },
+    { valor: 5, label: "Sexta-feira" },
+    { valor: 6, label: "Sábado" },
+  ];
+
+  // Carrega lista de campi, empresas e cursos para preencher os selects
   useEffect(() => {
     async function carregarAuxiliares() {
       try {
-        const [responseEmpresas, responseCursos] = await Promise.all([
+        const [responseCampi, responseEmpresas, responseCursos] = await Promise.all([
+          apiFetch("/campi?page=1&limit=1000"),
           apiFetch("/empresas?page=1&limit=1000"),
           apiFetch("/cursos?page=1&limit=1000"),
         ]);
 
-        if (responseEmpresas.ok && responseCursos.ok) {
+        if (responseCampi.ok && responseEmpresas.ok && responseCursos.ok) {
+          const dataCampi = await responseCampi.json();
           const dataEmpresas = await responseEmpresas.json();
           const dataCursos = await responseCursos.json();
+          setCampi(dataCampi.data || []);
           setEmpresas(dataEmpresas.data || []);
           setCursos(dataCursos.data || []);
         }
       } catch (error) {
-        console.error("Erro ao carregar dados auxiliares (empresas/cursos):", error);
+        console.error("Erro ao carregar dados auxiliares (campi/empresas/cursos):", error);
       }
     }
     carregarAuxiliares();
@@ -60,13 +80,33 @@ export default function CadastroVagaForm({ modo = "novo" }) {
           console.log("Vaga carregada para edição:", vaga);
 
           // Preenche os campos do formulário
-          setCodigo(vaga.tipoAditivo || vaga.codigo || "");
-          setTitulo(vaga.nomeSupervisor || vaga.titulo || "");
-          setDescricao(vaga.descricao || "");
+          setCampusId(vaga.campus?.id || "");
           setEmpresaId(vaga.empresa?.id || "");
           setAreaId(vaga.CursoReferencia?.id || "");
-          setNumeroVagas(vaga.cargaHoraria || vaga.numeroVagas || 1);
+          setCargaHoraria(vaga.cargaHoraria || 1);
+          
+          // Formatar data YYYY-MM-DD para o input HTML5
+          const formatarData = (d) => {
+            if (!d) return "";
+            return d.split("T")[0];
+          };
+          setDataInicio(formatarData(vaga.dataInicio));
+          setDataFim(formatarData(vaga.dataFim));
+          
           setStatus(vaga.status || "DISPONIVEL");
+          setNomeSupervisor(vaga.nomeSupervisor || "");
+          setEmailSupervisor(vaga.emailSupervisor || "");
+          setTelefoneSupervisor(vaga.telefoneSupervisor || "");
+          setAditivo(!!vaga.aditivo);
+          setTipoAditivo(vaga.tipoAditivo || "");
+          
+          // Mapeia horários existentes
+          const horariosMapeados = (vaga.horariosEstagio || []).map((h) => ({
+            diaSemana: typeof h.diaSemana === "number" ? h.diaSemana : 0,
+            horaInicio: h.horaInicio || "",
+            horaFim: h.horaFim || ""
+          }));
+          setHorariosEstagio(horariosMapeados);
         } catch (error) {
           console.error("Erro ao carregar vaga para edição:", error);
           alert("Erro ao carregar dados da vaga. Verifique a conexão.");
@@ -79,33 +119,43 @@ export default function CadastroVagaForm({ modo = "novo" }) {
     }
   }, [modo, id]);
 
+  // Manipulação dinâmica de horários
+  const adicionarHorario = () => {
+    setHorariosEstagio([
+      ...horariosEstagio,
+      { diaSemana: 1, horaInicio: "08:00", horaFim: "12:00" },
+    ]);
+  };
+
+  const removerHorario = (index) => {
+    setHorariosEstagio(horariosEstagio.filter((_, i) => i !== index));
+  };
+
+  const atualizarHorario = (index, campo, valor) => {
+    const novosHorarios = [...horariosEstagio];
+    novosHorarios[index][campo] = campo === "diaSemana" ? Number(valor) : valor;
+    setHorariosEstagio(novosHorarios);
+  };
+
   // Função para salvar registros (criação ou edição)
   async function salvar(e) {
     e.preventDefault();
 
     // Validações básicas de campos obrigatórios
-    if (!codigo.trim()) {
-      alert("Por favor, preencha o código da vaga.");
+    if (!campusId) {
+      alert("Por favor, selecione um campus.");
       return;
     }
     if (!empresaId) {
       alert("Por favor, selecione uma empresa.");
       return;
     }
-    if (!titulo.trim()) {
-      alert("Por favor, preencha o título da vaga.");
-      return;
-    }
-    if (!descricao.trim()) {
-      alert("Por favor, preencha a descrição das atividades.");
-      return;
-    }
     if (!areaId) {
-      alert("Por favor, selecione uma área.");
+      alert("Por favor, selecione um curso (área).");
       return;
     }
-    if (numeroVagas <= 0) {
-      alert("O número de vagas deve ser no mínimo 1.");
+    if (cargaHoraria <= 0) {
+      alert("A carga horária deve ser no mínimo 1.");
       return;
     }
 
@@ -114,30 +164,43 @@ export default function CadastroVagaForm({ modo = "novo" }) {
     try {
       // Constrói o corpo da requisição compatível com o DTO do backend
       const vagaBody = {
-        cargaHoraria: Number(numeroVagas),
-        status: status, // DISPONIVEL, EM_ANDAMENTO, ENCERRADO
-        aditivo: false,
-        horariosEstagio: [],
+        campus: {
+          id: campusId,
+        },
         empresa: {
           id: empresaId,
         },
+        estagiario: null,
+        usuarioOrientador: null,
+        cargaHoraria: Number(cargaHoraria),
         CursoReferencia: {
           id: areaId,
         },
-        // Mapeamentos nos campos textuais livres para evitar perda de dados
-        tipoAditivo: codigo.trim(),
-        nomeSupervisor: titulo.trim(),
-        // Envia campos customizados adicionais se o backend aceitar
-        codigo: codigo.trim(),
-        titulo: titulo.trim(),
-        descricao: descricao.trim(),
-        numeroVagas: Number(numeroVagas)
+        dataInicio: dataInicio || null,
+        dataFim: dataFim || null,
+        status: status,
+        nomeSupervisor: nomeSupervisor || null,
+        emailSupervisor: emailSupervisor || null,
+        telefoneSupervisor: telefoneSupervisor || null,
+        aditivo: Boolean(aditivo),
+        tipoAditivo: aditivo ? tipoAditivo || null : null,
+        horariosEstagio: horariosEstagio.map((h) => {
+          let inicio = h.horaInicio;
+          let fim = h.horaFim;
+          if (inicio && inicio.length === 5) inicio += ":00";
+          if (fim && fim.length === 5) fim += ":00";
+          return {
+            diaSemana: Number(h.diaSemana),
+            horaInicio: inicio,
+            horaFim: fim,
+          };
+        }),
       };
 
       let response;
       if (modo === "editar") {
         response = await apiFetch(`/estagios/${id}`, {
-          method: "PATCH", // A especificação diz PUT ou PATCH, o Swagger indicou PATCH
+          method: "PATCH",
           body: JSON.stringify(vagaBody),
         });
       } else {
@@ -153,14 +216,14 @@ export default function CadastroVagaForm({ modo = "novo" }) {
         throw new Error(
           dadosDoErro?.message || 
           dadosDoErro?.mensagem || 
-          "A API recusou a operação com esta vaga."
+          "A API recusou a operação com esta vaga de estágio."
         );
       }
 
       alert(
         modo === "editar"
-          ? `Vaga "${titulo}" atualizada com sucesso!`
-          : `Vaga "${titulo}" cadastrada com sucesso!`
+          ? "Vaga atualizada com sucesso!"
+          : "Vaga cadastrada com sucesso!"
       );
 
       navigate("/vagas");
@@ -187,13 +250,19 @@ export default function CadastroVagaForm({ modo = "novo" }) {
         <form id="formCadastroVaga" className={Styles.form} onSubmit={salvar}>
           
           <div className={Styles.campo}>
-            <label>Código da vaga</label>
-            <input 
-              value={codigo} 
-              onChange={(e) => setCodigo(e.target.value)} 
-              placeholder="Ex: VA0001"
-              required 
-            />
+            <label>Campus</label>
+            <select 
+              value={campusId} 
+              onChange={(e) => setCampusId(e.target.value)} 
+              required
+            >
+              <option value="">Selecione um campus</option>
+              {campi.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nomeFantasia || c.razaoSocial}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className={Styles.campo}>
@@ -212,29 +281,8 @@ export default function CadastroVagaForm({ modo = "novo" }) {
             </select>
           </div>
 
-          <div className={`${Styles.campo} ${Styles.fullWidth}`}>
-            <label>Título da vaga</label>
-            <input 
-              value={titulo} 
-              onChange={(e) => setTitulo(e.target.value)} 
-              placeholder="Ex: Desenvolvedor Web Jr"
-              required 
-            />
-          </div>
-
-          <div className={`${Styles.campo} ${Styles.fullWidth}`}>
-            <label>Descrição das atividades</label>
-            <textarea 
-              value={descricao} 
-              onChange={(e) => setDescricao(e.target.value)} 
-              placeholder="Descreva detalhadamente as atividades a serem desempenhadas..."
-              rows={4}
-              required 
-            />
-          </div>
-
           <div className={Styles.campo}>
-            <label>Área</label>
+            <label>Curso de Referência (Área)</label>
             <select 
               value={areaId} 
               onChange={(e) => setAreaId(e.target.value)} 
@@ -250,27 +298,181 @@ export default function CadastroVagaForm({ modo = "novo" }) {
           </div>
 
           <div className={Styles.campo}>
-            <label>Número de vagas</label>
+            <label>Carga Horária (horas)</label>
             <input 
               type="number" 
-              value={numeroVagas} 
-              onChange={(e) => setNumeroVagas(parseInt(e.target.value) || "")} 
+              value={cargaHoraria} 
+              onChange={(e) => setCargaHoraria(parseInt(e.target.value) || "")} 
               min="1"
               required 
             />
           </div>
 
           <div className={Styles.campo}>
-            <label>Status da vaga</label>
+            <label>Data de Início</label>
+            <input 
+              type="date"
+              value={dataInicio} 
+              onChange={(e) => setDataInicio(e.target.value)} 
+            />
+          </div>
+
+          <div className={Styles.campo}>
+            <label>Data de Fim</label>
+            <input 
+              type="date"
+              value={dataFim} 
+              onChange={(e) => setDataFim(e.target.value)} 
+            />
+          </div>
+
+          <div className={Styles.campo}>
+            <label>Nome do Supervisor</label>
+            <input 
+              value={nomeSupervisor} 
+              onChange={(e) => setNomeSupervisor(e.target.value)} 
+              placeholder="Ex: Dr. João da Silva"
+            />
+          </div>
+
+          <div className={Styles.campo}>
+            <label>E-mail do Supervisor</label>
+            <input 
+              type="email"
+              value={emailSupervisor} 
+              onChange={(e) => setEmailSupervisor(e.target.value)} 
+              placeholder="Ex: supervisor@empresa.com"
+            />
+          </div>
+
+          <div className={Styles.campo}>
+            <label>Telefone do Supervisor</label>
+            <input 
+              value={telefoneSupervisor} 
+              onChange={(e) => setTelefoneSupervisor(e.target.value)} 
+              placeholder="Ex: (69) 99999-9999"
+            />
+          </div>
+
+          <div className={Styles.campo}>
+            <label>Status da Vaga</label>
             <select 
               value={status} 
               onChange={(e) => setStatus(e.target.value)} 
               required
             >
-              <option value="DISPONIVEL">Aberta</option>
+              <option value="DISPONIVEL">Aberta (Disponível)</option>
               <option value="EM_ANDAMENTO">Em andamento</option>
               <option value="ENCERRADO">Fechada</option>
             </select>
+          </div>
+
+          <div className={Styles.campo} style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "10px", marginTop: "25px" }}>
+            <input 
+              type="checkbox" 
+              id="aditivo" 
+              checked={aditivo} 
+              onChange={(e) => setAditivo(e.target.checked)} 
+              style={{ width: "20px", height: "20px", cursor: "pointer" }}
+            />
+            <label htmlFor="aditivo" style={{ margin: 0, cursor: "pointer" }}>Esta vaga possui Aditivo?</label>
+          </div>
+
+          <div className={Styles.campo}>
+            <label>Tipo do Aditivo</label>
+            <input 
+              value={tipoAditivo} 
+              onChange={(e) => setTipoAditivo(e.target.value)} 
+              placeholder="Ex: Termo de Prorrogação"
+              disabled={!aditivo}
+              required={aditivo}
+            />
+          </div>
+
+          {/* Horários Dinâmicos */}
+          <div className={Styles.fullWidth} style={{ borderTop: "1px solid #eee", paddingTop: "1.5rem", marginTop: "1rem" }}>
+            <h3 style={{ color: "#066436", fontSize: "16px", marginBottom: "1rem" }}>Horários de Estágio</h3>
+            
+            {horariosEstagio.length === 0 ? (
+              <p style={{ color: "#777", fontSize: "0.9rem", marginBottom: "1rem" }}>Nenhum horário cadastrado para esta vaga.</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "15px", marginBottom: "1rem" }}>
+                {horariosEstagio.map((horario, index) => (
+                  <div key={index} style={{ display: "flex", alignItems: "center", gap: "15px", flexWrap: "wrap", background: "#f9f9f9", padding: "10px", borderRadius: "8px", border: "1px solid #eee" }}>
+                    <div style={{ display: "flex", flexDirection: "column", minWidth: "150px" }}>
+                      <label style={{ fontSize: "0.8rem", color: "#666", marginBottom: "4px" }}>Dia da Semana</label>
+                      <select
+                        value={horario.diaSemana}
+                        onChange={(e) => atualizarHorario(index, "diaSemana", e.target.value)}
+                        style={{ padding: "0.5rem", border: "1px solid #D0D5DD", borderRadius: "0.375rem" }}
+                      >
+                        {diasDaSemana.map((d) => (
+                          <option key={d.valor} value={d.valor}>{d.label}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <label style={{ fontSize: "0.8rem", color: "#666", marginBottom: "4px" }}>Hora Início</label>
+                      <input
+                        type="time"
+                        value={horario.horaInicio.substring(0, 5)}
+                        onChange={(e) => atualizarHorario(index, "horaInicio", e.target.value)}
+                        style={{ padding: "0.5rem", border: "1px solid #D0D5DD", borderRadius: "0.375rem" }}
+                        required
+                      />
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <label style={{ fontSize: "0.8rem", color: "#666", marginBottom: "4px" }}>Hora Fim</label>
+                      <input
+                        type="time"
+                        value={horario.horaFim.substring(0, 5)}
+                        onChange={(e) => atualizarHorario(index, "horaFim", e.target.value)}
+                        style={{ padding: "0.5rem", border: "1px solid #D0D5DD", borderRadius: "0.375rem" }}
+                        required
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => removerHorario(index)}
+                      style={{
+                        background: "#E7040E",
+                        color: "white",
+                        border: "none",
+                        padding: "0.5rem 1rem",
+                        borderRadius: "0.375rem",
+                        cursor: "pointer",
+                        alignSelf: "flex-end",
+                        height: "38px",
+                        fontSize: "0.85rem",
+                        fontWeight: 500
+                      }}
+                    >
+                      Remover
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={adicionarHorario}
+              style={{
+                background: "#016630",
+                color: "white",
+                border: "none",
+                padding: "0.5rem 1rem",
+                borderRadius: "0.375rem",
+                cursor: "pointer",
+                fontSize: "0.85rem",
+                fontWeight: 500
+              }}
+            >
+              + Adicionar Horário
+            </button>
           </div>
 
         </form>
