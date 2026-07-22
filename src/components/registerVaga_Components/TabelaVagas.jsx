@@ -26,11 +26,12 @@ export default function TabelaVagas() {
     async function carregarVagas() {
       setLoading(true);
       try {
-        // Busca estágios (vagas), empresas e cursos em paralelo para associar
-        const [resEstagios, resEmpresas, resCursos] = await Promise.all([
+        // Busca estágios (vagas), empresas, cursos e campi em paralelo para associar
+        const [resEstagios, resEmpresas, resCursos, resCampi] = await Promise.all([
           apiFetch("/estagios?page=1&limit=1000"),
           apiFetch("/empresas?page=1&limit=1000"),
           apiFetch("/cursos?page=1&limit=1000"),
+          apiFetch("/campi?page=1&limit=1000"),
         ]);
 
         if (!resEstagios.ok) {
@@ -40,26 +41,30 @@ export default function TabelaVagas() {
         const dataEstagios = await resEstagios.json();
         const dataEmpresas = await resEmpresas.json().catch(() => ({ data: [] }));
         const dataCursos = await resCursos.json().catch(() => ({ data: [] }));
+        const dataCampi = await resCampi.json().catch(() => ({ data: [] }));
 
         // Cria mapas para buscas O(1)
         const empresasMap = new Map((dataEmpresas.data || []).map((emp) => [emp.id, emp]));
         const cursosMap = new Map((dataCursos.data || []).map((c) => [c.id, c]));
+        const campiMap = new Map((dataCampi.data || []).map((cam) => [cam.id, cam]));
 
         // Formata e unifica as vagas
         const listaVagas = (dataEstagios.data || []).map((item) => {
           const empresaObj = item.empresa?.id ? empresasMap.get(item.empresa.id) : null;
           const cursoObj = item.CursoReferencia?.id ? cursosMap.get(item.CursoReferencia.id) : null;
+          const campusObj = item.campus?.id ? campiMap.get(item.campus.id) : null;
+
+          const empresaNome = item.empresa?.nomeFantasia || item.empresa?.razaoSocial || empresaObj?.nomeFantasia || empresaObj?.razaoSocial || "Não informada";
+          const cursoNome = item.CursoReferencia?.nomeAbreviado || item.CursoReferencia?.nome || cursoObj?.nomeAbreviado || cursoObj?.nome || "Não informado";
+          const campusNome = item.campus?.nomeFantasia || item.campus?.razaoSocial || campusObj?.nomeFantasia || campusObj?.razaoSocial || "Não informado";
 
           return {
             id: item.id,
-            codigo: item.tipoAditivo || item.codigo || `VA${String(item.id).substring(0, 4).toUpperCase()}`,
-            titulo: item.nomeSupervisor || item.titulo || "Título não informado",
-            descricao: item.descricao || "",
-            empresaId: item.empresa?.id || "",
-            empresaNome: empresaObj?.nomeFantasia || empresaObj?.razaoSocial || "Empresa não informada",
-            areaId: item.CursoReferencia?.id || "",
-            areaNome: cursoObj?.nomeAbreviado || cursoObj?.nome || "Área não informada",
-            vagasCount: item.cargaHoraria || item.numeroVagas || 1,
+            campusNome,
+            empresaNome,
+            cursoNome,
+            cargaHoraria: item.cargaHoraria || 1,
+            nomeSupervisor: item.nomeSupervisor || "-",
             status: item.status || "DISPONIVEL",
           };
         });
@@ -75,16 +80,16 @@ export default function TabelaVagas() {
     carregarVagas();
   }, []);
 
-  // Filtra as vagas com base na pesquisa (Código, Título, Empresa ou Área)
+  // Filtra as vagas com base na pesquisa (Empresa, Curso, Campus ou Supervisor)
   const vagasFiltradas = vagas.filter((vaga) => {
     const termo = busca.toLowerCase().trim();
     if (!termo) return true;
 
     return (
-      vaga.codigo.toLowerCase().includes(termo) ||
-      vaga.titulo.toLowerCase().includes(termo) ||
       vaga.empresaNome.toLowerCase().includes(termo) ||
-      vaga.areaNome.toLowerCase().includes(termo)
+      vaga.cursoNome.toLowerCase().includes(termo) ||
+      vaga.campusNome.toLowerCase().includes(termo) ||
+      vaga.nomeSupervisor.toLowerCase().includes(termo)
     );
   });
 
@@ -132,11 +137,11 @@ export default function TabelaVagas() {
   function renderBadgeStatus(status) {
     switch (status) {
       case "DISPONIVEL":
-        return <span className={`${Styles.badge} ${Styles.statusAberta}`}>Aberto</span>;
+        return <span className={`${Styles.badge} ${Styles.statusAberta}`}>Aberta</span>;
       case "EM_ANDAMENTO":
         return <span className={`${Styles.badge} ${Styles.statusAndamento}`}>Em Andamento</span>;
       default:
-        return <span className={`${Styles.badge} ${Styles.statusFechada}`}>Fechado</span>;
+        return <span className={`${Styles.badge} ${Styles.statusFechada}`}>Fechada</span>;
     }
   }
 
@@ -148,7 +153,7 @@ export default function TabelaVagas() {
         <PesquisaIcon size={36} className={Styles.searchIcon} />
         <input
           type="text"
-          placeholder="Buscar por título, empresa ou área..."
+          placeholder="Buscar por empresa, curso, campus ou supervisor..."
           value={busca}
           onChange={(e) => {
             setBusca(e.target.value);
@@ -165,11 +170,11 @@ export default function TabelaVagas() {
           <table className={Styles.table}>
             <thead>
               <tr>
-                <th>Código</th>
-                <th>Título</th>
+                <th>Campus</th>
                 <th>Empresa</th>
-                <th>Área</th>
-                <th>Vagas</th>
+                <th>Curso</th>
+                <th>Carga Horária</th>
+                <th>Supervisor</th>
                 <th>Status</th>
                 <th>Ações</th>
               </tr>
@@ -185,11 +190,11 @@ export default function TabelaVagas() {
               ) : (
                 vagasPaginadas.map((vaga) => (
                   <tr key={vaga.id}>
-                    <td className={Styles.codigoCell}>{vaga.codigo}</td>
-                    <td>{vaga.titulo}</td>
+                    <td>{vaga.campusNome}</td>
                     <td>{vaga.empresaNome}</td>
-                    <td>{vaga.areaNome}</td>
-                    <td>{vaga.vagasCount}</td>
+                    <td>{vaga.cursoNome}</td>
+                    <td>{vaga.cargaHoraria}h</td>
+                    <td>{vaga.nomeSupervisor}</td>
                     <td>{renderBadgeStatus(vaga.status)}</td>
                     <td className={Styles.actions}>
                       <button onClick={() => navigate(`/vagas/editar/${vaga.id}`)}>
@@ -240,8 +245,7 @@ export default function TabelaVagas() {
           <div className={Styles.modal}>
             <h3>Confirmar Exclusão</h3>
             <p>
-              Tem certeza de que deseja excluir a vaga{" "}
-              <strong>{vagaSelecionada?.titulo}</strong> da empresa{" "}
+              Tem certeza de que deseja excluir a vaga da empresa{" "}
               <strong>{vagaSelecionada?.empresaNome}</strong>? Esta ação é irreversível.
             </p>
             <div className={Styles.modalButtons}>
