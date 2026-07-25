@@ -1,11 +1,13 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 import Styles from "./cadastroEmpresaForm.module.css";
 import CadastrarEmpresaIcon from "../icons_Components/Icon_Cadastrar_Empresa_Comp";
+import apiFetch from "../../utils/api";
 
-export default function CadastroEmpresaForm() {
+export default function CadastroEmpresaForm({ modo = "novo" }) {
   const navigate = useNavigate();
+  const { id } = useParams();
 
   // EMPRESA
   const [razaoSocial, setRazaoSocial] = useState("");
@@ -15,6 +17,7 @@ export default function CadastroEmpresaForm() {
   const [telefone, setTelefone] = useState("");
 
   // ENDEREÇO
+  const [enderecoId, setEnderecoId] = useState(null);
   const [cep, setCep] = useState("");
   const [logradouro, setLogradouro] = useState("");
   const [numero, setNumero] = useState("");
@@ -25,6 +28,51 @@ export default function CadastroEmpresaForm() {
   const [cidadeId, setCidadeId] = useState(null);
   const [cidadeNome, setCidadeNome] = useState("");
   const [estado, setEstado] = useState("");
+
+  // SE MODO FOR EDITAR, CARREGA OS DADOS DA EMPRESA
+  useEffect(() => {
+    if (modo === "editar" && id) {
+      async function carregarEmpresa() {
+        try {
+          const response = await apiFetch(`/empresas/${id}`);
+          if (!response.ok) {
+            throw new Error("Erro ao carregar dados da empresa.");
+          }
+          const empresa = await response.json();
+          console.log("Empresa carregada:", empresa);
+
+          setRazaoSocial(empresa.razaoSocial || "");
+          setNomeFantasia(empresa.nomeFantasia || "");
+          setCnpj(empresa.cnpj || "");
+          setEmail(empresa.email || "");
+          setTelefone(empresa.telefone || "");
+
+          if (empresa.endereco) {
+            setEnderecoId(empresa.endereco.id || null);
+            setCep(empresa.endereco.cep || "");
+            setLogradouro(empresa.endereco.logradouro || "");
+            setNumero(empresa.endereco.numero || "");
+            setBairro(empresa.endereco.bairro || "");
+            setComplemento(empresa.endereco.complemento || "");
+            setPontoReferencia(empresa.endereco.pontoReferencia || "");
+
+            if (empresa.endereco.cidade) {
+              setCidadeId(empresa.endereco.cidade.id || null);
+              setCidadeNome(empresa.endereco.cidade.nome || "");
+              if (empresa.endereco.cidade.estado) {
+                setEstado(empresa.endereco.cidade.estado.sigla || "");
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Erro ao carregar dados para edição:", error);
+          alert("Erro ao carregar dados da empresa. Verifique a conexão.");
+        }
+      }
+
+      carregarEmpresa();
+    }
+  }, [modo, id]);
 
   // BUSCA CEP
   async function buscarCep() {
@@ -47,8 +95,8 @@ export default function CadastroEmpresaForm() {
       setEstado(dados.uf);
 
       // BUSCAR CIDADE NA API LADESA
-      const cidadeResponse = await fetch(
-        `https://dev.ladesa.com.br/api/v1/base/cidades?search=${encodeURIComponent(dados.localidade)}`
+      const cidadeResponse = await apiFetch(
+        `/base/cidades?search=${encodeURIComponent(dados.localidade)}`
       );
 
       const cidadeDados = await cidadeResponse.json();
@@ -74,9 +122,9 @@ export default function CadastroEmpresaForm() {
     }
   }
 
-  // SALVAR REGISTROS
+  // SALVAR REGISTROS (CRIAÇÃO OU EDIÇÃO)
   async function salvar(e) {
-    e.preventDefault(); // Evita o comportamento padrão do form
+    e.preventDefault();
 
     if (!cidadeId) {
       alert("Por favor, digite um CEP válido e aguarde a validação da cidade antes de salvar.");
@@ -84,73 +132,103 @@ export default function CadastroEmpresaForm() {
     }
 
     try {
-      // 1 - CRIA ENDEREÇO
-      const enderecoResponse = await fetch("https://dev.ladesa.com.br/api/v1/enderecos", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      // 1 - CRIA OU ATUALIZA ENDEREÇO
+      let currentEnderecoId = enderecoId;
+      const enderecoBody = {
+        cep,
+        logradouro,
+        numero: String(numero),
+        bairro,
+        complemento: complemento || null,
+        pontoReferencia: pontoReferencia || null,
+        cidade: {
+          id: cidadeId,
         },
-        body: JSON.stringify({
-          cep,
-          logradouro,
-          numero: String(numero), // Convertido para String baseado no GET da API
-          bairro,
-          complemento: complemento || null,
-          pontoReferencia: pontoReferencia || null,
-          cidade: {
-            id: cidadeId,
-          },
-        }),
-      });
+      };
 
-      if (!enderecoResponse.ok) {
-        const erroEnd = await enderecoResponse.json().catch(() => ({}));
-        console.error("Erro detalhes endereço:", erroEnd);
-        throw new Error("Erro ao criar endereço no servidor.");
+      if (modo === "editar" && currentEnderecoId) {
+        const enderecoResponse = await apiFetch(`/enderecos/${currentEnderecoId}`, {
+          method: "PUT",
+          body: JSON.stringify(enderecoBody),
+        });
+
+        if (!enderecoResponse.ok) {
+          const erroEnd = await enderecoResponse.json().catch(() => ({}));
+          console.error("Erro detalhes endereço:", erroEnd);
+          throw new Error("Erro ao atualizar endereço no servidor.");
+        }
+      } else {
+        const enderecoResponse = await apiFetch("/enderecos", {
+          method: "POST",
+          body: JSON.stringify(enderecoBody),
+        });
+
+        if (!enderecoResponse.ok) {
+          const erroEnd = await enderecoResponse.json().catch(() => ({}));
+          console.error("Erro detalhes endereço:", erroEnd);
+          throw new Error("Erro ao criar endereço no servidor.");
+        }
+
+        const enderecoCriado = await enderecoResponse.json();
+        currentEnderecoId = enderecoCriado.id;
       }
 
-      const enderecoCriado = await enderecoResponse.json();
-      console.log("Endereço criado com sucesso:", enderecoCriado);
-
-      // Garante que enviamos apenas os números do CNPJ para a API externa
+      // Limpa os caracteres do CNPJ
       const cnpjApenasNumeros = cnpj.replace(/\D/g, "");
 
-      // 2 - CRIA EMPRESA
-      const empresaResponse = await fetch("https://dev.ladesa.com.br/api/v1/empresas", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      // 2 - CRIA OU ATUALIZA EMPRESA
+      const empresaBody = {
+        razaoSocial,
+        nomeFantasia,
+        cnpj: cnpjApenasNumeros,
+        telefone,
+        email,
+        endereco: {
+          id: currentEnderecoId,
         },
-        body: JSON.stringify({
-          razaoSocial,
-          nomeFantasia,
-          cnpj: cnpjApenasNumeros,
-          telefone,
-          email,
-          endereco: {
-            id: enderecoCriado.id, 
-          },
-        }),
-      });
+      };
 
-      // TRATAMENTO DO ERRO 422: Captura o que a API Ladesa está rejeitando
-      if (!empresaResponse.ok) {
-        const dadosDoErro = await empresaResponse.json().catch(() => null);
-        console.error("Detalhes do Erro 422 da API Ladesa:", dadosDoErro);
-        
-        // Se a API retornou um array/objeto de validações (comum em erros 422), tenta expor
-        if (dadosDoErro && (dadosDoErro.message || dadosDoErro.mensagem)) {
-          throw new Error(dadosDoErro.message || dadosDoErro.mensagem);
+      if (modo === "editar") {
+        const empresaResponse = await apiFetch(`/empresas/${id}`, {
+          method: "PUT",
+          body: JSON.stringify(empresaBody),
+        });
+
+        if (!empresaResponse.ok) {
+          const dadosDoErro = await empresaResponse.json().catch(() => null);
+          console.error("Detalhes do Erro da API Ladesa:", dadosDoErro);
+          throw new Error(
+            dadosDoErro?.message || 
+            dadosDoErro?.mensagem || 
+            "A API recusou a atualização desta empresa."
+          );
         }
-        
-        throw new Error("Erro de validação (422) ao criar a empresa. Verifique o console.");
+
+        alert(`Empresa "${nomeFantasia}" atualizada com sucesso!`);
+      } else {
+        const empresaResponse = await apiFetch("/empresas", {
+          method: "POST",
+          body: JSON.stringify(empresaBody),
+        });
+
+        if (!empresaResponse.ok) {
+          const dadosDoErro = await empresaResponse.json().catch(() => null);
+          console.error("Detalhes do Erro da API Ladesa:", dadosDoErro);
+          throw new Error(
+            dadosDoErro?.message || 
+            dadosDoErro?.mensagem || 
+            "A API recusou o cadastro desta empresa. Verifique se o CNPJ ou E-mail já estão em uso."
+          );
+        }
+
+        const empresaCriadaObjeto = await empresaResponse.json();
+        alert(`Empresa "${empresaCriadaObjeto.nomeFantasia || nomeFantasia}" cadastrada com sucesso!`);
       }
 
-      alert("Empresa cadastrada com sucesso!");
       navigate("/cadastrarempresa");
     } catch (error) {
       console.error(error);
-      alert(error.message || "Erro ao cadastrar empresa");
+      alert(error.message || "Erro ao salvar empresa");
     }
   }
 
@@ -158,7 +236,7 @@ export default function CadastroEmpresaForm() {
     <div>
       <div className={Styles.title}>
         <CadastrarEmpresaIcon className={Styles.icone} />
-        <h2>Cadastrar Nova Empresa</h2>
+        <h2>{modo === "editar" ? "Editar Empresa" : "Cadastrar Nova Empresa"}</h2>
       </div>
 
       <div className={Styles.card}>
@@ -239,7 +317,7 @@ export default function CadastroEmpresaForm() {
           </button>
 
           <button type="submit" form="formCadastro" className={Styles.botaoCadastrar}>
-            Salvar Empresa
+            {modo === "editar" ? "Salvar Alterações" : "Salvar Empresa"}
           </button>
         </div>
       </div>

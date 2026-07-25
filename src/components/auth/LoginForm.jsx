@@ -38,12 +38,12 @@ export default function LoginForm({ form, onChange, onSubmit }) {
               <label htmlFor="senha" className={styles.labelLine}>
                 Senha
               </label>
-              {/*<span
+              <span
                 className={styles.iconEye}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <Eye /> : <EyeOff />}
-              </span>  */}
+              </span>
 
             </div>
             
