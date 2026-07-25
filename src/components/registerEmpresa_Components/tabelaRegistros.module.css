@@ -192,3 +192,53 @@
     color:#374151;
 
 }
+
+/* Estado "sem resultados" — célula centralizada */
+.semResultados {
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.95rem;
+    padding: 2rem !important;
+}
+
+/* Error state — container fora da tabela */
+.erroContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,.12);
+}
+
+.mensagem {
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin: 0;
+    text-align: center;
+}
+
+.btnTentar {
+    border: none;
+    background: #016630;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.btnTentar:hover {
+    background: #014d24;
+}
+
+/* Botões do modal desabilitados durante loading */
+.cancelButton:disabled,
+.deleteButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
