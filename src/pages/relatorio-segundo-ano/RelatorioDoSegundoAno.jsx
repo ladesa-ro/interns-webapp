@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import Cards from "../../components/global_Components/Cards";
 import Tabela from "../../components/global_Components/Tabela";
+import apiFetch from "../../utils/api";
 
 export default function RelatorioSegundoAno() {
   const navigate = useNavigate();
@@ -20,12 +21,8 @@ export default function RelatorioSegundoAno() {
     async function carregarDados() {
       try {
         const [resEstagiarios, resEstagios] = await Promise.all([
-          fetch(
-            "https://dev.ladesa.com.br/api/v1/estagiarios?page=1&limit=1000"
-          ),
-          fetch(
-            "https://dev.ladesa.com.br/api/v1/estagios?page=1&limit=1000"
-          ),
+          apiFetch("/estagiarios?page=1&limit=1000"),
+          apiFetch("/estagios?page=1&limit=1000")
         ]);
 
         const estagiariosJson = await resEstagiarios.json();
@@ -54,10 +51,9 @@ export default function RelatorioSegundoAno() {
           }
 
           return {
-            matricula:
-              aluno.perfil?.usuario?.matricula || "-",
-            nome:
-              aluno.perfil?.usuario?.nome || "-",
+            id: aluno.id, // Fornece o ID único para a chave no componente Tabela
+            matricula: aluno.perfil?.usuario?.matricula || "-",
+            nome: aluno.perfil?.usuario?.nome || "-",
             turma:
               aluno.curso?.nomeAbreviado ||
               aluno.curso?.nome ||
@@ -86,7 +82,7 @@ export default function RelatorioSegundoAno() {
           ).length
         );
       } catch (error) {
-        console.error(error);
+        console.error("Erro ao carregar dados do segundo ano:", error);
       } finally {
         setLoading(false);
       }
@@ -160,7 +156,7 @@ export default function RelatorioSegundoAno() {
         </div>
 
         {loading ? (
-          <p>Carregando...</p>
+          <p style={{ textAlign: "center", marginTop: "20px" }}>Carregando dados...</p>
         ) : (
           <Tabela
             colunas={colunas}

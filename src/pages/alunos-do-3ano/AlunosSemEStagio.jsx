@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import Cards from "../../components/global_Components/Cards";
 import Tabela from "../../components/global_Components/Tabela";
+import apiFetch from "../../utils/api";
 
 export default function AlunosSemEstagio() {
   const navigate = useNavigate();
@@ -18,12 +19,8 @@ export default function AlunosSemEstagio() {
     async function carregarDados() {
       try {
         const [resEstagiarios, resEstagios] = await Promise.all([
-          fetch(
-            "https://dev.ladesa.com.br/api/v1/estagiarios?page=1&limit=1000"
-          ),
-          fetch(
-            "https://dev.ladesa.com.br/api/v1/estagios?page=1&limit=1000"
-          ),
+          apiFetch("/estagiarios?page=1&limit=1000"),
+          apiFetch("/estagios?page=1&limit=1000")
         ]);
 
         const estagiariosJson = await resEstagiarios.json();
@@ -61,6 +58,7 @@ export default function AlunosSemEstagio() {
             );
           })
           .map((aluno) => ({
+            id: aluno.id, // Fornece o ID único para a chave no componente Tabela
             matricula:
               aluno.perfil?.usuario?.matricula || "-",
             nome:
@@ -73,7 +71,7 @@ export default function AlunosSemEstagio() {
 
         setAlunos(alunosSemEstagio);
       } catch (error) {
-        console.error(error);
+        console.error("Erro ao carregar alunos sem estágio:", error);
       } finally {
         setLoading(false);
       }
@@ -137,7 +135,7 @@ export default function AlunosSemEstagio() {
         </div>
 
         {loading ? (
-          <p>Carregando...</p>
+          <p style={{ textAlign: "center", marginTop: "20px" }}>Carregando...</p>
         ) : alunos.length > 0 ? (
           <Tabela
             colunas={colunas}
@@ -150,6 +148,7 @@ export default function AlunosSemEstagio() {
               padding: "30px",
               borderRadius: "10px",
               textAlign: "center",
+              boxShadow: "0px 4px 12px rgba(0,0,0,.08)",
             }}
           >
             Nenhum aluno do 3º ano sem estágio encontrado.
