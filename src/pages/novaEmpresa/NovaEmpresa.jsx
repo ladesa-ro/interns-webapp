@@ -3,4 +3,4 @@ import CadastroEmpresaForm from '../../components/registerEmpresa_Components/Cad
 
 export default function NovaEmpresa() {
   return <CadastroEmpresaForm modo="novo" />;
-}
+}

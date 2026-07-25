@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import Tabela from "../../components/global_Components/Tabela";
 import Cards from "../../components/global_Components/Cards";
+import apiFetch from "../../utils/api";
 
 export default function AlunosEmEstagio() {
   const navigate = useNavigate();
@@ -13,17 +14,21 @@ export default function AlunosEmEstagio() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://dev.ladesa.com.br/api/v1/estagios?page=1&limit=100")
-      .then((response) => response.json())
-      .then((json) => {
-        console.log("RETORNO DA API:");
-        console.log(json);
+    async function fetchAlunos() {
+      setLoading(true);
+      try {
+        const response = await apiFetch("/estagios?page=1&limit=100");
+        if (!response.ok) {
+          throw new Error("Erro ao buscar estágios.");
+        }
+        const json = await response.json();
 
-        const estagiosEmAndamento = json.data.filter(
+        const estagiosEmAndamento = (json.data || []).filter(
           (estagio) => estagio.status === "EM_ANDAMENTO"
         );
 
         const dadosTabela = estagiosEmAndamento.map((estagio) => ({
+          id: estagio.id,
           matricula: estagio.estagiario?.matricula || "-",
           nome: estagio.estagiario?.nome || "-",
           turma:
@@ -34,13 +39,13 @@ export default function AlunosEmEstagio() {
         }));
 
         setAlunos(dadosTabela);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
+      } catch (error) {
+        console.error("Erro ao carregar alunos em estágio:", error);
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+    fetchAlunos();
   }, []);
 
   const colunas = [
@@ -90,7 +95,7 @@ export default function AlunosEmEstagio() {
         </div>
 
         {loading ? (
-          <p>Carregando...</p>
+          <p style={{ textAlign: "center", marginTop: "20px" }}>Carregando dados...</p>
         ) : alunos.length > 0 ? (
           <Tabela
             colunas={colunas}
