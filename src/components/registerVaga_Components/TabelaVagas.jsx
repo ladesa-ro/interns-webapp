@@ -15,23 +15,36 @@ export default function TabelaVagas() {
   const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState("");
   const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
   const itensPorPagina = 10;
 
   // Estados do modal de exclusão
   const [modalAberto, setModalAberto] = useState(false);
   const [vagaSelecionada, setVagaSelecionada] = useState(null);
+  const [deletando, setDeletando] = useState(false);
 
-  // Busca as vagas e dados relacionados da API no carregamento do componente
+  // Busca as vagas paginadas do backend
   useEffect(() => {
+    let cancelado = false;
+
     async function carregarVagas() {
       setLoading(true);
       try {
-        // Busca estágios (vagas), empresas, cursos e campi em paralelo para associar
+        const queryParams = new URLSearchParams({
+          page: pagina.toString(),
+          limit: itensPorPagina.toString(),
+        });
+
+        if (busca.trim()) {
+          queryParams.append("search", busca.trim());
+        }
+
+        // Busca estágios paginados e tabelas auxiliares para enriquecer exibição
         const [resEstagios, resEmpresas, resCursos, resCampi] = await Promise.all([
-          apiFetch("/estagios?page=1&limit=1000"),
-          apiFetch("/empresas?page=1&limit=1000"),
-          apiFetch("/cursos?page=1&limit=1000"),
-          apiFetch("/campi?page=1&limit=1000"),
+          apiFetch(`/estagios?${queryParams.toString()}`),
+          apiFetch("/empresas?limit=1000").catch(() => null),
+          apiFetch("/cursos?limit=1000").catch(() => null),
+          apiFetch("/campi?limit=1000").catch(() => null),
         ]);
 
         if (!resEstagios.ok) {
@@ -39,24 +52,45 @@ export default function TabelaVagas() {
         }
 
         const dataEstagios = await resEstagios.json();
-        const dataEmpresas = await resEmpresas.json().catch(() => ({ data: [] }));
-        const dataCursos = await resCursos.json().catch(() => ({ data: [] }));
-        const dataCampi = await resCampi.json().catch(() => ({ data: [] }));
+        const dataEmpresas = resEmpresas && resEmpresas.ok ? await resEmpresas.json() : { data: [] };
+        const dataCursos = resCursos && resCursos.ok ? await resCursos.json() : { data: [] };
+        const dataCampi = resCampi && resCampi.ok ? await resCampi.json() : { data: [] };
+
+        if (cancelado) return;
 
         // Cria mapas para buscas O(1)
         const empresasMap = new Map((dataEmpresas.data || []).map((emp) => [emp.id, emp]));
         const cursosMap = new Map((dataCursos.data || []).map((c) => [c.id, c]));
         const campiMap = new Map((dataCampi.data || []).map((cam) => [cam.id, cam]));
 
+        const rawEstagios = dataEstagios.data || (Array.isArray(dataEstagios) ? dataEstagios : []);
+
         // Formata e unifica as vagas
-        const listaVagas = (dataEstagios.data || []).map((item) => {
+        const listaVagas = rawEstagios.map((item) => {
           const empresaObj = item.empresa?.id ? empresasMap.get(item.empresa.id) : null;
           const cursoObj = item.CursoReferencia?.id ? cursosMap.get(item.CursoReferencia.id) : null;
           const campusObj = item.campus?.id ? campiMap.get(item.campus.id) : null;
 
-          const empresaNome = item.empresa?.nomeFantasia || item.empresa?.razaoSocial || empresaObj?.nomeFantasia || empresaObj?.razaoSocial || "Não informada";
-          const cursoNome = item.CursoReferencia?.nomeAbreviado || item.CursoReferencia?.nome || cursoObj?.nomeAbreviado || cursoObj?.nome || "Não informado";
-          const campusNome = item.campus?.nomeFantasia || item.campus?.razaoSocial || campusObj?.nomeFantasia || campusObj?.razaoSocial || "Não informado";
+          const empresaNome =
+            item.empresa?.nomeFantasia ||
+            item.empresa?.razaoSocial ||
+            empresaObj?.nomeFantasia ||
+            empresaObj?.razaoSocial ||
+            "Não informada";
+
+          const cursoNome =
+            item.CursoReferencia?.nomeAbreviado ||
+            item.CursoReferencia?.nome ||
+            cursoObj?.nomeAbreviado ||
+            cursoObj?.nome ||
+            "Não informado";
+
+          const campusNome =
+            item.campus?.nomeFantasia ||
+            item.campus?.razaoSocial ||
+            campusObj?.nomeFantasia ||
+            campusObj?.razaoSocial ||
+            "Não informado";
 
           return {
             id: item.id,
@@ -70,38 +104,41 @@ export default function TabelaVagas() {
         });
 
         setVagas(listaVagas);
+
+        // Atualiza total de páginas dinamicamente com base nos metadados da API Ladesa
+        const pageCount = dataEstagios.meta?.pageCount || dataEstagios.meta?.totalPages || dataEstagios.pageCount;
+        const totalItems = dataEstagios.meta?.itemCount || dataEstagios.meta?.totalItems || dataEstagios.total;
+
+        if (pageCount) {
+          setTotalPaginas(Math.max(1, pageCount));
+        } else if (totalItems !== undefined) {
+          setTotalPaginas(Math.max(1, Math.ceil(totalItems / itensPorPagina)));
+        } else {
+          setTotalPaginas(1);
+        }
       } catch (error) {
-        console.error("Erro ao buscar vagas:", error);
+        if (!cancelado) {
+          console.error("Erro ao buscar vagas:", error);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelado) {
+          setLoading(false);
+        }
       }
     }
 
     carregarVagas();
-  }, []);
 
-  // Filtra as vagas com base na pesquisa (Empresa, Curso, Campus ou Supervisor)
-  const vagasFiltradas = vagas.filter((vaga) => {
-    const termo = busca.toLowerCase().trim();
-    if (!termo) return true;
-
-    return (
-      vaga.empresaNome.toLowerCase().includes(termo) ||
-      vaga.cursoNome.toLowerCase().includes(termo) ||
-      vaga.campusNome.toLowerCase().includes(termo) ||
-      vaga.nomeSupervisor.toLowerCase().includes(termo)
-    );
-  });
-
-  // Paginação dos dados filtrados
-  const totalPaginas = Math.ceil(vagasFiltradas.length / itensPorPagina) || 1;
-  const indiceInicial = (pagina - 1) * itensPorPagina;
-  const vagasPaginadas = vagasFiltradas.slice(indiceInicial, indiceInicial + itensPorPagina);
+    return () => {
+      cancelado = true;
+    };
+  }, [pagina, busca]);
 
   // Executa exclusão da vaga selecionada
   async function handleDeletar() {
     if (!vagaSelecionada) return;
 
+    setDeletando(true);
     try {
       const response = await apiFetch(`/estagios/${vagaSelecionada.id}`, {
         method: "DELETE",
@@ -116,20 +153,20 @@ export default function TabelaVagas() {
 
       alert("Vaga excluída com sucesso!");
 
-      // Remove a vaga localmente do estado
-      setVagas(vagas.filter((v) => v.id !== vagaSelecionada.id));
+      setVagas((prev) => prev.filter((v) => v.id !== vagaSelecionada.id));
       setModalAberto(false);
       setVagaSelecionada(null);
 
-      // Recalcula página ativa se necessário
-      if (vagasPaginadas.length === 1 && pagina > 1) {
-        setPagina(pagina - 1);
+      if (vagas.length === 1 && pagina > 1) {
+        setPagina((p) => p - 1);
       }
     } catch (error) {
       console.error("Erro ao excluir vaga:", error);
       alert(error.message || "Ocorreu um erro ao tentar excluir a vaga.");
       setModalAberto(false);
       setVagaSelecionada(null);
+    } finally {
+      setDeletando(false);
     }
   }
 
@@ -147,7 +184,6 @@ export default function TabelaVagas() {
 
   return (
     <div className={Styles.container}>
-      
       {/* Barra de Pesquisa */}
       <div className={Styles.searchContainer}>
         <PesquisaIcon size={36} className={Styles.searchIcon} />
@@ -157,7 +193,7 @@ export default function TabelaVagas() {
           value={busca}
           onChange={(e) => {
             setBusca(e.target.value);
-            setPagina(1); // Reinicia para a primeira página ao pesquisar
+            setPagina(1);
           }}
         />
       </div>
@@ -181,14 +217,14 @@ export default function TabelaVagas() {
             </thead>
 
             <tbody>
-              {vagasPaginadas.length === 0 ? (
+              {vagas.length === 0 ? (
                 <tr>
                   <td colSpan="7" style={{ textAlign: "center" }}>
                     Nenhuma vaga encontrada.
                   </td>
                 </tr>
               ) : (
-                vagasPaginadas.map((vaga) => (
+                vagas.map((vaga) => (
                   <tr key={vaga.id}>
                     <td>{vaga.campusNome}</td>
                     <td>{vaga.empresaNome}</td>
@@ -216,11 +252,11 @@ export default function TabelaVagas() {
             </tbody>
           </table>
 
-          {/* Paginação */}
+          {/* Paginação Server-side */}
           <div className={Styles.pagination}>
-            <button 
-              disabled={pagina === 1} 
-              onClick={() => setPagina(pagina - 1)}
+            <button
+              disabled={pagina === 1 || loading}
+              onClick={() => setPagina((p) => Math.max(1, p - 1))}
             >
               Anterior
             </button>
@@ -229,9 +265,9 @@ export default function TabelaVagas() {
               Página {pagina} de {totalPaginas}
             </span>
 
-            <button 
-              disabled={pagina === totalPaginas || totalPaginas === 0} 
-              onClick={() => setPagina(pagina + 1)}
+            <button
+              disabled={pagina >= totalPaginas || loading}
+              onClick={() => setPagina((p) => p + 1)}
             >
               Próxima
             </button>
@@ -255,20 +291,21 @@ export default function TabelaVagas() {
                   setModalAberto(false);
                   setVagaSelecionada(null);
                 }}
+                disabled={deletando}
               >
                 Cancelar
               </button>
-              <button 
-                className={Styles.deleteButton} 
+              <button
+                className={Styles.deleteButton}
                 onClick={handleDeletar}
+                disabled={deletando}
               >
-                Excluir
+                {deletando ? "Excluindo..." : "Excluir"}
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }
