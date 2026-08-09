@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import Styles from "./cadastroEmpresaForm.module.css";
 import CadastrarEmpresaIcon from "../icons_Components/Icon_Cadastrar_Empresa_Comp";
+import apiFetch from "../../utils/api";
 
 // Formata CNPJ como XX.XXX.XXX/XXXX-XX enquanto o usuário digita
 function formatarCnpj(valor) {
@@ -78,6 +79,10 @@ export default function CadastroEmpresaForm({ modo }) {
   const [carregandoDados, setCarregandoDados] = useState(modo === "editar");
   const [toast, setToast] = useState(null); // { tipo: "sucesso"|"erro", mensagem: "" }
 
+  // Ref para controlar se os dados do endereço já foram carregados (modo editar)
+  // Impede que o onBlur do CEP sobrescreva os dados vindos da API
+  const dadosEnderecoCarregados = useRef(false);
+
   // Exibe um toast que some automaticamente após 4 segundos
   function exibirToast(tipo, mensagem) {
     setToast({ tipo, mensagem });
@@ -88,11 +93,9 @@ export default function CadastroEmpresaForm({ modo }) {
   useEffect(() => {
     if (modo !== "editar" || !id) return;
 
-    const token = localStorage.getItem("token");
+    dadosEnderecoCarregados.current = false;
 
-    fetch(`https://dev.ladesa.com.br/api/v1/empresas/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    apiFetch(`/empresas/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Empresa não encontrada.");
         return res.json();
@@ -107,7 +110,9 @@ export default function CadastroEmpresaForm({ modo }) {
         const end = empresa.endereco;
         if (end) {
           setEnderecoId(end.id);
-          setCep(end.cep || "");
+          // Formata o CEP como XXXXX-XXX para exibição
+          const cepFormatado = (end.cep || "").replace(/^(\d{5})(\d{3})$/, "$1-$2");
+          setCep(cepFormatado);
           setLogradouro(end.logradouro || "");
           setNumero(end.numero || "");
           setBairro(end.bairro || "");
@@ -116,6 +121,8 @@ export default function CadastroEmpresaForm({ modo }) {
           setCidadeId(end.cidade?.id || null);
           setCidadeNome(end.cidade?.nome || "");
           setEstado(end.cidade?.estado?.sigla || "");
+          // Marca que os dados do endereço já foram carregados
+          dadosEnderecoCarregados.current = true;
         }
       })
       .catch((err) => {
@@ -128,6 +135,12 @@ export default function CadastroEmpresaForm({ modo }) {
   async function buscarCep() {
     const cepLimpo = cep.replace(/\D/g, "");
     if (cepLimpo.length !== 8) return;
+
+    // Se estamos em modo editar e os dados já foram carregados da API,
+    // só busca o CEP novamente se o usuário realmente modificou o campo
+    if (modo === "editar" && dadosEnderecoCarregados.current && cidadeId) {
+      return;
+    }
 
     setBuscandoCep(true);
 
@@ -145,10 +158,8 @@ export default function CadastroEmpresaForm({ modo }) {
       setCidadeNome(dados.localidade);
       setEstado(dados.uf);
 
-      const token = localStorage.getItem("token");
-      const cidadeResponse = await fetch(
-        `https://dev.ladesa.com.br/api/v1/base/cidades?search=${encodeURIComponent(dados.localidade)}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+      const cidadeResponse = await apiFetch(
+        `/base/cidades?search=${encodeURIComponent(dados.localidade)}`
       );
       const cidadeDados = await cidadeResponse.json();
 
@@ -186,7 +197,6 @@ export default function CadastroEmpresaForm({ modo }) {
       return;
     }
 
-    const token = localStorage.getItem("token");
     const cnpjApenasNumeros = cnpj.replace(/\D/g, "");
     const telefoneApenasNumeros = telefone.replace(/\D/g, "");
 
@@ -196,16 +206,12 @@ export default function CadastroEmpresaForm({ modo }) {
       if (modo === "editar") {
         // PUT endereço existente
         if (enderecoId) {
-          const enderecoRes = await fetch(
-            `https://dev.ladesa.com.br/api/v1/enderecos/${enderecoId}`,
+          const enderecoRes = await apiFetch(
+            `/enderecos/${enderecoId}`,
             {
               method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
               body: JSON.stringify({
-                cep,
+                cep: cep.replace(/\D/g, ""),
                 logradouro,
                 numero: String(numero),
                 bairro,
@@ -223,14 +229,10 @@ export default function CadastroEmpresaForm({ modo }) {
         }
 
         // PUT empresa
-        const empresaRes = await fetch(
-          `https://dev.ladesa.com.br/api/v1/empresas/${id}`,
+        const empresaRes = await apiFetch(
+          `/empresas/${id}`,
           {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
             body: JSON.stringify({
               razaoSocial,
               nomeFantasia,
@@ -250,14 +252,10 @@ export default function CadastroEmpresaForm({ modo }) {
         setTimeout(() => navigate("/cadastrarempresa"), 1500);
       } else {
         // POST endereço
-        const enderecoRes = await fetch("https://dev.ladesa.com.br/api/v1/enderecos", {
+        const enderecoRes = await apiFetch("/enderecos", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify({
-            cep,
+            cep: cep.replace(/\D/g, ""),
             logradouro,
             numero: String(numero),
             bairro,
@@ -275,12 +273,8 @@ export default function CadastroEmpresaForm({ modo }) {
         const enderecoCriado = await enderecoRes.json();
 
         // POST empresa
-        const empresaRes = await fetch("https://dev.ladesa.com.br/api/v1/empresas", {
+        const empresaRes = await apiFetch("/empresas", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify({
             razaoSocial,
             nomeFantasia,
@@ -294,10 +288,7 @@ export default function CadastroEmpresaForm({ modo }) {
         if (!empresaRes.ok) {
           const err = await empresaRes.json().catch(() => ({}));
           // Tenta fazer rollback do endereço órfão
-          fetch(`https://dev.ladesa.com.br/api/v1/enderecos/${enderecoCriado.id}`, {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` },
-          }).catch(() => {});
+          apiFetch(`/enderecos/${enderecoCriado.id}`, { method: "DELETE" }).catch(() => {});
           throw new Error(err.message || "Erro ao cadastrar empresa.");
         }
 
@@ -389,7 +380,11 @@ export default function CadastroEmpresaForm({ modo }) {
             <label>CEP</label>
             <input
               value={cep}
-              onChange={(e) => setCep(e.target.value)}
+              onChange={(e) => {
+                setCep(e.target.value);
+                // Ao editar o CEP manualmente, libera nova busca
+                dadosEnderecoCarregados.current = false;
+              }}
               onBlur={buscarCep}
               placeholder="00000-000"
               required
