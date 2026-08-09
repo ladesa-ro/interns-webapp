@@ -196,3 +196,50 @@
   font-weight: 500;
   color: #374151;
 }
+
+/* Contador de resultados */
+.contador {
+  font-size: 0.88rem;
+  color: #6b7280;
+  margin-bottom: 12px;
+  margin-top: 0;
+}
+
+/* Estado de erro */
+.erroContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.mensagem {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin: 0;
+  text-align: center;
+}
+
+.btnTentar {
+  border: none;
+  background: #016630;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btnTentar:hover {
+  background: #014d24;
+}
+
+/* Botões do modal desabilitados */
+.cancelButton:disabled,
+.deleteButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
