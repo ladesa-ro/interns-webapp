@@ -203,76 +203,65 @@ export default function CadastroEmpresaForm({ modo }) {
     setCarregando(true);
 
     try {
-      if (modo === "editar") {
-        // PUT endereço existente
-        if (enderecoId) {
-          const enderecoRes = await apiFetch(
-            `/enderecos/${enderecoId}`,
-            {
-              method: "PUT",
-              body: JSON.stringify({
-                cep: cep.replace(/\D/g, ""),
-                logradouro,
-                numero: String(numero),
-                bairro,
-                complemento: complemento || null,
-                pontoReferencia: pontoReferencia || null,
-                cidade: { id: cidadeId },
-              }),
-            }
-          );
+      // 1. Cria o novo registro de endereço (evita o bug de validação em PATCH /enderecos/:id da API Ladesa)
+      const enderecoRes = await apiFetch("/enderecos", {
+        method: "POST",
+        body: JSON.stringify({
+          cep: cep.replace(/\D/g, ""),
+          logradouro,
+          numero: String(numero),
+          bairro,
+          complemento: complemento || null,
+          pontoReferencia: pontoReferencia || null,
+          cidade: { id: Number(cidadeId) },
+        }),
+      });
 
-          if (!enderecoRes.ok) {
-            const err = await enderecoRes.json().catch(() => ({}));
-            throw new Error(err.message || "Erro ao atualizar endereço.");
-          }
-        }
-
-        // PUT empresa
-        const empresaRes = await apiFetch(
-          `/empresas/${id}`,
-          {
-            method: "PUT",
-            body: JSON.stringify({
-              razaoSocial,
-              nomeFantasia,
-              cnpj: cnpjApenasNumeros,
-              telefone: telefoneApenasNumeros,
-              email,
-            }),
-          }
+      if (!enderecoRes.ok) {
+        const err = await enderecoRes.json().catch(() => ({}));
+        throw new Error(
+          Array.isArray(err.details)
+            ? err.details.map((d) => `${d.field}: ${d.message}`).join(" | ")
+            : err.message || "Erro ao salvar endereço."
         );
+      }
+
+      const enderecoCriado = await enderecoRes.json();
+
+      if (modo === "editar") {
+        // 2. Atualiza a empresa vinculando o novo endereço
+        const empresaRes = await apiFetch(`/empresas/${id}`, {
+          method: "PATCH",
+          body: JSON.stringify({
+            razaoSocial,
+            nomeFantasia,
+            cnpj: cnpjApenasNumeros,
+            telefone: telefoneApenasNumeros,
+            email,
+            endereco: { id: enderecoCriado.id },
+          }),
+        });
 
         if (!empresaRes.ok) {
           const err = await empresaRes.json().catch(() => ({}));
-          throw new Error(err.message || "Erro ao atualizar empresa.");
+          // Rollback do endereço recém criado se falhar a atualização da empresa
+          apiFetch(`/enderecos/${enderecoCriado.id}`, { method: "DELETE" }).catch(() => {});
+          throw new Error(
+            Array.isArray(err.details)
+              ? err.details.map((d) => `${d.field}: ${d.message}`).join(" | ")
+              : err.message || "Erro ao atualizar empresa."
+          );
+        }
+
+        // 3. Remove silenciosamente o endereço antigo
+        if (enderecoId && enderecoId !== enderecoCriado.id) {
+          apiFetch(`/enderecos/${enderecoId}`, { method: "DELETE" }).catch(() => {});
         }
 
         exibirToast("sucesso", "Empresa atualizada com sucesso!");
         setTimeout(() => navigate("/cadastrarempresa"), 1500);
       } else {
-        // POST endereço
-        const enderecoRes = await apiFetch("/enderecos", {
-          method: "POST",
-          body: JSON.stringify({
-            cep: cep.replace(/\D/g, ""),
-            logradouro,
-            numero: String(numero),
-            bairro,
-            complemento: complemento || null,
-            pontoReferencia: pontoReferencia || null,
-            cidade: { id: cidadeId },
-          }),
-        });
-
-        if (!enderecoRes.ok) {
-          const err = await enderecoRes.json().catch(() => ({}));
-          throw new Error(err.message || "Erro ao criar endereço.");
-        }
-
-        const enderecoCriado = await enderecoRes.json();
-
-        // POST empresa
+        // Modo Cadastro
         const empresaRes = await apiFetch("/empresas", {
           method: "POST",
           body: JSON.stringify({
@@ -287,7 +276,7 @@ export default function CadastroEmpresaForm({ modo }) {
 
         if (!empresaRes.ok) {
           const err = await empresaRes.json().catch(() => ({}));
-          // Tenta fazer rollback do endereço órfão
+          // Rollback do endereço órfão
           apiFetch(`/enderecos/${enderecoCriado.id}`, { method: "DELETE" }).catch(() => {});
           throw new Error(err.message || "Erro ao cadastrar empresa.");
         }
