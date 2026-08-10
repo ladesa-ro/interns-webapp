@@ -1,0 +1,810 @@
+/* =====================================================
+   RESET
+===================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   PÁGINA
+===================================================== */
+
+.perfilPage {
+  width: 100%;
+  min-height: 100vh;
+
+  background: #f7f7f7;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 40px;
+}
+
+
+/* =====================================================
+   CARD PRINCIPAL
+===================================================== */
+
+.perfilCard {
+  width: 100%;
+  max-width: 1250px;
+
+  background: #fff;
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.18);
+
+  display: flex;
+
+  padding: 35px;
+}
+
+
+/* =====================================================
+   LADO ESQUERDO
+===================================================== */
+
+.perfilEsquerda {
+  width: 330px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* =====================================================
+   FOTO
+===================================================== */
+
+.fotoContainer {
+  position: relative;
+}
+
+
+.fotoPerfil {
+  width: 190px;
+  height: 190px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  border: 4px solid #0a4d42;
+}
+
+
+/* =====================================================
+   BOTÃO DA CÂMERA
+===================================================== */
+
+.cameraBtn {
+  position: absolute;
+
+  right: 10px;
+  bottom: 10px;
+
+  width: 36px;
+  height: 36px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #0c8b3c;
+
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+
+.cameraBtn:hover {
+  background: #087530;
+}
+
+
+/* =====================================================
+   NOME
+===================================================== */
+
+.perfilEsquerda h2 {
+  margin-top: 28px;
+
+  font-size: 36px;
+
+  font-weight: 700;
+
+  color: #222;
+
+  text-align: center;
+}
+
+
+/* =====================================================
+   LINHA DIVISÓRIA
+===================================================== */
+
+.linha {
+  width: 2px;
+
+  background: #95d39e;
+
+  margin: 0 45px;
+}
+
+
+/* =====================================================
+   LADO DIREITO
+===================================================== */
+
+.perfilDireita {
+  flex: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+
+/* =====================================================
+   CARDS DE INFORMAÇÃO
+===================================================== */
+
+.infoCard {
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+
+  background: #edfceb;
+
+  border: 1px solid #c7efc5;
+
+  border-radius: 10px;
+
+  padding: 22px 20px;
+
+  color: #046a38;
+}
+
+
+.infoCard>svg {
+  color: #046a38;
+
+  flex-shrink: 0;
+}
+
+
+/* =====================================================
+   TÍTULO DOS CARDS
+===================================================== */
+
+.infoCard h3 {
+  font-size: 24px;
+
+  margin-bottom: 4px;
+
+  color: #046a38;
+}
+
+
+/* =====================================================
+   TEXTO DOS CARDS
+===================================================== */
+
+.infoCard p {
+  font-size: 18px;
+
+  color: #166c3b;
+
+  margin: 0;
+}
+
+
+/* =====================================================
+   CONTEÚDO DO EMAIL
+===================================================== */
+
+.emailCardContent {
+  padding-right: 70px;
+}
+
+
+/* =====================================================
+   LISTA DE EMAILS NO CARD
+===================================================== */
+
+.listaEmailsCard {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+
+.listaEmailsCard p {
+  margin: 0;
+
+  font-size: 18px;
+
+  color: #166c3b;
+
+  word-break: break-word;
+}
+
+
+/* =====================================================
+   BOTÃO EDITAR
+===================================================== */
+
+.editar {
+  position: absolute;
+
+  top: 10px;
+  right: 16px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  font-size: 14px;
+
+  color: #0a7c37;
+
+  cursor: pointer;
+
+  background: transparent;
+
+  border: none;
+}
+
+
+.editar:hover {
+  color: #065c2b;
+}
+
+
+/* =====================================================
+   MODAL - FUNDO
+===================================================== */
+
+.modalOverlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  z-index: 9999;
+
+  padding: 20px;
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.modal {
+  width: 100%;
+
+  max-width: 520px;
+
+  background: #ffffff;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.25);
+
+  overflow: hidden;
+
+  animation: aparecerModal 0.2s ease;
+}
+
+
+/* =====================================================
+   ANIMAÇÃO DO MODAL
+===================================================== */
+
+@keyframes aparecerModal {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-15px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0) scale(1);
+  }
+
+}
+
+
+/* =====================================================
+   CABEÇALHO DO MODAL
+===================================================== */
+
+.modalHeader {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 20px 24px;
+
+  border-bottom: 1px solid #e5e5e5;
+}
+
+
+/* =====================================================
+   TÍTULO DO MODAL
+===================================================== */
+
+.modalTitle {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  color: #046a38;
+}
+
+
+.modalTitle h2 {
+  font-size: 20px;
+
+  color: #222;
+
+  margin: 0;
+}
+
+
+/* =====================================================
+   BOTÃO FECHAR
+===================================================== */
+
+.fecharModal {
+  width: 34px;
+  height: 34px;
+
+  border: none;
+
+  background: transparent;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  color: #555;
+
+  transition: 0.2s;
+}
+
+
+.fecharModal:hover {
+  background: #f1f1f1;
+
+  color: #222;
+}
+
+
+/* =====================================================
+   CONTEÚDO DO MODAL
+===================================================== */
+
+.modalContent {
+  padding: 24px;
+}
+
+
+.modalDescricao {
+  margin-bottom: 18px;
+
+  color: #666;
+
+  font-size: 14px;
+}
+
+
+/* =====================================================
+   LISTA DE EMAILS
+===================================================== */
+
+.emailLista {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+  margin-bottom: 22px;
+}
+
+
+/* =====================================================
+   ITEM DE EMAIL
+===================================================== */
+
+.emailItem {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 13px 15px;
+
+  background: #f1fbf1;
+
+  border: 1px solid #c7efc5;
+
+  border-radius: 8px;
+}
+
+
+.emailItemInfo {
+  min-width: 0;
+}
+
+
+.emailItem span {
+  display: block;
+
+  font-size: 12px;
+
+  color: #0a7c37;
+
+  margin-bottom: 3px;
+
+  font-weight: 600;
+}
+
+
+.emailItem p {
+  margin: 0;
+
+  font-size: 14px;
+
+  color: #222;
+
+  word-break: break-word;
+}
+
+
+/* =====================================================
+   BOTÃO REMOVER EMAIL
+===================================================== */
+
+.removerEmail {
+  width: 32px;
+  height: 32px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #d93025;
+
+  border-radius: 6px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  flex-shrink: 0;
+}
+
+
+.removerEmail:hover {
+  background: #ffecec;
+}
+
+
+/* =====================================================
+   NOVO EMAIL
+===================================================== */
+
+.novoEmail {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+
+.novoEmail label {
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: #333;
+}
+
+
+/* =====================================================
+   INPUT EMAIL
+===================================================== */
+
+.inputEmail {
+  height: 44px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 0 13px;
+
+  border: 1px solid #ccc;
+
+  border-radius: 8px;
+
+  background: #fff;
+
+  transition: 0.2s;
+}
+
+
+.inputEmail:focus-within {
+  border-color: #0a7c37;
+
+  box-shadow:
+    0 0 0 2px rgba(10, 124, 55, 0.1);
+}
+
+
+.inputEmail svg {
+  color: #0a7c37;
+
+  flex-shrink: 0;
+}
+
+
+.inputEmail input {
+  width: 100%;
+
+  border: none;
+
+  outline: none;
+
+  font-size: 14px;
+
+  color: #333;
+
+  background: transparent;
+}
+
+
+/* =====================================================
+   BOTÃO ADICIONAR EMAIL
+===================================================== */
+
+.btnAdicionar {
+  align-self: flex-start;
+
+  margin-top: 4px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #0a7c37;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  cursor: pointer;
+}
+
+
+.btnAdicionar:hover {
+  text-decoration: underline;
+}
+
+
+/* =====================================================
+   RODAPÉ DO MODAL
+===================================================== */
+
+.modalFooter {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding: 16px 24px;
+
+  background: #fafafa;
+
+  border-top: 1px solid #e5e5e5;
+}
+
+
+/* =====================================================
+   BOTÃO CANCELAR
+===================================================== */
+
+.btnCancelar {
+  padding: 10px 18px;
+
+  border: 1px solid #ccc;
+
+  background: #fff;
+
+  color: #555;
+
+  border-radius: 7px;
+
+  cursor: pointer;
+
+  font-size: 14px;
+}
+
+
+.btnCancelar:hover {
+  background: #f1f1f1;
+}
+
+
+/* =====================================================
+   BOTÃO SALVAR
+===================================================== */
+
+.btnSalvar {
+  padding: 10px 18px;
+
+  border: none;
+
+  background: #087f3b;
+
+  color: #fff;
+
+  border-radius: 7px;
+
+  cursor: pointer;
+
+  font-size: 14px;
+
+  font-weight: 600;
+}
+
+
+.btnSalvar:hover {
+  background: #066b31;
+}
+
+
+/* =====================================================
+   RESPONSIVO
+===================================================== */
+
+@media (max-width: 950px) {
+
+  .perfilCard {
+    flex-direction: column;
+
+    align-items: center;
+  }
+
+
+  .linha {
+    width: 100%;
+
+    height: 2px;
+
+    margin: 30px 0;
+  }
+
+
+  .perfilEsquerda {
+    width: 100%;
+  }
+
+
+  .perfilDireita {
+    width: 100%;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .perfilPage {
+    padding: 20px;
+  }
+
+
+  .perfilCard {
+    padding: 25px 20px;
+  }
+
+
+  .perfilEsquerda h2 {
+    font-size: 28px;
+  }
+
+
+  .modal {
+    max-width: 100%;
+  }
+
+
+  .modalHeader {
+    padding: 17px 18px;
+  }
+
+
+  .modalContent {
+    padding: 18px;
+  }
+
+
+  .modalFooter {
+    padding: 14px 18px;
+  }
+
+
+  .modalFooter button {
+    flex: 1;
+  }
+
+}
