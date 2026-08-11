@@ -11,11 +11,11 @@ export default function TabelaVagas() {
   const navigate = useNavigate();
 
   // Estados dos dados e carregamento
-  const [vagas, setVagas] = useState([]);
+  const [todasVagas, setTodasVagas] = useState([]); // lista completa vinda da API
   const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState(null);
   const [busca, setBusca] = useState("");
   const [pagina, setPagina] = useState(1);
-  const [totalPaginas, setTotalPaginas] = useState(1);
   const itensPorPagina = 10;
 
   // Estados do modal de exclusão
@@ -23,25 +23,20 @@ export default function TabelaVagas() {
   const [vagaSelecionada, setVagaSelecionada] = useState(null);
   const [deletando, setDeletando] = useState(false);
 
-  // Busca as vagas paginadas do backend
+  // Busca TODAS as vagas da API (paginação client-side)
+  // A API /estagios não retorna metadados de paginação, por isso buscamos
+  // todos os registros disponíveis de uma vez e paginamos localmente.
   useEffect(() => {
     let cancelado = false;
 
     async function carregarVagas() {
       setLoading(true);
+      setErro(null);
+
       try {
-        const queryParams = new URLSearchParams({
-          page: pagina.toString(),
-          limit: itensPorPagina.toString(),
-        });
-
-        if (busca.trim()) {
-          queryParams.append("search", busca.trim());
-        }
-
-        // Busca estágios paginados e tabelas auxiliares para enriquecer exibição
+        // Busca estágios e tabelas auxiliares para enriquecer exibição
         const [resEstagios, resEmpresas, resCursos, resCampi] = await Promise.all([
-          apiFetch(`/estagios?${queryParams.toString()}`),
+          apiFetch("/estagios?limit=100"),
           apiFetch("/empresas?limit=1000").catch(() => null),
           apiFetch("/cursos?limit=1000").catch(() => null),
           apiFetch("/campi?limit=1000").catch(() => null),
@@ -103,22 +98,11 @@ export default function TabelaVagas() {
           };
         });
 
-        setVagas(listaVagas);
-
-        // Atualiza total de páginas dinamicamente com base nos metadados da API Ladesa
-        const pageCount = dataEstagios.meta?.pageCount || dataEstagios.meta?.totalPages || dataEstagios.pageCount;
-        const totalItems = dataEstagios.meta?.itemCount || dataEstagios.meta?.totalItems || dataEstagios.total;
-
-        if (pageCount) {
-          setTotalPaginas(Math.max(1, pageCount));
-        } else if (totalItems !== undefined) {
-          setTotalPaginas(Math.max(1, Math.ceil(totalItems / itensPorPagina)));
-        } else {
-          setTotalPaginas(1);
-        }
+        setTodasVagas(listaVagas);
       } catch (error) {
         if (!cancelado) {
           console.error("Erro ao buscar vagas:", error);
+          setErro(error.message || "Erro ao carregar vagas. Tente novamente.");
         }
       } finally {
         if (!cancelado) {
@@ -132,7 +116,32 @@ export default function TabelaVagas() {
     return () => {
       cancelado = true;
     };
-  }, [pagina, busca]);
+  }, []); // Busca uma única vez ao montar o componente
+
+  // Filtragem client-side por busca
+  const vagasFiltradas = todasVagas.filter((vaga) => {
+    if (!busca.trim()) return true;
+    const termo = busca.toLowerCase();
+    return (
+      vaga.empresaNome.toLowerCase().includes(termo) ||
+      vaga.cursoNome.toLowerCase().includes(termo) ||
+      vaga.campusNome.toLowerCase().includes(termo) ||
+      vaga.nomeSupervisor.toLowerCase().includes(termo)
+    );
+  });
+
+  // Paginação client-side
+  const totalPaginas = Math.max(1, Math.ceil(vagasFiltradas.length / itensPorPagina));
+  const vagasPaginadas = vagasFiltradas.slice(
+    (pagina - 1) * itensPorPagina,
+    pagina * itensPorPagina
+  );
+
+  // Reseta para página 1 ao buscar
+  function handleBusca(valor) {
+    setBusca(valor);
+    setPagina(1);
+  }
 
   // Executa exclusão da vaga selecionada
   async function handleDeletar() {
@@ -151,14 +160,15 @@ export default function TabelaVagas() {
         );
       }
 
-      alert("Vaga excluída com sucesso!");
-
-      setVagas((prev) => prev.filter((v) => v.id !== vagaSelecionada.id));
+      setTodasVagas((prev) => prev.filter((v) => v.id !== vagaSelecionada.id));
       setModalAberto(false);
       setVagaSelecionada(null);
 
-      if (vagas.length === 1 && pagina > 1) {
-        setPagina((p) => p - 1);
+      // Ajusta a página se a página atual ficar vazia após a exclusão
+      const novoTotal = vagasFiltradas.length - 1;
+      const novasTotalPaginas = Math.max(1, Math.ceil(novoTotal / itensPorPagina));
+      if (pagina > novasTotalPaginas) {
+        setPagina(novasTotalPaginas);
       }
     } catch (error) {
       console.error("Erro ao excluir vaga:", error);
@@ -191,17 +201,31 @@ export default function TabelaVagas() {
           type="text"
           placeholder="Buscar por empresa, curso, campus ou supervisor..."
           value={busca}
-          onChange={(e) => {
-            setBusca(e.target.value);
-            setPagina(1);
-          }}
+          onChange={(e) => handleBusca(e.target.value)}
         />
       </div>
 
       {loading ? (
         <p style={{ textAlign: "center", margin: "20px 0" }}>Carregando vagas...</p>
+      ) : erro ? (
+        <div className={Styles.erroContainer}>
+          <p className={Styles.mensagem}>{erro}</p>
+          <button
+            className={Styles.btnTentar}
+            onClick={() => window.location.reload()}
+          >
+            Tentar novamente
+          </button>
+        </div>
       ) : (
         <>
+          {/* Contador de resultados */}
+          <p className={Styles.contador}>
+            {busca.trim()
+              ? `${vagasFiltradas.length} vaga(s) encontrada(s) para "${busca}"`
+              : `${todasVagas.length} vaga(s) cadastrada(s) no total`}
+          </p>
+
           {/* Tabela de Vagas */}
           <table className={Styles.table}>
             <thead>
@@ -217,14 +241,16 @@ export default function TabelaVagas() {
             </thead>
 
             <tbody>
-              {vagas.length === 0 ? (
+              {vagasPaginadas.length === 0 ? (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: "center" }}>
-                    Nenhuma vaga encontrada.
+                  <td colSpan="7" style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}>
+                    {busca
+                      ? `Nenhuma vaga encontrada para "${busca}".`
+                      : "Nenhuma vaga cadastrada."}
                   </td>
                 </tr>
               ) : (
-                vagas.map((vaga) => (
+                vagasPaginadas.map((vaga) => (
                   <tr key={vaga.id}>
                     <td>{vaga.campusNome}</td>
                     <td>{vaga.empresaNome}</td>
@@ -252,26 +278,28 @@ export default function TabelaVagas() {
             </tbody>
           </table>
 
-          {/* Paginação Server-side */}
-          <div className={Styles.pagination}>
-            <button
-              disabled={pagina === 1 || loading}
-              onClick={() => setPagina((p) => Math.max(1, p - 1))}
-            >
-              Anterior
-            </button>
+          {/* Paginação Client-side */}
+          {totalPaginas > 1 && (
+            <div className={Styles.pagination}>
+              <button
+                disabled={pagina === 1}
+                onClick={() => setPagina((p) => Math.max(1, p - 1))}
+              >
+                Anterior
+              </button>
 
-            <span>
-              Página {pagina} de {totalPaginas}
-            </span>
+              <span>
+                Página {pagina} de {totalPaginas}
+              </span>
 
-            <button
-              disabled={pagina >= totalPaginas || loading}
-              onClick={() => setPagina((p) => p + 1)}
-            >
-              Próxima
-            </button>
-          </div>
+              <button
+                disabled={pagina >= totalPaginas}
+                onClick={() => setPagina((p) => p + 1)}
+              >
+                Próxima
+              </button>
+            </div>
+          )}
         </>
       )}
 
