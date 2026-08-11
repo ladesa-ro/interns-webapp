@@ -1,38 +1,143 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+} from "react";
 
 const AuthContext = createContext(null);
 
 /**
- * Decodifica o payload do JWT (sem verificar assinatura — apenas client-side).
+ * =========================================================
+ * DECODIFICAR PAYLOAD DO JWT
+ * =========================================================
+ *
+ * Apenas decodifica o JWT no frontend.
+ * Isso NÃO verifica a assinatura do token.
  */
 function decodeJwtPayload(token) {
   try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    if (!token) {
+      return null;
+    }
+
+    const partes = token.split(".");
+
+    if (partes.length !== 3) {
+      return null;
+    }
+
+    const base64Url = partes[1];
+
+    const base64 = base64Url
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split("")
-        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .map(
+          (c) =>
+            "%" +
+            ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+        )
         .join("")
     );
+
     return JSON.parse(jsonPayload);
-  } catch {
+
+  } catch (error) {
+
+    console.error(
+      "[AUTH] Erro ao decodificar JWT:",
+      error
+    );
+
     return null;
   }
 }
 
+
 /**
- * Analisa o payload decodificado e determina o perfil do usuário.
- * Retorna "aluno" | "admin".
- * O payload completo é impresso no console para diagnóstico.
+ * =========================================================
+ * PEGAR ID DO USUÁRIO
+ * =========================================================
+ *
+ * Como ainda não sabemos exatamente em qual campo
+ * a API coloca o ID dentro do JWT, verificamos
+ * algumas possibilidades.
+ */
+function pegarUsuarioId(payload) {
+
+  if (!payload) {
+    return null;
+  }
+
+
+  /*
+   * Possibilidades mais comuns
+   */
+
+  const id =
+    payload.id ||
+    payload.userId ||
+    payload.user_id ||
+    payload.usuarioId ||
+    payload.usuario_id ||
+    payload.user?.id ||
+    payload.usuario?.id ||
+    null;
+
+
+  /*
+   * IMPORTANTE:
+   *
+   * Não usamos "sub" automaticamente como usuarioId,
+   * porque no seu sistema ele pode representar
+   * matrícula em vez do UUID do usuário.
+   */
+
+
+  console.log(
+    "[AUTH] ID encontrado no JWT:",
+    id
+  );
+
+
+  return id;
+}
+
+
+/**
+ * =========================================================
+ * DETERMINAR PERFIL
+ * =========================================================
+ *
+ * Retorna:
+ *
+ * "aluno"
+ * "admin"
  */
 function determinarPerfil(payload) {
-  if (!payload) return "admin";
 
-  // Log de diagnóstico — remover após confirmar o campo correto no JWT da API
-  console.log("[AUTH] JWT payload decodificado:", payload);
+  if (!payload) {
+    return "admin";
+  }
 
-  const textoCompleto = JSON.stringify(payload).toLowerCase();
+
+  console.log(
+    "[AUTH] JWT payload decodificado:",
+    payload
+  );
+
+
+  const textoCompleto =
+    JSON.stringify(payload).toLowerCase();
+
+
+  /*
+   * ALUNO
+   */
 
   if (
     textoCompleto.includes("aluno") ||
@@ -40,8 +145,14 @@ function determinarPerfil(payload) {
     textoCompleto.includes("estudante") ||
     textoCompleto.includes("discente")
   ) {
+
     return "aluno";
   }
+
+
+  /*
+   * ADMIN / SERVIDOR
+   */
 
   if (
     textoCompleto.includes("servidor") ||
@@ -50,68 +161,354 @@ function determinarPerfil(payload) {
     textoCompleto.includes("employee") ||
     textoCompleto.includes("staff")
   ) {
+
     return "admin";
   }
 
-  // Fallback por matrícula: padrão IFRO alunos = 13 dígitos
+
+  /*
+   * MATRÍCULA
+   */
+
   const matriculaCandidata = String(
-    payload.sub || payload.username || payload.matricula || payload.login || ""
+    payload.sub ||
+    payload.username ||
+    payload.matricula ||
+    payload.login ||
+    ""
   );
 
-  if (/^\d{13}$/.test(matriculaCandidata)) {
-    console.log("[AUTH] Detectado como aluno pela matrícula de 13 dígitos:", matriculaCandidata);
+
+  /*
+   * IFRO - aluno
+   */
+
+  if (
+    /^\d{13}$/.test(
+      matriculaCandidata
+    )
+  ) {
+
+    console.log(
+      "[AUTH] Detectado como aluno pela matrícula:",
+      matriculaCandidata
+    );
+
     return "aluno";
   }
 
-  // Padrão IFRO servidores = matrícula SIAPE 7 dígitos
-  if (/^\d{7}$/.test(matriculaCandidata)) {
-    console.log("[AUTH] Detectado como servidor pela matrícula SIAPE:", matriculaCandidata);
+
+  /*
+   * IFRO - servidor
+   */
+
+  if (
+    /^\d{7}$/.test(
+      matriculaCandidata
+    )
+  ) {
+
+    console.log(
+      "[AUTH] Detectado como servidor pela matrícula:",
+      matriculaCandidata
+    );
+
     return "admin";
   }
 
-  console.warn("[AUTH] Perfil não determinado. Usando 'admin' como fallback.");
+
+  /*
+   * Fallback
+   */
+
+  console.warn(
+    "[AUTH] Perfil não determinado. Usando 'admin'."
+  );
+
   return "admin";
 }
 
+
+/**
+ * =========================================================
+ * AUTH PROVIDER
+ * =========================================================
+ */
+
 export function AuthProvider({ children }) {
-  const [perfil, setPerfil] = useState(null);
-  const [carregando, setCarregando] = useState(true);
+
+  const [perfil, setPerfil] =
+    useState(null);
+
+
+  const [usuarioId, setUsuarioId] =
+    useState(null);
+
+
+  const [usuario, setUsuario] =
+    useState(null);
+
+
+  const [token, setToken] =
+    useState(null);
+
+
+  const [carregando, setCarregando] =
+    useState(true);
+
+
+  /**
+   * =======================================================
+   * INICIALIZAR AUTENTICAÇÃO
+   * =======================================================
+   */
 
   useEffect(() => {
-    async function inicializar() {
-      const token = localStorage.getItem("token");
-      const novoPerfil = token ? determinarPerfil(decodeJwtPayload(token)) : null;
-      setPerfil(novoPerfil);
-      setCarregando(false);
+
+    function inicializar() {
+
+      try {
+
+        const tokenSalvo =
+          localStorage.getItem("token");
+
+
+        /*
+         * Usuário não está logado
+         */
+
+        if (!tokenSalvo) {
+
+          setToken(null);
+          setPerfil(null);
+          setUsuarioId(null);
+          setUsuario(null);
+          setCarregando(false);
+
+          return;
+        }
+
+
+        /*
+         * Decodifica token
+         */
+
+        const payload =
+          decodeJwtPayload(tokenSalvo);
+
+
+        console.log(
+          "[AUTH] Payload inicial:",
+          payload
+        );
+
+
+        /*
+         * Descobre perfil
+         */
+
+        const novoPerfil =
+          determinarPerfil(payload);
+
+
+        /*
+         * Descobre ID
+         */
+
+        const novoUsuarioId =
+          pegarUsuarioId(payload);
+
+
+        /*
+         * Salva tudo no estado
+         */
+
+        setToken(tokenSalvo);
+
+        setPerfil(novoPerfil);
+
+        setUsuarioId(novoUsuarioId);
+
+        setUsuario(payload);
+
+
+      } catch (error) {
+
+        console.error(
+          "[AUTH] Erro ao inicializar:",
+          error
+        );
+
+        setToken(null);
+        setPerfil(null);
+        setUsuarioId(null);
+        setUsuario(null);
+
+      } finally {
+
+        setCarregando(false);
+
+      }
+
     }
+
+
     inicializar();
+
   }, []);
 
-  function login(token) {
-    localStorage.setItem("token", token);
-    const payload = decodeJwtPayload(token);
-    const novoPerfil = determinarPerfil(payload);
+
+  /**
+   * =======================================================
+   * LOGIN
+   * =======================================================
+   */
+
+  function login(novoToken) {
+
+    /*
+     * Salva token
+     */
+
+    localStorage.setItem(
+      "token",
+      novoToken
+    );
+
+
+    /*
+     * Decodifica JWT
+     */
+
+    const payload =
+      decodeJwtPayload(novoToken);
+
+
+    console.log(
+      "[AUTH] Payload após login:",
+      payload
+    );
+
+
+    /*
+     * Descobre perfil
+     */
+
+    const novoPerfil =
+      determinarPerfil(payload);
+
+
+    /*
+     * Descobre ID
+     */
+
+    const novoUsuarioId =
+      pegarUsuarioId(payload);
+
+
+    console.log(
+      "[AUTH] Usuário logado:",
+      {
+        id: novoUsuarioId,
+        perfil: novoPerfil,
+      }
+    );
+
+
+    /*
+     * Atualiza estados
+     */
+
+    setToken(novoToken);
+
     setPerfil(novoPerfil);
+
+    setUsuarioId(novoUsuarioId);
+
+    setUsuario(payload);
+
+
     return novoPerfil;
   }
 
+
+  /**
+   * =======================================================
+   * LOGOUT
+   * =======================================================
+   */
+
   function logout() {
-    localStorage.removeItem("token");
+
+    localStorage.removeItem(
+      "token"
+    );
+
+
+    setToken(null);
+
     setPerfil(null);
+
+    setUsuarioId(null);
+
+    setUsuario(null);
   }
 
+
+  /**
+   * =======================================================
+   * CONTEXT
+   * =======================================================
+   */
+
   return (
-    <AuthContext.Provider value={{ perfil, carregando, login, logout }}>
+
+    <AuthContext.Provider
+      value={{
+        perfil,
+        carregando,
+
+        token,
+
+        usuarioId,
+
+        usuario,
+
+        login,
+
+        logout,
+      }}
+    >
+
       {children}
+
     </AuthContext.Provider>
+
   );
 }
 
+
+/**
+ * =========================================================
+ * USE AUTH
+ * =========================================================
+ */
+
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
-  const ctx = useContext(AuthContext);
+
+  const ctx =
+    useContext(AuthContext);
+
+
   if (!ctx) {
-    throw new Error("useAuth deve ser usado dentro de <AuthProvider>");
+
+    throw new Error(
+      "useAuth deve ser usado dentro de AuthProvider."
+    );
+
   }
+
+
   return ctx;
 }
