@@ -1,8 +1,46 @@
+import React from 'react';
+import styles from './GuiaEstagio.module.css';
+import { List, FileDown, Phone, Star } from 'lucide-react';
+
 export default function GuiaEstagio() {
   return (
-    <div>
-      <h1>Guia de Estágio</h1>
-      <p>Informações sobre estágio.</p>
-    </div>
+    <main className={styles.container}>
+      <header className={styles.header}>
+        <h1 className={styles.title}>Painel aluno</h1>
+        <h2 className={styles.subtitle}>Guia de Estágio</h2>
+      </header>
+
+      <section className={styles.contentArea}>
+        <div className={styles.grid}>
+          <button className={styles.card} aria-label="Folha de pontos">
+            <div className={styles.iconWrapper}>
+              <List size={40} strokeWidth={2.5} />
+            </div>
+            <span className={styles.cardTitle}>Folha de pontos</span>
+          </button>
+
+          <button className={styles.card} aria-label="Modelo de relatório">
+            <div className={styles.iconWrapper}>
+              <FileDown size={40} strokeWidth={2.5} />
+            </div>
+            <span className={styles.cardTitle}>Modelo de relatório</span>
+          </button>
+
+          <button className={styles.card} aria-label="Contato CIEC">
+            <div className={styles.iconWrapper}>
+              <Phone size={40} strokeWidth={2.5} />
+            </div>
+            <span className={styles.cardTitle}>Contato CIEC</span>
+          </button>
+
+          <button className={styles.card} aria-label="Avaliar empresa">
+            <div className={styles.iconWrapper}>
+              <Star size={40} strokeWidth={2.5} />
+            </div>
+            <span className={styles.cardTitle}>Avaliar empresa</span>
+          </button>
+        </div>
+      </section>
+    </main>
   );
 }
