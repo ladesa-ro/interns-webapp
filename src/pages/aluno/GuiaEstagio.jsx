@@ -1,12 +1,25 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './GuiaEstagio.module.css';
 import { List, FileDown, Phone, Star } from 'lucide-react';
 
 export default function GuiaEstagio() {
+  const navigate = useNavigate();
+
+  const handleContatoCIEC = () => {
+    navigate('/aluno/contato-ciec');
+  };
+
   return (
     <main className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Painel aluno</h1>
+        <h1
+          className={styles.title}
+          onClick={handleContatoCIEC}
+          style={{ cursor: 'pointer' }}
+        >
+          Painel aluno
+        </h1>
         <h2 className={styles.subtitle}>Guia de Estágio</h2>
       </header>
 
@@ -26,7 +39,11 @@ export default function GuiaEstagio() {
             <span className={styles.cardTitle}>Modelo de relatório</span>
           </button>
 
-          <button className={styles.card} aria-label="Contato CIEC">
+          <button
+            className={styles.card}
+            aria-label="Contato CIEC"
+            onClick={handleContatoCIEC}
+          >
             <div className={styles.iconWrapper}>
               <Phone size={40} strokeWidth={2.5} />
             </div>
