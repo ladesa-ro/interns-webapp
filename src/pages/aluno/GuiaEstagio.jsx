@@ -15,6 +15,10 @@ export default function GuiaEstagio() {
     navigate('/aluno/avaliar/1');
   };
 
+  const handleFolhaDePontos = () => {
+    navigate('/aluno/folha-pontos');
+  };
+
   return (
     <main className={styles.container}>
       <header className={styles.header}>
@@ -30,7 +34,11 @@ export default function GuiaEstagio() {
 
       <section className={styles.contentArea}>
         <div className={styles.grid}>
-          <button className={styles.card} aria-label="Folha de pontos">
+          <button 
+            className={styles.card} 
+            aria-label="Folha de pontos"
+            onClick={handleFolhaDePontos}
+          >
             <div className={styles.iconWrapper}>
               <List size={40} strokeWidth={2.5} />
             </div>
