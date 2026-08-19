@@ -7,6 +7,8 @@ import ListaEsperaAluno from "../../pages/aluno/ListaEsperaAluno";
 import GuiaEstagio from "../../pages/aluno/GuiaEstagio";
 import ContatoCIEC from "../../pages/aluno/ContatoCIEC";
 import SolicitarEstagio from "../../pages/aluno/inicio/solicitar-estagio/SolicitarEstagio";
+import AvaliarEmpresa from "../../pages/aluno/AvaliarEmpresa";
+
 export default function LayoutAluno() {
   return (
     <div className="app">
@@ -19,6 +21,7 @@ export default function LayoutAluno() {
           <Route path="lista-espera" element={<ListaEsperaAluno />} />
           <Route path="guia-estagio" element={<GuiaEstagio />} />
           <Route path="contato-ciec" element={<ContatoCIEC />} />
+          <Route path="avaliar/:estagioId" element={<AvaliarEmpresa />} />
           <Route
             path="solicitar-estagio"
             element={<SolicitarEstagio />}
