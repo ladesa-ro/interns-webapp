@@ -10,6 +10,11 @@ export default function GuiaEstagio() {
     navigate('/aluno/contato-ciec');
   };
 
+  const handleAvaliarEmpresa = () => {
+    // Podemos passar um ID de empresa/estágio fictício ou que esteja no contexto
+    navigate('/aluno/avaliar/1');
+  };
+
   return (
     <main className={styles.container}>
       <header className={styles.header}>
@@ -50,7 +55,11 @@ export default function GuiaEstagio() {
             <span className={styles.cardTitle}>Contato CIEC</span>
           </button>
 
-          <button className={styles.card} aria-label="Avaliar empresa">
+          <button
+            className={styles.card}
+            aria-label="Avaliar empresa"
+            onClick={handleAvaliarEmpresa}
+          >
             <div className={styles.iconWrapper}>
               <Star size={40} strokeWidth={2.5} />
             </div>
