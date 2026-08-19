@@ -1,0 +1,114 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.card {
+  flex: 1;
+  background-color: #EAF6EE;
+  border-radius: 8px;
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.column:first-child {
+  align-items: flex-start;
+}
+
+.column:last-child {
+  align-items: center;
+}
+
+.label {
+  font-weight: 700;
+  color: #1F7A4D; /* Verde principal */
+  font-size: 16px;
+}
+
+.value {
+  color: #1F7A4D; /* Mantendo verde escuro no valor de acordo com mockup (opcional, pode ser cinza, mas #1F7A4D combina mais) */
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.checkbox {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  accent-color: #1F7A4D;
+  border: 1px solid #1F7A4D;
+  border-radius: 4px;
+}
+
+.checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.enviarButton {
+  width: 140px;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  transition: background-color 0.2s;
+  color: white;
+}
+
+.enabled {
+  background-color: #1F7A4D;
+  cursor: pointer;
+}
+
+.enabled:hover {
+  background-color: #165c3a;
+}
+
+.disabled {
+  background-color: #8A8A8A;
+  cursor: not-allowed;
+}
+
+.sent {
+  background-color: #d1d5db;
+  color: #4b5563;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .card {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+  }
+  
+  .column, .column:first-child, .column:last-child {
+    align-items: flex-start;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .enviarButton {
+    width: 100%;
+    padding: 14px;
+  }
+}
