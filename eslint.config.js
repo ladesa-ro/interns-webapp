@@ -2,6 +2,8 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import security from 'eslint-plugin-security'
+import jsxA11y from 'eslint-plugin-jsx-a11y'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
@@ -24,6 +26,20 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
+  {
+    files: ['**/*.{js,jsx}'],
+    plugins: {
+      security,
+      'jsx-a11y': jsxA11y,
+    },
+    rules: {
+      ...security.configs.recommended.rules,
+      'security/detect-object-injection': 'warn',
+      'security/detect-non-literal-fs-filename': 'error',
+      'security/detect-unsafe-regex': 'error',
+      'jsx-a11y/no-noninteractive-element-interactions': 'warn',
     },
   },
 ])

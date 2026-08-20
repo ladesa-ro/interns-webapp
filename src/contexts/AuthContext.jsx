@@ -4,6 +4,7 @@ import {
   useState,
   useEffect,
 } from "react";
+import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext(null);
 
@@ -21,38 +22,14 @@ function decodeJwtPayload(token) {
       return null;
     }
 
-    const partes = token.split(".");
+    const payload = jwtDecode(token);
 
-    if (partes.length !== 3) {
+    if (payload.exp && payload.exp * 1000 < Date.now()) {
       return null;
     }
 
-    const base64Url = partes[1];
-
-    const base64 = base64Url
-      .replace(/-/g, "+")
-      .replace(/_/g, "/");
-
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map(
-          (c) =>
-            "%" +
-            ("00" + c.charCodeAt(0).toString(16)).slice(-2)
-        )
-        .join("")
-    );
-
-    return JSON.parse(jsonPayload);
-
-  } catch (error) {
-
-    console.error(
-      "[AUTH] Erro ao decodificar JWT:",
-      error
-    );
-
+    return payload;
+  } catch {
     return null;
   }
 }
@@ -269,8 +246,7 @@ export function AuthProvider({ children }) {
 
       try {
 
-        const tokenSalvo =
-          localStorage.getItem("token");
+        const tokenSalvo = null;
 
 
         /*
@@ -370,12 +346,6 @@ export function AuthProvider({ children }) {
      * Salva token
      */
 
-    localStorage.setItem(
-      "token",
-      novoToken
-    );
-
-
     /*
      * Decodifica JWT
      */
@@ -439,11 +409,6 @@ export function AuthProvider({ children }) {
    */
 
   function logout() {
-
-    localStorage.removeItem(
-      "token"
-    );
-
 
     setToken(null);
 

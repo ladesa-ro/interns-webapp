@@ -1,11 +1,21 @@
-const BASE_URL = "https://dev.ladesa.com.br/api/v1";
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+if (!BASE_URL) {
+  throw new Error(
+    "VITE_API_URL não definida. Copie .env.example para .env e configure."
+  );
+}
+
+function getCsrfToken() {
+  return document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("csrf_token="))
+    ?.split("=")[1];
+}
 
 async function apiFetch(endpoint, options = {}) {
   // Check if endpoint is fully qualified, otherwise prepend BASE_URL
   const url = endpoint.startsWith("http") ? endpoint : `${BASE_URL}${endpoint}`;
-
-  // Read token from localStorage
-  const token = localStorage.getItem("token");
 
   // Merge headers
   const headers = {
@@ -17,23 +27,21 @@ async function apiFetch(endpoint, options = {}) {
     headers["Content-Type"] = "application/json";
   }
 
-  // Add authorization header if token exists and it's NOT a public endpoint
-  const isPublicEndpoint =
-    url.includes("viacep.com.br") ||
-    url.includes("/autenticacao/login");
+  const method = (options.method || "GET").toLowerCase();
+  const csrfToken = getCsrfToken();
 
-  if (token && !isPublicEndpoint) {
-    headers["Authorization"] = `Bearer ${token}`;
+  if (csrfToken && ["post", "put", "patch", "delete"].includes(method)) {
+    headers["X-CSRF-Token"] = decodeURIComponent(csrfToken);
   }
 
   const response = await fetch(url, {
     ...options,
     headers,
+    credentials: "include",
   });
 
   // Handle unauthorized globally (e.g. redirect to login)
   if (response.status === 401 && !url.includes("/autenticacao/login")) {
-    localStorage.removeItem("token");
     // Only redirect if window is defined (browser environment)
     if (typeof window !== "undefined") {
       window.location.href = "/login";

@@ -2,10 +2,9 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function ProtectedRoute({ children, perfilNecessario }) {
-  const { perfil, carregando } = useAuth();
-  const token = localStorage.getItem("token");
+  const { perfil, token, carregando } = useAuth();
 
-  // Enquanto o contexto está lendo o token do localStorage, não faz nada
+  // Enquanto o contexto inicializa a sessão, não faz nada
   if (carregando) {
     return null;
   }
