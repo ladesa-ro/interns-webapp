@@ -1,0 +1,33 @@
+# Estende as regras padrão do gitleaks.
+# As regras abaixo cobrem o padrão do vazamento ocorrido neste repositório
+# (senhas de dicionário em scripts de teste), que as regras padrão não detectam.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "hardcoded-password-assignment"
+description = "Senha/segredo atribuido literalmente no codigo"
+regex = '''(?i)\b(senha|password|passwd|pwd|secret)\s*[:=]\s*["'][^"'\n]{3,}["']'''
+tags = ["password", "hardcoded"]
+
+[[rules]]
+id = "credential-list-literal"
+description = "Lista literal de credenciais ou matriculas em codigo"
+regex = '''(?i)\b(senhas|passwords|matriculas|credenciais|logins)\s*=\s*\['''
+tags = ["password", "hardcoded"]
+
+[[rules]]
+id = "scratch-script-file"
+description = "Script scratch solto: nao deve ser versionado"
+regex = '''(?i)(fetch|axios|http)'''
+path = '''(^|/)scratch_[^/]*\.(js|jsx|ts|tsx|mjs|cjs)$'''
+tags = ["scratch"]
+
+[allowlist]
+description = "Caminhos sem valor de auditoria de segredos"
+paths = [
+  '''(^|/)package-lock\.json$''',
+  '''(^|/)node_modules/''',
+  '''(^|/)dist/''',
+  '''(^|/)\.env\.example$''',
+]
