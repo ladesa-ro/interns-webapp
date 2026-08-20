@@ -335,11 +335,6 @@ export default function Perfil() {
     "Nome não informado";
 
 
-  const emailPrincipal =
-    usuario.email ||
-    "Email não informado";
-
-
   const matricula =
     usuario.matricula ||
     "Matrícula não informada";
