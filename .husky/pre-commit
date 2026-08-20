@@ -1,0 +1,19 @@
+#!/bin/sh
+# Bloqueia commits que introduzam segredos, usando as regras de .gitleaks.toml.
+
+if command -v gitleaks >/dev/null 2>&1; then
+  GITLEAKS=gitleaks
+elif [ -x "$HOME/.local/bin/gitleaks" ]; then
+  GITLEAKS="$HOME/.local/bin/gitleaks"
+else
+  echo "AVISO: gitleaks nao encontrado; commit liberado SEM verificacao de segredos."
+  echo "Instale a partir de https://github.com/gitleaks/gitleaks/releases e refaca o commit."
+  exit 0
+fi
+
+"$GITLEAKS" protect --staged --redact -v --config .gitleaks.toml || {
+  echo ""
+  echo "Commit bloqueado: possivel segredo detectado nas mudancas staged."
+  echo "Remova o segredo. Se for falso positivo, ajuste o allowlist em .gitleaks.toml."
+  exit 1
+}
