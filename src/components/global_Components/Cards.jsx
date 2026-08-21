@@ -1,6 +1,8 @@
 import React from "react";
 
 import styles from "./Cards.module.css";
+
+const CLASSES_COR = new Map(Object.entries(styles));
 export default function Cards({
   titulo,
   valor,
@@ -11,7 +13,7 @@ export default function Cards({
 }) {
   return (
     <div
-      className={`${styles.card} ${styles[cor]}`}
+      className={`${styles.card} ${CLASSES_COR.get(cor) ?? ""}`}
       onClick={onClick}
       style={{ cursor: onClick ? "pointer" : "default" }}
     >

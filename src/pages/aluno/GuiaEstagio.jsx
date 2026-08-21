@@ -22,12 +22,21 @@ export default function GuiaEstagio() {
   return (
     <main className={styles.container}>
       <header className={styles.header}>
-        <h1
-          className={styles.title}
-          onClick={handleContatoCIEC}
-          style={{ cursor: 'pointer' }}
-        >
-          Painel aluno
+        <h1 className={styles.title}>
+          <button
+            type="button"
+            onClick={handleContatoCIEC}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              font: 'inherit',
+              color: 'inherit',
+              cursor: 'pointer',
+            }}
+          >
+            Painel aluno
+          </button>
         </h1>
         <h2 className={styles.subtitle}>Guia de Estágio</h2>
       </header>

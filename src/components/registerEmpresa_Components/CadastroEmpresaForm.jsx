@@ -38,7 +38,7 @@ function validarCnpj(cnpj) {
     let soma = 0;
     let peso = pos;
     for (let i = 0; i < n; i++) {
-      soma += parseInt(nums[i]) * peso--;
+      soma += parseInt(nums.charAt(i)) * peso--;
       if (peso < 2) peso = 9;
     }
     const resto = soma % 11;
@@ -176,7 +176,7 @@ export default function CadastroEmpresaForm({ modo }) {
       }
 
       setCidadeId(cidadeEncontrada.id);
-    } catch (error) {
+    } catch {
       exibirToast("erro", "Erro ao buscar informações do CEP.");
     } finally {
       setBuscandoCep(false);
