@@ -23,7 +23,7 @@ export default function Perfil() {
   // =====================================================
 
   const {
-    token,
+    autenticado,
     usuarioId,
     carregando: carregandoAuth,
   } = useAuth();
@@ -70,7 +70,7 @@ export default function Perfil() {
         // Verifica autenticação
         // -----------------------------------------------
 
-        if (!token) {
+        if (!autenticado) {
 
           setErro(
             "Usuário não está autenticado."
@@ -234,7 +234,7 @@ export default function Perfil() {
 
     /*
      * Só busca quando o AuthContext terminou
-     * de carregar e temos token + ID.
+     * de carregar e a sessão é conhecida.
      */
 
     if (!carregandoAuth) {
@@ -244,7 +244,7 @@ export default function Perfil() {
     }
 
   }, [
-    token,
+    autenticado,
     usuarioId,
     carregandoAuth,
   ]);

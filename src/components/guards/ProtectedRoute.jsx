@@ -1,26 +1,31 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { PERFIL_ALUNO } from "../../contexts/perfis";
 
 export default function ProtectedRoute({ children, perfilNecessario }) {
-  const { perfil, token, carregando } = useAuth();
+  const { autenticado, perfil, erroPerfil, carregando } = useAuth();
 
-  // Enquanto o contexto inicializa a sessão, não faz nada
   if (carregando) {
     return null;
   }
 
-  // Sem token → redireciona para login
-  if (!token) {
+  if (!autenticado) {
     return <Navigate to="/login" replace />;
   }
 
-  // Se foi especificado um perfil necessário e o usuário não tem esse perfil,
-  // redireciona para a área correta em vez de mostrar tela branca
-  if (perfilNecessario && perfil && perfil !== perfilNecessario) {
-    if (perfil === "aluno") {
-      return <Navigate to="/aluno" replace />;
-    }
-    return <Navigate to="/" replace />;
+  // Perfil não reconhecido nunca recebe acesso: mostra erro em vez de redirecionar,
+  // o que criaria ciclo entre a área de aluno e a administrativa.
+  if (!perfil) {
+    return (
+      <div role="alert" style={{ padding: "2rem", textAlign: "center" }}>
+        <h1>Acesso indisponível</h1>
+        <p>{erroPerfil}</p>
+      </div>
+    );
+  }
+
+  if (perfilNecessario && perfil !== perfilNecessario) {
+    return <Navigate to={perfil === PERFIL_ALUNO ? "/aluno" : "/"} replace />;
   }
 
   return children;

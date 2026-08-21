@@ -1,479 +1,135 @@
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-} from "react";
-import { jwtDecode } from "jwt-decode";
+  apiJson,
+  authMode,
+  setAccessToken,
+  setUnauthorizedHandler,
+} from "../utils/api";
+import {
+  PERFIL_ADMIN,
+  PERFIL_ALUNO,
+  determinarPerfil,
+} from "./perfis";
 
 const AuthContext = createContext(null);
 
-/**
- * =========================================================
- * DECODIFICAR PAYLOAD DO JWT
- * =========================================================
- *
- * Apenas decodifica o JWT no frontend.
- * Isso NÃO verifica a assinatura do token.
- */
-function decodeJwtPayload(token) {
-  try {
-    if (!token) {
-      return null;
-    }
+const ENDPOINT_SESSAO = "/autenticacao/quem-sou-eu";
+const ENDPOINT_LOGIN = "/autenticacao/login";
 
-    const payload = jwtDecode(token);
-
-    if (payload.exp && payload.exp * 1000 < Date.now()) {
-      return null;
-    }
-
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
-
-/**
- * =========================================================
- * PEGAR ID DO USUÁRIO
- * =========================================================
- *
- * Como ainda não sabemos exatamente em qual campo
- * a API coloca o ID dentro do JWT, verificamos
- * algumas possibilidades.
- */
-function pegarUsuarioId(payload) {
-
-  if (!payload) {
-    return null;
-  }
-
-
-  /*
-   * Possibilidades mais comuns
-   */
-
-  const id =
-    payload.id ||
-    payload.userId ||
-    payload.user_id ||
-    payload.usuarioId ||
-    payload.usuario_id ||
-    payload.user?.id ||
-    payload.usuario?.id ||
-    null;
-
-
-  /*
-   * IMPORTANTE:
-   *
-   * Não usamos "sub" automaticamente como usuarioId,
-   * porque no seu sistema ele pode representar
-   * matrícula em vez do UUID do usuário.
-   */
-
-
-  console.log(
-    "[AUTH] ID encontrado no JWT:",
-    id
-  );
-
-
-  return id;
-}
-
-
-/**
- * =========================================================
- * DETERMINAR PERFIL
- * =========================================================
- *
- * Retorna:
- *
- * "aluno"
- * "admin"
- */
-function determinarPerfil(payload) {
-
-  if (!payload) {
-    return "admin";
-  }
-
-
-  console.log(
-    "[AUTH] JWT payload decodificado:",
-    payload
-  );
-
-
-  const textoCompleto =
-    JSON.stringify(payload).toLowerCase();
-
-
-  /*
-   * ALUNO
-   */
-
-  if (
-    textoCompleto.includes("aluno") ||
-    textoCompleto.includes("student") ||
-    textoCompleto.includes("estudante") ||
-    textoCompleto.includes("discente")
-  ) {
-
-    return "aluno";
-  }
-
-
-  /*
-   * ADMIN / SERVIDOR
-   */
-
-  if (
-    textoCompleto.includes("servidor") ||
-    textoCompleto.includes("coordenador") ||
-    textoCompleto.includes("admin") ||
-    textoCompleto.includes("employee") ||
-    textoCompleto.includes("staff")
-  ) {
-
-    return "admin";
-  }
-
-
-  /*
-   * MATRÍCULA
-   */
-
-  const matriculaCandidata = String(
-    payload.sub ||
-    payload.username ||
-    payload.matricula ||
-    payload.login ||
-    ""
-  );
-
-
-  /*
-   * IFRO - aluno
-   */
-
-  if (
-    /^\d{13}$/.test(
-      matriculaCandidata
-    )
-  ) {
-
-    console.log(
-      "[AUTH] Detectado como aluno pela matrícula:",
-      matriculaCandidata
-    );
-
-    return "aluno";
-  }
-
-
-  /*
-   * IFRO - servidor
-   */
-
-  if (
-    /^\d{7}$/.test(
-      matriculaCandidata
-    )
-  ) {
-
-    console.log(
-      "[AUTH] Detectado como servidor pela matrícula:",
-      matriculaCandidata
-    );
-
-    return "admin";
-  }
-
-
-  /*
-   * Fallback
-   */
-
-  console.warn(
-    "[AUTH] Perfil não determinado. Usando 'admin'."
-  );
-
-  return "admin";
-}
-
-
-/**
- * =========================================================
- * AUTH PROVIDER
- * =========================================================
- */
+const ESTADO_ANONIMO = {
+  autenticado: false,
+  usuario: null,
+  perfil: null,
+  usuarioId: null,
+  erroPerfil: null,
+};
 
 export function AuthProvider({ children }) {
+  const [sessao, setSessao] = useState(ESTADO_ANONIMO);
+  const [carregando, setCarregando] = useState(true);
 
-  const [perfil, setPerfil] =
-    useState(null);
+  // A API responde 200 com usuario: null quando não há sessão, então o estado
+  // anônimo é determinado pelo corpo, não pelo status.
+  const carregarSessao = useCallback(async () => {
+    const dados = await apiJson(ENDPOINT_SESSAO);
+    const usuario = dados?.usuario ?? null;
 
-
-  const [usuarioId, setUsuarioId] =
-    useState(null);
-
-
-  const [usuario, setUsuario] =
-    useState(null);
-
-
-  const [token, setToken] =
-    useState(null);
-
-
-  const [carregando, setCarregando] =
-    useState(true);
-
-
-  /**
-   * =======================================================
-   * INICIALIZAR AUTENTICAÇÃO
-   * =======================================================
-   */
-
-  useEffect(() => {
-
-    function inicializar() {
-
-      try {
-
-        const tokenSalvo = null;
-
-
-        /*
-         * Usuário não está logado
-         */
-
-        if (!tokenSalvo) {
-
-          setToken(null);
-          setPerfil(null);
-          setUsuarioId(null);
-          setUsuario(null);
-          setCarregando(false);
-
-          return;
-        }
-
-
-        /*
-         * Decodifica token
-         */
-
-        const payload =
-          decodeJwtPayload(tokenSalvo);
-
-
-        console.log(
-          "[AUTH] Payload inicial:",
-          payload
-        );
-
-
-        /*
-         * Descobre perfil
-         */
-
-        const novoPerfil =
-          determinarPerfil(payload);
-
-
-        /*
-         * Descobre ID
-         */
-
-        const novoUsuarioId =
-          pegarUsuarioId(payload);
-
-
-        /*
-         * Salva tudo no estado
-         */
-
-        setToken(tokenSalvo);
-
-        setPerfil(novoPerfil);
-
-        setUsuarioId(novoUsuarioId);
-
-        setUsuario(payload);
-
-
-      } catch (error) {
-
-        console.error(
-          "[AUTH] Erro ao inicializar:",
-          error
-        );
-
-        setToken(null);
-        setPerfil(null);
-        setUsuarioId(null);
-        setUsuario(null);
-
-      } finally {
-
-        setCarregando(false);
-
-      }
-
+    if (!usuario) {
+      setSessao(ESTADO_ANONIMO);
+      return ESTADO_ANONIMO;
     }
 
+    const { perfil, erro } = determinarPerfil(usuario, dados?.perfisAtivos);
+
+    const nova = {
+      autenticado: true,
+      usuario,
+      perfil,
+      usuarioId: usuario.id ?? null,
+      erroPerfil: erro,
+    };
+
+    setSessao(nova);
+    return nova;
+  }, []);
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function inicializar() {
+      try {
+        await carregarSessao();
+      } catch {
+        if (ativo) setSessao(ESTADO_ANONIMO);
+      } finally {
+        if (ativo) setCarregando(false);
+      }
+    }
 
     inicializar();
 
+    return () => {
+      ativo = false;
+    };
+  }, [carregarSessao]);
+
+  const encerrarSessaoLocal = useCallback(() => {
+    setAccessToken(null);
+    setSessao(ESTADO_ANONIMO);
   }, []);
 
+  useEffect(() => {
+    setUnauthorizedHandler(encerrarSessaoLocal);
+    return () => setUnauthorizedHandler(null);
+  }, [encerrarSessaoLocal]);
 
-  /**
-   * =======================================================
-   * LOGIN
-   * =======================================================
-   */
+  const login = useCallback(
+    async (matricula, senha) => {
+      const credenciais = await apiJson(ENDPOINT_LOGIN, {
+        method: "POST",
+        body: JSON.stringify({ matricula, senha }),
+      });
 
-  function login(novoToken) {
-
-    /*
-     * Salva token
-     */
-
-    /*
-     * Decodifica JWT
-     */
-
-    const payload =
-      decodeJwtPayload(novoToken);
-
-
-    console.log(
-      "[AUTH] Payload após login:",
-      payload
-    );
-
-
-    /*
-     * Descobre perfil
-     */
-
-    const novoPerfil =
-      determinarPerfil(payload);
-
-
-    /*
-     * Descobre ID
-     */
-
-    const novoUsuarioId =
-      pegarUsuarioId(payload);
-
-
-    console.log(
-      "[AUTH] Usuário logado:",
-      {
-        id: novoUsuarioId,
-        perfil: novoPerfil,
+      // No modo cookie o backend emite Set-Cookie e nenhum token trafega no corpo.
+      if (authMode === "bearer" && credenciais?.access_token) {
+        setAccessToken(credenciais.access_token);
       }
-    );
 
+      return carregarSessao();
+    },
+    [carregarSessao]
+  );
 
-    /*
-     * Atualiza estados
-     */
-
-    setToken(novoToken);
-
-    setPerfil(novoPerfil);
-
-    setUsuarioId(novoUsuarioId);
-
-    setUsuario(payload);
-
-
-    return novoPerfil;
-  }
-
-
-  /**
-   * =======================================================
-   * LOGOUT
-   * =======================================================
-   */
-
-  function logout() {
-
-    setToken(null);
-
-    setPerfil(null);
-
-    setUsuarioId(null);
-
-    setUsuario(null);
-  }
-
-
-  /**
-   * =======================================================
-   * CONTEXT
-   * =======================================================
-   */
+  // A API não expõe endpoint de logout; o encerramento é local. Quando o
+  // backend publicar POST /autenticacao/logout, chamá-lo aqui antes de limpar.
+  const logout = useCallback(async () => {
+    encerrarSessaoLocal();
+  }, [encerrarSessaoLocal]);
 
   return (
-
     <AuthContext.Provider
       value={{
-        perfil,
+        ...sessao,
         carregando,
-
-        token,
-
-        usuarioId,
-
-        usuario,
-
         login,
-
         logout,
+        recarregarSessao: carregarSessao,
       }}
     >
-
       {children}
-
     </AuthContext.Provider>
-
   );
 }
 
-
-/**
- * =========================================================
- * USE AUTH
- * =========================================================
- */
-
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
-
-  const ctx =
-    useContext(AuthContext);
-
+  const ctx = useContext(AuthContext);
 
   if (!ctx) {
-
-    throw new Error(
-      "useAuth deve ser usado dentro de AuthProvider."
-    );
-
+    throw new Error("useAuth deve ser usado dentro de AuthProvider.");
   }
-
 
   return ctx;
 }
+
+export { PERFIL_ADMIN, PERFIL_ALUNO };
