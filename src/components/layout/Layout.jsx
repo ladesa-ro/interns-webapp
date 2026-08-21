@@ -1,5 +1,9 @@
 import { Routes, Route } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import AppShell from "./AppShell";
+import IconePainel from "../icons_Components/Icon_Painel_Comp";
+import IconeCadastrarEmpresa from "../icons_Components/Icon_Cadastrar_Empresa_Comp";
+import IconeCadastrarVaga from "../icons_Components/Icon_Cadastrar_Vaga_Comp";
+import IconeListaEspera from "../icons_Components/Icon_Lista_Espera_Comp";
 
 import Painel from "../../pages/dashboard/Painel";
 import Empresa from "../../pages/empresas/Empresa";
@@ -16,13 +20,17 @@ import EditarVaga from "../../pages/editarVaga/EditarVaga";
 import AlunosSemEstagio from "../../pages/alunos-do-3ano/AlunosSemEStagio";
 import RelatorioSegundoAno from "../../pages/relatorio-segundo-ano/RelatorioDoSegundoAno";
 
+const NAV_CIEC = [
+  { to: "/", label: "Painel", icon: IconePainel, end: true },
+  { to: "/cadastrarempresa", label: "Cadastrar Empresa", icon: IconeCadastrarEmpresa },
+  { to: "/vagas", label: "Cadastrar Vaga", icon: IconeCadastrarVaga },
+  { to: "/lista", label: "Lista de espera", icon: IconeListaEspera },
+];
+
 export default function Layout() {
   return (
-    <div className="app">
-      <Sidebar />
-
-      <div className="content">
-        <Routes>
+    <AppShell navItems={NAV_CIEC} titulo="Estágios IFRO">
+      <Routes>
           <Route index element={<Painel />} />
 
           <Route path="empresa" element={<Empresa />} />
@@ -62,8 +70,7 @@ export default function Layout() {
             path="relatorio-segundo-ano"
             element={<RelatorioSegundoAno />}
           />
-        </Routes>
-      </div>
-    </div>
+      </Routes>
+    </AppShell>
   );
 }
