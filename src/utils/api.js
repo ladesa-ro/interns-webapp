@@ -15,6 +15,7 @@ export const authMode = AUTH_MODE;
 
 export const ApiErrorKind = {
   NETWORK: "network",
+  TIMEOUT: "timeout",
   UNAUTHORIZED: "unauthorized",
   FORBIDDEN: "forbidden",
   NOT_FOUND: "not_found",
@@ -22,8 +23,13 @@ export const ApiErrorKind = {
   UNKNOWN: "unknown",
 };
 
+// fetch nao expira sozinho: sem isto uma requisicao pendurada deixaria a
+// interface em carregamento indefinido.
+export const TIMEOUT_MS = 15000;
+
 const MENSAGENS = new Map([
   [ApiErrorKind.NETWORK, "Não foi possível conectar ao servidor. Verifique sua conexão."],
+  [ApiErrorKind.TIMEOUT, "O servidor demorou demais para responder. Tente novamente."],
   [ApiErrorKind.UNAUTHORIZED, "Sua sessão expirou. Faça login novamente."],
   [ApiErrorKind.FORBIDDEN, "Você não tem permissão para acessar este recurso."],
   [ApiErrorKind.NOT_FOUND, "Recurso não encontrado."],
@@ -97,15 +103,23 @@ async function apiFetch(endpoint, options = {}) {
   }
 
   let response;
+  const controller = new AbortController();
+  const temporizador = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
     response = await fetch(url, {
       ...options,
       headers,
       credentials: AUTH_MODE === "cookie" ? "include" : "omit",
+      signal: options.signal ?? controller.signal,
     });
-  } catch {
+  } catch (erro) {
+    if (erro?.name === "AbortError" && !options.signal) {
+      throw new ApiError(ApiErrorKind.TIMEOUT);
+    }
     throw new ApiError(ApiErrorKind.NETWORK);
+  } finally {
+    clearTimeout(temporizador);
   }
 
   if (response.status === 401 && !isAuthEndpoint(url)) {
