@@ -1,36 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import StarRating from '../../components/common/StarRating';
 import styles from './AvaliarEmpresa.module.css';
 
+// Tela ainda sem endpoint correspondente na API: os dados abaixo existem apenas
+// para compor o layout e nao representam uma empresa real.
+const EMPRESA_EXEMPLO = {
+  nome: 'Tech Solutions S.A.',
+  imagemUrl:
+    'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200&ixlib=rb-4.0.3',
+};
+
 const AvaliarEmpresa = () => {
   const navigate = useNavigate();
   // Obtém o ID do estágio ou da empresa a partir dos parâmetros da rota
-  const { estagioId } = useParams(); 
-  
+  const { estagioId } = useParams();
+
   const [nota, setNota] = useState(0);
   const [comentario, setComentario] = useState('');
-  const [empresa, setEmpresa] = useState(null);
+  const [empresa] = useState(EMPRESA_EXEMPLO);
   const [erro, setErro] = useState('');
-  const [sucesso, setSucesso] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  // Efeito para simular a busca dos dados da empresa/estágio
-  useEffect(() => {
-    // Exemplo de integração futura com a API:
-    // fetch(`/api/estagios/${estagioId}`).then(res => res.json()).then(data => setEmpresa(data.empresa))
-    
-    // Dados mocados para visualização do layout
-    setEmpresa({
-      nome: "Tech Solutions S.A.",
-      imagemUrl: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200&ixlib=rb-4.0.3" // Imagem genérica de escritório corporativo
-    });
-  }, [estagioId]);
+  const [aviso, setAviso] = useState('');
+  const [loading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErro('');
-    setSucesso('');
+    setAviso('');
 
     // Validação dos campos
     if (nota === 0) {
@@ -42,27 +38,11 @@ const AvaliarEmpresa = () => {
       return;
     }
 
-    setLoading(true);
-    
-    try {
-      // Mock da função de avaliação na API:
-      // await avaliarEmpresa(estagioId, { nota, comentario });
-      
-      // Simulando tempo de resposta da rede
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setSucesso('Avaliação enviada com sucesso! Muito obrigado pelo seu feedback.');
-      setNota(0);
-      setComentario('');
-      
-      // Opcional: Redirecionar o usuário após o envio com sucesso
-      // setTimeout(() => navigate('/aluno/painel'), 2000);
-      
-    } catch (error) {
-      setErro('Ocorreu um erro ao enviar sua avaliação. Por favor, tente novamente mais tarde.');
-    } finally {
-      setLoading(false);
-    }
+    // A API ainda não expõe endpoint de avaliação; não afirmar envio concluído.
+    setAviso(
+      'Funcionalidade em desenvolvimento: sua avaliação ainda não pode ser enviada. ' +
+        `Estágio de referência: ${estagioId ?? 'não informado'}.`
+    );
   };
 
   return (
@@ -75,8 +55,13 @@ const AvaliarEmpresa = () => {
       </header>
 
       <main className={styles.content}>
+        <div role="status" className={styles.errorMessage}>
+          Tela em desenvolvimento: os dados exibidos são de exemplo e a avaliação
+          ainda não é registrada no sistema.
+        </div>
+
         {erro && <div className={styles.errorMessage}>{erro}</div>}
-        {sucesso && <div className={styles.successMessage}>{sucesso}</div>}
+        {aviso && <div role="status" className={styles.errorMessage}>{aviso}</div>}
 
         <form onSubmit={handleSubmit} className={styles.evaluationForm}>
           
