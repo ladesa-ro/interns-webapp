@@ -10,4 +10,13 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset()] }),
     svgr(),
   ],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.js'],
+    env: {
+      VITE_API_URL: 'https://api.test/api/v1',
+      VITE_AUTH_MODE: 'bearer',
+    },
+  },
 })
