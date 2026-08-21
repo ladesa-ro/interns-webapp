@@ -7,15 +7,32 @@
 
 ## Contexto
 
-O front-end já foi preparado para autenticação baseada em cookie:
+Verificado contra a especificação real da API (`GET /api/v1/docs/openapi.v3.json`,
+*Ladesa Management Service API 1.0*). O estado atual é:
 
-- `src/utils/api.js` envia `credentials: "include"` em todas as requisições;
-- o header `Authorization: Bearer` foi removido;
-- o JWT não é mais persistido em `localStorage`.
+- `securitySchemes` define **apenas** `bearer` (HTTP Bearer JWT); não há esquema de cookie;
+- `POST /autenticacao/login` responde `201` com `AuthSessionCredentialsDto`
+  (`access_token`, `refresh_token`, `token_type`, `id_token`, `expires_in`);
+- a sessão é consultada em `GET /autenticacao/quem-sou-eu`, que responde `200`
+  com `{ usuario, perfisAtivos }` e `usuario: null` quando não autenticado;
+- **não existe endpoint de logout**;
+- a API responde `Access-Control-Allow-Origin: *`, sem `Allow-Credentials`.
 
-Hoje `POST /autenticacao/login` responde com `access_token` no corpo JSON. Enquanto o backend não emitir o cookie, o token fica apenas em memória no front-end, o que significa que **a sessão é perdida a cada reload da página**. Esta issue descreve o contrato necessário para fechar essa lacuna.
+O front-end está preparado para os dois modelos através da variável
+`VITE_AUTH_MODE` (`bearer` por padrão, `cookie` quando o backend estiver pronto).
 
-O front-end não pode implementar isso sozinho: um cookie `httpOnly` só pode ser criado pelo servidor via `Set-Cookie`, e é justamente essa restrição que o protege contra leitura por XSS.
+> **Bloqueio atual:** enquanto o CORS responder `*`, qualquer requisição com
+> `credentials: "include"` é recusada pelo navegador. Isso foi confirmado em
+> execução: `The value of the 'Access-Control-Allow-Origin' header in the
+> response must not be the wildcard '*' when the request's credentials mode is
+> 'include'`. Portanto o item 2 abaixo é pré-requisito de todos os demais.
+
+Com o modelo atual, o token permanece apenas em memória e **a sessão é perdida a
+cada reload da página**. Essa é a principal motivação desta issue.
+
+O front-end não pode resolver isso sozinho: um cookie `httpOnly` só pode ser
+criado pelo servidor via `Set-Cookie`, e é justamente essa restrição que o
+protege contra leitura por XSS.
 
 ## O que precisa ser implementado
 
@@ -43,18 +60,28 @@ Como o front-end envia `credentials: "include"`, o backend precisa responder com
 - `Access-Control-Allow-Origin` com a **origem explícita** do front-end (não `*`, que é inválido com credenciais)
 - `Access-Control-Allow-Headers` incluindo o header de CSRF definido no item 4
 
-### 3. Endpoint de sessão (bloqueador para o reload)
+### 3. Endpoint de sessão
 
-Como o front-end não consegue ler o cookie `httpOnly`, ele precisa de um endpoint para descobrir quem é o usuário logado ao carregar a aplicação.
+O endpoint já existe e **não precisa ser criado**:
 
 ```
-GET /autenticacao/sessao        (ou /autenticacao/eu)
+GET /autenticacao/quem-sou-eu
 ```
 
-- **200**: retorna os dados necessários para a UI — identificador do usuário, nome, e o **perfil/papel de forma explícita** (ex.: `"aluno"` ou `"admin"`), além de matrícula se aplicável.
-- **401**: quando não há sessão válida.
+Hoje ele responde `200` com `usuario: null` para anônimos, o que é aceitável e já
+é tratado pelo front-end. O necessário é que ele passe a **reconhecer a sessão
+por cookie**, e não apenas pelo header `Authorization`.
 
-> **Observação importante:** hoje o front-end infere o perfil aplicando heurísticas sobre o payload do JWT (busca por termos como "aluno"/"servidor" e checagem do formato da matrícula por quantidade de dígitos). Isso é frágil e propenso a erro. Retornar o papel de forma explícita neste endpoint permite eliminar essas heurísticas.
+O papel já vem de forma explícita em `perfisAtivos[].cargo`, com o campo `ativo`
+para filtrar vínculos, além de `usuario.isSuperUser`. O front-end passou a usar
+esses campos e **eliminou as heurísticas** que antes inferiam o papel pelo texto
+do JWT e pela quantidade de dígitos da matrícula.
+
+> **Pedido complementar:** documentar os valores possíveis de `cargo`. Hoje a
+> especificação declara apenas `string`, sem enum. Uma amostra de 800 registros
+> em `GET /perfis` retornou `aluno`, `dape`, `professor` e vazio. O front-end
+> nega acesso administrativo quando o cargo é vazio ou desconhecido, então
+> cargos não documentados resultam em usuários sem acesso.
 
 ### 4. Proteção CSRF
 
@@ -67,19 +94,24 @@ O front-end **já está preparado** para esse formato: `src/utils/api.js` lê o 
 
 ### 5. Endpoint de logout
 
+**Não existe hoje** e precisa ser criado:
+
 ```
 POST /autenticacao/logout
 ```
 
-Deve invalidar a sessão no servidor e expirar o cookie via `Set-Cookie` com `Max-Age=0`. O front-end não consegue apagar um cookie `httpOnly` por conta própria.
+Deve invalidar a sessão no servidor e expirar o cookie via `Set-Cookie` com
+`Max-Age=0`. O front-end não consegue apagar um cookie `httpOnly` por conta
+própria; enquanto o endpoint não existir, o logout apenas limpa o estado local.
 
 ## Critérios de aceite
 
+- [ ] CORS responde com origem explícita e `Access-Control-Allow-Credentials: true` (pré-requisito).
 - [ ] Login responde com `Set-Cookie` contendo `HttpOnly`, `Secure` e `SameSite`.
-- [ ] CORS configurado com origem explícita e `Allow-Credentials: true`.
-- [ ] `GET /autenticacao/sessao` retorna usuário e papel explícito, e `401` sem sessão.
+- [ ] `GET /autenticacao/quem-sou-eu` reconhece a sessão por cookie.
+- [ ] Valores de `cargo` documentados na especificação OpenAPI.
 - [ ] Cookie `csrf_token` emitido e header `X-CSRF-Token` validado nas mutações.
-- [ ] `POST /autenticacao/logout` expira o cookie e invalida a sessão.
+- [ ] `POST /autenticacao/logout` criado, expirando o cookie e invalidando a sessão.
 - [ ] Sessão sobrevive ao reload da página no front-end.
 - [ ] Requisição de mutação sem CSRF token válido é rejeitada.
 
@@ -87,9 +119,10 @@ Deve invalidar a sessão no servidor e expirar o cookie via `Set-Cookie` com `Ma
 
 Para não quebrar o front-end em produção durante a migração:
 
-1. Backend passa a emitir o cookie **mantendo** `access_token` no corpo temporariamente.
-2. Front-end passa a usar o endpoint de sessão e para de ler `access_token`.
-3. Backend remove `access_token` do corpo da resposta.
+1. Backend corrige o CORS para origem explícita com `Allow-Credentials: true`.
+2. Backend passa a emitir o cookie **mantendo** `access_token` no corpo temporariamente.
+3. Front-end passa a rodar com `VITE_AUTH_MODE=cookie` em ambiente de teste.
+4. Backend remove `access_token` do corpo da resposta.
 
 ## Fora do escopo desta issue
 
