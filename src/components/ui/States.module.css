@@ -1,0 +1,66 @@
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-6);
+  text-align: center;
+}
+
+.icon {
+  color: var(--color-text-muted);
+}
+
+.title {
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+}
+
+.message {
+  margin: 0;
+  max-width: 48ch;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.errorTitle {
+  color: var(--color-danger-text);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-brand-strong);
+  border-radius: var(--radius-full);
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Esqueleto para listas e tabelas. */
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-4);
+}
+
+.skeletonRow {
+  height: 20px;
+  background-color: var(--color-skeleton);
+  border-radius: var(--radius-sm);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
