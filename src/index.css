@@ -1,7 +1,4 @@
-:root {
-    --font-body: 'Poppins', sans-serif;
-    --font-title: 'Poppins', sans-serif;
-}
+/* Tokens de fonte vivem em styles/tokens.css. */
 
 h1, h2, h3, h4, h5, h6 {
 font-family: var(--font-title);
