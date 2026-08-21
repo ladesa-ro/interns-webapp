@@ -30,4 +30,8 @@ paths = [
   '''(^|/)node_modules/''',
   '''(^|/)dist/''',
   '''(^|/)\.env\.example$''',
+  # Bundles minificados de terceiros de uma pagina web salva, presentes apenas
+  # no historico. Contem chaves de vendor (Facebook/GCP), nenhuma credencial da
+  # Ladesa. Sem esta excecao a varredura de historico falha permanentemente.
+  '''(^|/)public/foto-perfil_arquivos/''',
 ]
