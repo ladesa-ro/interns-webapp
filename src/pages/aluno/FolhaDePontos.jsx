@@ -25,7 +25,7 @@ const FolhaDePontos = () => {
         ];
         
         setRegistros(mockData);
-      } catch (err) {
+      } catch {
         setErro('Ocorreu um erro ao carregar a folha de pontos. Tente novamente mais tarde.');
       } finally {
         setLoading(false);
@@ -41,21 +41,12 @@ const FolhaDePontos = () => {
     );
   };
 
-  const enviarFrequencia = async (registroId) => {
-    try {
-      // Mock da chamada à API:
-      // await api.post(`/registros/${registroId}/enviar`, { frequencia: true });
-      
-      // Simula o tempo de resposta da rede
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Atualiza o estado local para marcar o registro como enviado com sucesso
-      setRegistros(prev => 
-        prev.map(reg => reg.id === registroId ? { ...reg, enviado: true } : reg)
-      );
-    } catch (err) {
-      setErro('Ocorreu um erro ao enviar a frequência. Por favor, tente novamente.');
-    }
+  // A API ainda nao expoe endpoint de envio de frequencia: nao marcar como
+  // enviado, o que faria a interface afirmar uma persistencia inexistente.
+  const enviarFrequencia = async () => {
+    setErro(
+      'Funcionalidade em desenvolvimento: o envio de frequência ainda não está disponível.'
+    );
   };
 
   // Encontra qual é o índice do primeiro registro que AINDA NÃO FOI ENVIADO.

@@ -132,9 +132,13 @@ export default function CadastroVagaForm({ modo = "novo" }) {
   };
 
   const atualizarHorario = (index, campo, valor) => {
-    const novosHorarios = [...horariosEstagio];
-    novosHorarios[index][campo] = campo === "diaSemana" ? Number(valor) : valor;
-    setHorariosEstagio(novosHorarios);
+    setHorariosEstagio((prev) =>
+      prev.map((horario, i) =>
+        i === index
+          ? { ...horario, [campo]: campo === "diaSemana" ? Number(valor) : valor }
+          : horario
+      )
+    );
   };
 
   // Função para salvar registros (criação ou edição)

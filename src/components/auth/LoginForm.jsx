@@ -5,7 +5,7 @@ import Background from "../image_Components/Background_Login_Comp";
 import { Eye, EyeOff } from "lucide-react";
 import Mascote from "../image_Components/Mascote_Login_Comp";
 
-export default function LoginForm({ form, onChange, onSubmit }) {
+export default function LoginForm({ form, onChange, onSubmit, erro, enviando }) {
   const [showPassword, setShowPassword] = React.useState(false);
 
   return (
@@ -51,8 +51,14 @@ export default function LoginForm({ form, onChange, onSubmit }) {
               Esqueceu a senha? <a href="/">Clique aqui.</a>
             </p>
 
-            <button type="submit" className={styles.button}>
-              Entrar
+            {erro && (
+              <p role="alert" style={{ color: "#bd4b4b", margin: "0 0 8px" }}>
+                {erro}
+              </p>
+            )}
+
+            <button type="submit" className={styles.button} disabled={enviando}>
+              {enviando ? "Entrando..." : "Entrar"}
             </button>
           </form>
         </div>

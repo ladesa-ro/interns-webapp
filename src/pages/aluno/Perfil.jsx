@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../../contexts/AuthContext";
+import apiFetch from "../../utils/api";
 
 export default function Perfil() {
 
@@ -22,7 +23,7 @@ export default function Perfil() {
   // =====================================================
 
   const {
-    token,
+    autenticado,
     usuarioId,
     carregando: carregandoAuth,
   } = useAuth();
@@ -69,7 +70,7 @@ export default function Perfil() {
         // Verifica autenticação
         // -----------------------------------------------
 
-        if (!token) {
+        if (!autenticado) {
 
           setErro(
             "Usuário não está autenticado."
@@ -108,13 +109,9 @@ export default function Perfil() {
         // URL DA API
         // -----------------------------------------------
 
-        const url =
-          `https://dev.ladesa.com.br/api/v1/perfis?filter.usuario.id=${encodeURIComponent(usuarioId)}`;
-
-
         console.log(
-          "[PERFIL] URL:",
-          url
+          "[PERFIL] Buscando perfil do usuário:",
+          usuarioId
         );
 
 
@@ -123,16 +120,9 @@ export default function Perfil() {
         // -----------------------------------------------
 
         const resposta =
-          await fetch(url, {
-
-            method: "GET",
-
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-
-          });
+          await apiFetch(
+            `/perfis?filter.usuario.id=${encodeURIComponent(usuarioId)}`
+          );
 
 
         console.log(
@@ -244,7 +234,7 @@ export default function Perfil() {
 
     /*
      * Só busca quando o AuthContext terminou
-     * de carregar e temos token + ID.
+     * de carregar e a sessão é conhecida.
      */
 
     if (!carregandoAuth) {
@@ -254,7 +244,7 @@ export default function Perfil() {
     }
 
   }, [
-    token,
+    autenticado,
     usuarioId,
     carregandoAuth,
   ]);
@@ -343,11 +333,6 @@ export default function Perfil() {
   const nome =
     usuario.nome ||
     "Nome não informado";
-
-
-  const emailPrincipal =
-    usuario.email ||
-    "Email não informado";
 
 
   const matricula =
