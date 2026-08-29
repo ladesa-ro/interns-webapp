@@ -5,4 +5,3 @@ dist
 .husky
 README.md
 Dockerfile
-nginx.conf
