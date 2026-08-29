@@ -18,16 +18,13 @@ jobs:
   qualidade:
     name: Lint, build, testes e auditoria
     runs-on: ubuntu-latest
+    container:
+      image: node:22-alpine
     steps:
-      - uses: actions/checkout@v4
-        with:
-          # Histórico completo para que a varredura de segredos cubra os commits.
-          fetch-depth: 0
+      - name: Instalar git e dependências do sistema
+        run: apk add --no-cache git
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
+      - uses: actions/checkout@v4
 
       - name: Instalar dependências
         run: npm ci
