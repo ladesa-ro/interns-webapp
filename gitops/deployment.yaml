@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: interns-webapp
+  namespace: default
+  labels:
+    app: interns-webapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: interns-webapp
+  template:
+    metadata:
+      labels:
+        app: interns-webapp
+    spec:
+      containers:
+        - name: webapp
+          image: ghcr.io/ladesa-ro/interns-webapp:latest
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
