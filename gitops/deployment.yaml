@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: interns-webapp
-  namespace: default
+  namespace: ladesa-ro-development
   labels:
     app: interns-webapp
 spec:
