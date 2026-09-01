@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Menu, Moon, PanelLeftClose, PanelLeftOpen, Sun, X } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
@@ -9,10 +9,16 @@ import styles from "./AppShell.module.css";
 
 const ID_CONTEUDO = "conteudo-principal";
 const ID_NAVEGACAO = "navegacao-principal";
+const SELETOR_FOCAVEL =
+  'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export default function AppShell({ navItems, titulo, children }) {
   const [gavetaAberta, setGavetaAberta] = useState(false);
   const [recolhida, setRecolhida] = useState(false);
+  const sidebarRef = useRef(null);
+  const botaoAbrirRef = useRef(null);
+  const botaoFecharRef = useRef(null);
+  const bodyRef = useRef(null);
   const { logout } = useAuth();
   const { escuro, alternarTema } = useTheme();
   const navigate = useNavigate();
@@ -20,12 +26,42 @@ export default function AppShell({ navItems, titulo, children }) {
   useEffect(() => {
     if (!gavetaAberta) return undefined;
 
-    function fecharComEsc(evento) {
-      if (evento.key === "Escape") setGavetaAberta(false);
+    const body = bodyRef.current;
+    const botaoAbrir = botaoAbrirRef.current;
+
+    body.inert = true;
+    const temporizadorFoco = setTimeout(() => botaoFecharRef.current?.focus(), 0);
+
+    function controlarTeclado(evento) {
+      if (evento.key === "Escape") {
+        setGavetaAberta(false);
+        return;
+      }
+
+      if (evento.key !== "Tab") return;
+
+      const focaveis = Array.from(
+        sidebarRef.current?.querySelectorAll(SELETOR_FOCAVEL) ?? []
+      ).filter((elemento) => elemento.getClientRects().length > 0);
+      const primeiro = focaveis[0];
+      const ultimo = focaveis[focaveis.length - 1];
+
+      if (evento.shiftKey && document.activeElement === primeiro) {
+        evento.preventDefault();
+        ultimo?.focus();
+      } else if (!evento.shiftKey && document.activeElement === ultimo) {
+        evento.preventDefault();
+        primeiro?.focus();
+      }
     }
 
-    document.addEventListener("keydown", fecharComEsc);
-    return () => document.removeEventListener("keydown", fecharComEsc);
+    document.addEventListener("keydown", controlarTeclado);
+    return () => {
+      clearTimeout(temporizadorFoco);
+      document.removeEventListener("keydown", controlarTeclado);
+      body.inert = false;
+      botaoAbrir?.focus();
+    };
   }, [gavetaAberta]);
 
   function handleLogout() {
@@ -52,11 +88,19 @@ export default function AppShell({ navItems, titulo, children }) {
           type="button"
           className={styles.overlay}
           onClick={() => setGavetaAberta(false)}
-          aria-label="Fechar menu de navegação"
+          tabIndex={-1}
+          aria-hidden="true"
         />
       )}
 
-      <div className={classesSidebar} id={ID_NAVEGACAO}>
+      <div
+        ref={sidebarRef}
+        className={classesSidebar}
+        id={ID_NAVEGACAO}
+        role={gavetaAberta ? "dialog" : undefined}
+        aria-modal={gavetaAberta || undefined}
+        aria-label={gavetaAberta ? "Menu de navegação" : undefined}
+      >
         <div className={styles.sidebarHeader}>
           <button
             type="button"
@@ -75,6 +119,7 @@ export default function AppShell({ navItems, titulo, children }) {
           {!recolhida && <Titulo className={styles.logo} />}
 
           <button
+            ref={botaoFecharRef}
             type="button"
             className={[styles.iconButton, styles.menuButton].join(" ")}
             onClick={() => setGavetaAberta(false)}
@@ -115,12 +160,14 @@ export default function AppShell({ navItems, titulo, children }) {
       </div>
 
       <div
+        ref={bodyRef}
         className={[styles.body, recolhida ? styles.bodyCollapsed : ""]
           .filter(Boolean)
           .join(" ")}
       >
         <header className={styles.header}>
           <button
+            ref={botaoAbrirRef}
             type="button"
             className={[styles.headerButton, styles.menuButton].join(" ")}
             onClick={() => setGavetaAberta(true)}

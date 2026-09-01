@@ -193,7 +193,10 @@
 
 .main {
   flex: 1;
+  min-width: 0;
+  max-width: 100%;
   padding: var(--space-5);
+  overflow-x: auto;
 }
 
 .overlay {
@@ -204,7 +207,7 @@
    Tablet e mobile: a barra lateral vira gaveta sobreposta
    -------------------------------------------------------------------------- */
 
-@media (max-width: 1023px) {
+@media (max-width: 1024px) {
   .sidebar {
     width: var(--sidebar-width);
     padding-inline: var(--space-4);
