@@ -21,7 +21,6 @@ export default function ConfirmDialog({
       description={description}
       size="sm"
       closeOnOverlayClick={!loading}
-      closeLabel={cancelLabel}
       footer={
         <>
           <Button variant="secondary" onClick={onCancel} disabled={loading}>
