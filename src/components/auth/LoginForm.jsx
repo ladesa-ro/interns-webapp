@@ -1,73 +1,117 @@
-import React from "react";
+import { useState } from "react";
+import { Eye, EyeOff, Moon, Sun } from "lucide-react";
+import { Button, Card, Input } from "../ui";
+import { useTheme } from "../../contexts/ThemeContext";
 import styles from "./LoginForm.module.css";
 import Titulo from "../icons_Components/Icon_Logo_Comp";
-import Background from "../image_Components/Background_Login_Comp";
-import { Eye, EyeOff } from "lucide-react";
-import Mascote from "../image_Components/Mascote_Login_Comp";
+
+const ERRO_CAMPOS_OBRIGATORIOS = "Informe matrícula e senha.";
+const ID_ERRO_LOGIN = "erro-login";
 
 export default function LoginForm({ form, onChange, onSubmit, erro, enviando }) {
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const { escuro, alternarTema } = useTheme();
+  const erroNosCampos = erro === ERRO_CAMPOS_OBRIGATORIOS ? erro : undefined;
+  const erroGlobal = erro && !erroNosCampos ? erro : "";
+  const descricaoErroGlobal = erroGlobal
+    ? { "aria-describedby": ID_ERRO_LOGIN, "aria-invalid": true }
+    : {};
 
   return (
-    <div className={styles.container}>
-      <div className={styles.left}>
-        <div className={styles.card}>
-          <form onSubmit={onSubmit} className={styles.form}>
-            <Titulo className={styles.logo} />
-            <div className={styles.inputUser}>
-            <input
-              type="text"
-              name="matricula"
-              placeholder=""
-              value={form.matricula}
+    <main className={styles.page}>
+      <div className={styles.brandShapeStart} aria-hidden="true" />
+      <div className={styles.brandShapeEnd} aria-hidden="true" />
+
+      <button
+        type="button"
+        className={styles.themeButton}
+        onClick={alternarTema}
+        aria-label={escuro ? "Ativar tema claro" : "Ativar tema escuro"}
+        aria-pressed={escuro}
+      >
+        {escuro ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
+      </button>
+
+      <Card padding="none" elevated className={styles.card}>
+        <form
+          onSubmit={onSubmit}
+          className={styles.form}
+          aria-labelledby="titulo-login"
+          noValidate
+        >
+          <h1 id="titulo-login" className="sr-only">
+            Acessar o sistema de estágios
+          </h1>
+          <Titulo className={styles.logo} />
+
+          <Input
+            id="matricula"
+            name="matricula"
+            type="text"
+            label="Matrícula"
+            autoComplete="username"
+            value={form.matricula}
+            onChange={onChange}
+            error={erroNosCampos}
+            className={erroGlobal ? styles.invalidGlobal : ""}
+            {...descricaoErroGlobal}
+            disabled={enviando}
+          />
+
+          <div className={styles.passwordField}>
+            <Input
+              id="senha"
+              name="senha"
+              type={mostrarSenha ? "text" : "password"}
+              label="Senha"
+              autoComplete="current-password"
+              value={form.senha}
               onChange={onChange}
+              error={erroNosCampos}
+              {...descricaoErroGlobal}
+              className={[styles.passwordInput, erroGlobal ? styles.invalidGlobal : ""]
+                .filter(Boolean)
+                .join(" ")}
+              disabled={enviando}
             />
-            <label htmlFor="matricula" className={styles.labelLine}>
-              Usuário
-            </label>
-            </div>
-
-            <div className={styles.inputPassword}>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="senha"
-                placeholder=""
-                value={form.senha}
-                onChange={onChange}
-              />
-              <label htmlFor="senha" className={styles.labelLine}>
-                Senha
-              </label>
-              <span
-                className={styles.iconEye}
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <Eye /> : <EyeOff />}
-              </span>
-
-            </div>
-            
-            <p className={styles.forgotPassword}>
-              Esqueceu a senha? <a href="/">Clique aqui.</a>
-            </p>
-
-            {erro && (
-              <p role="alert" style={{ color: "#bd4b4b", margin: "0 0 8px" }}>
-                {erro}
-              </p>
-            )}
-
-            <button type="submit" className={styles.button} disabled={enviando}>
-              {enviando ? "Entrando..." : "Entrar"}
+            <button
+              type="button"
+              className={styles.passwordButton}
+              onClick={() => setMostrarSenha((valor) => !valor)}
+              aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+              aria-pressed={mostrarSenha}
+              disabled={enviando}
+            >
+              {mostrarSenha ? (
+                <EyeOff aria-hidden="true" />
+              ) : (
+                <Eye aria-hidden="true" />
+              )}
             </button>
-          </form>
-        </div>
-      </div>
+          </div>
 
-      <div className={styles.right}>
-        <Background className={styles.background}/>
-        <Mascote className={styles.mascote}/>
-      </div>
-    </div>
+          <p className={styles.forgotPassword}>
+            Esqueceu a senha? <a href="/">Clique aqui.</a>
+          </p>
+
+          {erroGlobal && (
+            <p id={ID_ERRO_LOGIN} className={styles.error} role="alert">
+              {erroGlobal}
+            </p>
+          )}
+
+          <Button
+            type="submit"
+            size="lg"
+            fullWidth
+            loading={enviando}
+            disabled={enviando}
+            loadingLabel="Entrando"
+          >
+            {enviando ? null : "Entrar"}
+          </Button>
+        </form>
+      </Card>
+    </main>
   );
 }
