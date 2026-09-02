@@ -6,6 +6,7 @@ import styles from "./listaEspera.module.css";
 
 import Cards from "../../components/global_Components/Cards";
 import Tabela from "../../components/global_Components/Tabela";
+import { EmptyState, PageHeader } from "../../components/ui";
 
 import logoQuimica from "../../assets/imagems/quimica.png";
 import logoinformtica from "../../assets/imagems/informatica.png";
@@ -82,65 +83,68 @@ export default function ListaEspera() {
   return (
     <div className={styles.layout}>
       <main className={styles.container}>
-        <div className={styles.topo}>
-          <button
-            className={styles.voltar}
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft size={20} />
-          </button>
-
-          <h1>Lista de espera</h1>
-        </div>
+        <PageHeader
+          title="Lista de espera"
+          actions={
+            <button
+              type="button"
+              className={styles.voltar}
+              onClick={() => navigate(-1)}
+              aria-label="Voltar"
+            >
+              <ArrowLeft size={20} aria-hidden="true" />
+            </button>
+          }
+        />
 
         <div className={styles.cards}>
-          <div
-            className={`${styles.cardWrapper} ${cursoSelecionado === "Informática"
-                ? styles.cardAtivo
-                : ""
-              }`}
+          <button
+            type="button"
+            className={[styles.cardWrapper, cursoSelecionado === "Informática" ? styles.cardAtivo : ""]
+              .filter(Boolean)
+              .join(" ")}
             onClick={() => selecionarCurso("Informática")}
+            aria-pressed={cursoSelecionado === "Informática"}
+            aria-label="Filtrar por Informática"
           >
-            <Cards
-              titulo="Informática"
-              valor="24"
-              imagem={logoinformtica}
-            />
-          </div>
+            <Cards titulo="Informática" valor="24" imagem={logoinformtica} />
+          </button>
 
-          <div
-            className={`${styles.cardWrapper} ${cursoSelecionado === "Química"
-                ? styles.cardAtivo
-                : ""
-              }`}
+          <button
+            type="button"
+            className={[styles.cardWrapper, cursoSelecionado === "Química" ? styles.cardAtivo : ""]
+              .filter(Boolean)
+              .join(" ")}
             onClick={() => selecionarCurso("Química")}
+            aria-pressed={cursoSelecionado === "Química"}
+            aria-label="Filtrar por Química"
           >
-            <Cards
-              titulo="Química"
-              valor="24"
-              imagem={logoQuimica}
-            />
-          </div>
+            <Cards titulo="Química" valor="24" imagem={logoQuimica} />
+          </button>
 
-          <div
-            className={`${styles.cardWrapper} ${cursoSelecionado === "Florestas"
-                ? styles.cardAtivo
-                : ""
-              }`}
+          <button
+            type="button"
+            className={[styles.cardWrapper, cursoSelecionado === "Florestas" ? styles.cardAtivo : ""]
+              .filter(Boolean)
+              .join(" ")}
             onClick={() => selecionarCurso("Florestas")}
+            aria-pressed={cursoSelecionado === "Florestas"}
+            aria-label="Filtrar por Florestas"
           >
-            <Cards
-              titulo="Florestas"
-              valor="24"
-              imagem={logofloresta}
-            />
-          </div>
+            <Cards titulo="Florestas" valor="24" imagem={logofloresta} />
+          </button>
         </div>
 
-        <Tabela
-          colunas={colunas}
-          dados={alunosFiltrados}
-        />
+        {alunosFiltrados.length > 0 ? (
+          <Tabela
+            colunas={colunas}
+            dados={alunosFiltrados}
+          />
+        ) : (
+          <EmptyState
+            title={`Nenhum aluno de ${cursoSelecionado} na lista de espera`}
+          />
+        )}
       </main>
     </div>
   );
