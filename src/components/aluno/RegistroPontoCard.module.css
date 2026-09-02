@@ -1,114 +1,60 @@
-.wrapper {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
 .card {
-  flex: 1;
-  background-color: #EAF6EE;
-  border-radius: 8px;
-  padding: 24px 32px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.column {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  flex: 1;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text);
 }
 
-.column:first-child {
-  align-items: flex-start;
+.dados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-4);
 }
 
-.column:last-child {
-  align-items: center;
+.coluna {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
 }
 
-.label {
-  font-weight: 700;
-  color: #1F7A4D; /* Verde principal */
-  font-size: 16px;
+.rotulo {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.value {
-  color: #1F7A4D; /* Mantendo verde escuro no valor de acordo com mockup (opcional, pode ser cinza, mas #1F7A4D combina mais) */
-  font-size: 15px;
-  font-weight: 500;
+.valor {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  overflow-wrap: anywhere;
 }
 
-.checkbox {
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  accent-color: #1F7A4D;
-  border: 1px solid #1F7A4D;
-  border-radius: 4px;
+.observacoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
 }
 
-.checkbox:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
+.textoObservacoes {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-subtle);
+  line-height: var(--line-height-normal);
+  overflow-wrap: anywhere;
 }
 
-.enviarButton {
-  width: 140px;
-  padding: 12px 24px;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  transition: background-color 0.2s;
-  color: white;
-}
-
-.enabled {
-  background-color: #1F7A4D;
-  cursor: pointer;
-}
-
-.enabled:hover {
-  background-color: #165c3a;
-}
-
-.disabled {
-  background-color: #8A8A8A;
-  cursor: not-allowed;
-}
-
-.sent {
-  background-color: #d1d5db;
-  color: #4b5563;
-  cursor: not-allowed;
-}
-
-@media (max-width: 768px) {
-  .wrapper {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-  }
-  
-  .card {
-    flex-direction: column;
-    gap: 16px;
-    padding: 20px;
-  }
-  
-  .column, .column:first-child, .column:last-child {
-    align-items: flex-start;
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-  
-  .enviarButton {
-    width: 100%;
-    padding: 14px;
-  }
+.acoes {
+  display: flex;
+  justify-content: flex-end;
 }
