@@ -1,0 +1,266 @@
+.shell {
+  min-height: 100vh;
+  background-color: var(--color-surface-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Barra lateral
+   -------------------------------------------------------------------------- */
+
+.sidebar {
+  position: fixed;
+  inset-block: 0;
+  left: 0;
+  z-index: var(--z-sidebar);
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-width);
+  padding: var(--space-4);
+  background-color: var(--color-sidebar-bg);
+  color: var(--color-sidebar-text);
+  transition: width var(--transition-base), transform var(--transition-base);
+}
+
+.sidebarCollapsed {
+  width: var(--sidebar-width-collapsed);
+  padding-inline: var(--space-2);
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  margin-bottom: var(--space-6);
+}
+
+.sidebarCollapsed .sidebarHeader {
+  justify-content: center;
+}
+
+.logo {
+  width: 100%;
+  height: auto;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: inherit;
+  cursor: pointer;
+}
+
+.iconButton:hover {
+  background-color: var(--color-sidebar-item-hover);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  color: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast);
+}
+
+.navItem:hover {
+  background-color: var(--color-sidebar-item-hover);
+}
+
+.navItemActive {
+  background-color: var(--color-sidebar-item-active);
+  font-weight: var(--font-weight-semibold);
+}
+
+.navIcon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.sidebarCollapsed .navLabel {
+  display: none;
+}
+
+.sidebarCollapsed .navItem,
+.sidebarCollapsed .logout {
+  justify-content: center;
+}
+
+.logout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  margin-top: auto;
+  padding: var(--space-3);
+  background-color: var(--color-sidebar-item-hover);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.logout:hover {
+  background-color: var(--color-sidebar-item-active);
+}
+
+/* --------------------------------------------------------------------------
+   Cabeçalho e conteúdo
+   -------------------------------------------------------------------------- */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-left: var(--sidebar-width);
+  transition: margin-left var(--transition-base);
+}
+
+.bodyCollapsed {
+  margin-left: var(--sidebar-width-collapsed);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--header-height);
+  padding: var(--space-2) var(--space-6);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.headerTitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.headerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.headerButton:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.menuButton {
+  display: none;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--space-5);
+  overflow-x: auto;
+}
+
+.overlay {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Tablet e mobile: a barra lateral vira gaveta sobreposta
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: var(--sidebar-width);
+    padding-inline: var(--space-4);
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .sidebarCollapsed .navLabel {
+    display: inline;
+  }
+
+  .sidebarCollapsed .navItem,
+  .sidebarCollapsed .logout {
+    justify-content: flex-start;
+  }
+
+  .collapseButton {
+    display: none;
+  }
+
+  .body,
+  .bodyCollapsed {
+    margin-left: 0;
+  }
+
+  .menuButton {
+    display: inline-flex;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    display: block;
+    background-color: var(--color-overlay);
+    border: none;
+  }
+
+  .sidebar {
+    z-index: calc(var(--z-overlay) + 1);
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding-inline: var(--space-4);
+  }
+
+  .headerTitle {
+    font-size: var(--font-size-md);
+  }
+}

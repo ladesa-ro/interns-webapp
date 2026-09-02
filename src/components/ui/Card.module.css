@@ -1,0 +1,41 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  text-align: left;
+}
+
+.md {
+  padding: var(--space-4);
+}
+
+.lg {
+  padding: var(--space-6);
+}
+
+.none {
+  padding: 0;
+}
+
+.elevated {
+  border-color: transparent;
+  box-shadow: var(--shadow-md);
+}
+
+/* Aplicado quando o card é renderizado como button. */
+.interactive {
+  width: 100%;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color var(--transition-fast),
+    box-shadow var(--transition-fast), background-color var(--transition-fast);
+}
+
+.interactive:hover {
+  border-color: var(--color-brand-strong);
+  box-shadow: var(--shadow-md);
+}

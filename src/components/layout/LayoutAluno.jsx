@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import SidebarAluno from "./SidebarAluno";
+import { BookOpen, CircleUserRound, ClipboardList, House } from "lucide-react";
+import AppShell from "./AppShell";
 
 import Inicio from "../../pages/aluno/inicio/Inicio";
 import Perfil from "../../pages/aluno/Perfil";
@@ -10,13 +11,17 @@ import SolicitarEstagio from "../../pages/aluno/inicio/solicitar-estagio/Solicit
 import AvaliarEmpresa from "../../pages/aluno/AvaliarEmpresa";
 import FolhaDePontos from "../../pages/aluno/FolhaDePontos";
 
+const NAV_ALUNO = [
+  { to: "/aluno", label: "Início", icon: House, end: true },
+  { to: "/aluno/perfil", label: "Perfil", icon: CircleUserRound },
+  { to: "/aluno/lista-espera", label: "Lista de espera", icon: ClipboardList },
+  { to: "/aluno/guia-estagio", label: "Guia de estágio", icon: BookOpen },
+];
+
 export default function LayoutAluno() {
   return (
-    <div className="app">
-      <SidebarAluno />
-
-      <div className="content">
-        <Routes>
+    <AppShell navItems={NAV_ALUNO} titulo="Portal do Aluno">
+      <Routes>
           <Route index element={<Inicio />} />
           <Route path="perfil" element={<Perfil />} />
           <Route path="lista-espera" element={<ListaEsperaAluno />} />
@@ -28,8 +33,7 @@ export default function LayoutAluno() {
             path="solicitar-estagio"
             element={<SolicitarEstagio />}
           />
-        </Routes>
-      </div>
-    </div>
+      </Routes>
+    </AppShell>
   );
 }

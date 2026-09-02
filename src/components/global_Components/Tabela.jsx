@@ -14,8 +14,8 @@ const Tabela = ({ colunas, dados }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {dados.map((item) => (
-                        <tr key={item.id} className={styles.linha}>
+                    {dados.map((item, indice) => (
+                        <tr key={item.id ?? indice} className={styles.linha}>
                             {colunas.map((coluna) => (
                                 <td key={coluna.chave}>
                                     {item[coluna.chave]}

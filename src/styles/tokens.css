@@ -1,0 +1,277 @@
+/**
+ * Design tokens — extraídos do Figma "ESTÁGIOS IFRO"
+ * Páginas de origem: Componentes > Paleta De Cores, Paleta - White Mode, Paleta - Dark Mode, Fontes.
+ *
+ * Camada 1 (primitivos): valores brutos da paleta. Não use diretamente em componentes.
+ * Camada 2 (semânticos): use estes. Trocam de valor conforme o tema.
+ */
+
+:root {
+  /* ---------------------------------------------------------------------- */
+  /* Camada 1 — primitivos                                                   */
+  /* ---------------------------------------------------------------------- */
+
+  /* Verde (escala g1–g9). g5 é a cor de marca oficial (--ldsa-green-1). */
+  --ldsa-green-1: #035611;
+  --ldsa-green-2: #086a18;
+  --ldsa-green-3: #157d26;
+  --ldsa-green-4: #208e32;
+  --ldsa-green-5: #2f9e41;
+  --ldsa-green-6: #46b157;
+  --ldsa-green-7: #5bc86d;
+  --ldsa-green-8: #6ee281;
+  --ldsa-green-9: #82f494;
+
+  /* Verdes da paleta semântica (não pertencem à escala g1–g9). */
+  --ldsa-green-accent: #3cc052;
+  --ldsa-green-dark-base: #066436;
+  --ldsa-green-dark-accent: #1d935a;
+
+  /* Neutros (escala c1–c14). */
+  --ldsa-neutral-1: #121212;
+  --ldsa-neutral-2: #242424;
+  --ldsa-neutral-3: #3b3b3b;
+  --ldsa-neutral-4: #4c4c4c;
+  --ldsa-neutral-5: #616161;
+  --ldsa-neutral-6: #737373;
+  --ldsa-neutral-7: #828282;
+  --ldsa-neutral-8: #949494;
+  --ldsa-neutral-9: #a6a6a6;
+  --ldsa-neutral-10: #c2c2c2;
+  --ldsa-neutral-11: #d1d1d1;
+  --ldsa-neutral-12: #e8e8e8;
+  --ldsa-neutral-13: #f5f5f5;
+  --ldsa-neutral-14: #fafafa;
+
+  /* Cinza e preto da paleta semântica. */
+  --ldsa-grey: #9f9f9f;
+  --ldsa-grey-dark: #555d6e;
+  --ldsa-black: #050f07;
+  --ldsa-white: #ffffff;
+  --ldsa-surface-dark: #191b22;
+  --ldsa-text-dark: #d4dede;
+
+  /* Erro (escala r1–r6). */
+  --ldsa-red-1: #fededf;
+  --ldsa-red-2: #ffb4b6;
+  --ldsa-red-3: #ff7276;
+  --ldsa-red-4: #d42328;
+  --ldsa-red-5: #be151a;
+  --ldsa-red-6: #910509;
+  --ldsa-red-base: #cd191e;
+  --ldsa-red-dark: #a00f25;
+
+  /* Informação (escala b1–b6). */
+  --ldsa-blue-1: #d5e6f8;
+  --ldsa-blue-2: #a6d1ff;
+  --ldsa-blue-3: #74b6fb;
+  --ldsa-blue-4: #449dfa;
+  --ldsa-blue-5: #226cb9;
+  --ldsa-blue-6: #114e8f;
+
+  /* Aviso (escala y1–y6). */
+  --ldsa-yellow-1: #fff6de;
+  --ldsa-yellow-2: #ffe6a7;
+  --ldsa-yellow-3: #ffd773;
+  --ldsa-yellow-4: #ffc83b;
+  --ldsa-yellow-5: #e2a408;
+  --ldsa-yellow-6: #a88508;
+
+  /* ---------------------------------------------------------------------- */
+  /* Camada 2 — semânticos (tema claro)                                      */
+  /* ---------------------------------------------------------------------- */
+
+  /* Marca. `brand-strong` existe porque `brand` sobre branco tem contraste
+     3,2:1 e reprova WCAG AA para texto; g3 atinge 4,9:1. */
+  --color-brand: var(--ldsa-green-5);
+  --color-brand-strong: var(--ldsa-green-3);
+  --color-brand-hover: var(--ldsa-green-2);
+  --color-brand-active: var(--ldsa-green-1);
+  --color-brand-subtle: #eaf7ed;
+  --color-brand-contrast: var(--ldsa-white);
+
+  /* Superfícies. */
+  --color-bg: var(--ldsa-white);
+  --color-surface: var(--ldsa-white);
+  --color-surface-muted: var(--ldsa-neutral-14);
+  --color-surface-hover: var(--ldsa-neutral-13);
+  --color-overlay: rgb(5 15 7 / 55%);
+
+  /* Texto. `text-muted` usa c6 em vez do #9F9F9F do Figma, que tem 2,5:1. */
+  --color-text: var(--ldsa-black);
+  --color-text-muted: var(--ldsa-neutral-6);
+  --color-text-subtle: var(--ldsa-neutral-5);
+  --color-text-inverse: var(--ldsa-white);
+  --color-text-on-brand: var(--ldsa-white);
+
+  /* Bordas. */
+  --color-border: var(--ldsa-neutral-11);
+  --color-border-strong: var(--ldsa-neutral-9);
+  --color-border-brand: var(--color-brand);
+
+  /* Foco. */
+  --color-focus: var(--ldsa-green-3);
+  --focus-ring: 0 0 0 3px rgb(47 158 65 / 40%);
+
+  /* Estados. */
+  --color-danger: var(--ldsa-red-base);
+  --color-danger-hover: var(--ldsa-red-5);
+  --color-danger-surface: var(--ldsa-red-1);
+  --color-danger-text: var(--ldsa-red-6);
+
+  --color-success: var(--ldsa-green-3);
+  --color-success-surface: var(--color-brand-subtle);
+  --color-success-text: var(--ldsa-green-1);
+
+  --color-warning: var(--ldsa-yellow-5);
+  --color-warning-surface: var(--ldsa-yellow-1);
+  --color-warning-text: var(--ldsa-yellow-6);
+
+  --color-info: var(--ldsa-blue-5);
+  --color-info-surface: var(--ldsa-blue-1);
+  --color-info-text: var(--ldsa-blue-6);
+
+  --color-skeleton: var(--ldsa-neutral-12);
+
+  /* Navegação. */
+  --color-sidebar-bg: var(--color-brand-strong);
+  --color-sidebar-text: var(--ldsa-white);
+  --color-sidebar-item-hover: rgb(255 255 255 / 14%);
+  --color-sidebar-item-active: rgb(255 255 255 / 22%);
+
+  /* ---------------------------------------------------------------------- */
+  /* Tipografia — Poppins para títulos, Inter para corpo (Figma > Fontes)     */
+  /* ---------------------------------------------------------------------- */
+  --font-title: "Poppins", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.375rem;
+  --font-size-2xl: 1.75rem;
+  --font-size-3xl: 2.5rem;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.7;
+
+  /* ---------------------------------------------------------------------- */
+  /* Espaçamento — base 4px                                                  */
+  /* ---------------------------------------------------------------------- */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ---------------------------------------------------------------------- */
+  /* Raios, sombras e camadas                                                */
+  /* ---------------------------------------------------------------------- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgb(5 15 7 / 8%);
+  --shadow-md: 0 2px 8px rgb(5 15 7 / 10%);
+  --shadow-lg: 0 8px 24px rgb(5 15 7 / 14%);
+
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-sidebar: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* ---------------------------------------------------------------------- */
+  /* Layout — larguras do Figma (sidebar 251px aberta / 45px fechada)         */
+  /* ---------------------------------------------------------------------- */
+  --sidebar-width: 251px;
+  --sidebar-width-collapsed: 64px;
+  --header-height: 64px;
+  --content-max-width: 1330px;
+
+  /* Breakpoints. Media queries não aceitam var(); estes valores existem para
+     documentação e para uso em JS via getComputedStyle. */
+  --breakpoint-sm: 390px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1440px;
+
+  --transition-fast: 120ms ease;
+  --transition-base: 200ms ease;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Tema escuro — valores de Componentes > Paleta - Dark Mode                   */
+/* -------------------------------------------------------------------------- */
+
+[data-theme="dark"] {
+  --color-brand: var(--ldsa-green-dark-base);
+  --color-brand-strong: var(--ldsa-green-dark-accent);
+  --color-brand-hover: var(--ldsa-green-dark-accent);
+  --color-brand-active: var(--ldsa-green-4);
+  --color-brand-subtle: #0f2a1c;
+  --color-brand-contrast: var(--ldsa-text-dark);
+
+  --color-bg: var(--ldsa-surface-dark);
+  --color-surface: #212430;
+  --color-surface-muted: #1e202a;
+  --color-surface-hover: #2a2e3c;
+  --color-overlay: rgb(0 0 0 / 65%);
+
+  --color-text: var(--ldsa-text-dark);
+  --color-text-muted: #9aa3b2;
+  --color-text-subtle: var(--ldsa-grey-dark);
+  --color-text-inverse: var(--ldsa-black);
+  --color-text-on-brand: var(--ldsa-white);
+
+  --color-border: var(--ldsa-grey-dark);
+  --color-border-strong: #6b7488;
+  --color-border-brand: var(--ldsa-green-dark-accent);
+
+  --color-focus: var(--ldsa-green-7);
+  --focus-ring: 0 0 0 3px rgb(91 200 109 / 45%);
+
+  --color-danger: var(--ldsa-red-dark);
+  --color-danger-hover: var(--ldsa-red-5);
+  --color-danger-surface: #3a1119;
+  --color-danger-text: var(--ldsa-red-2);
+
+  --color-success: var(--ldsa-green-dark-accent);
+  --color-success-surface: #0f2a1c;
+  --color-success-text: var(--ldsa-green-8);
+
+  --color-warning: var(--ldsa-yellow-5);
+  --color-warning-surface: #33280a;
+  --color-warning-text: var(--ldsa-yellow-3);
+
+  --color-info: var(--ldsa-blue-4);
+  --color-info-surface: #10243a;
+  --color-info-text: var(--ldsa-blue-2);
+
+  --color-skeleton: #2a2e3c;
+
+  --color-sidebar-bg: #10231a;
+  --color-sidebar-text: var(--ldsa-text-dark);
+  --color-sidebar-item-hover: rgb(255 255 255 / 10%);
+  --color-sidebar-item-active: rgb(29 147 90 / 45%);
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow-md: 0 2px 8px rgb(0 0 0 / 45%);
+  --shadow-lg: 0 8px 24px rgb(0 0 0 / 55%);
+}
