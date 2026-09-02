@@ -8,79 +8,100 @@ import {
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 
-import { Card, PageHeader } from "../../components/ui";
+import { Card, ErrorState, LoadingState, PageHeader } from "../../components/ui";
+import { buscarIndicadoresPainel } from "../../utils/dashboardApi";
 
 import styles from "./Painel.module.css";
 
 const TONS = new Map(Object.entries(styles));
+
+function obterValorIndicador(indicadores, chave) {
+  if (!indicadores) return 0;
+  switch (chave) {
+    case "empresas": return indicadores.empresas ?? 0;
+    case "vagas": return indicadores.vagas ?? 0;
+    case "alunosEmEstagio": return indicadores.alunosEmEstagio ?? 0;
+    case "alunosSemEstagio": return indicadores.alunosSemEstagio ?? 0;
+    case "relatoriosSegundoAno": return indicadores.relatoriosSegundoAno ?? 0;
+    default: return 0;
+  }
+}
 
 // Roxo e laranja não têm token semântico dedicado; reaproveitam marca e aviso.
 // A distinção entre indicadores não depende só da cor: ícone e título diferem.
 const INDICADORES = [
   {
     titulo: "Empresas Cadastradas",
-    valor: "24",
+    chave: "empresas",
     tom: "brandStrong",
     Icon: Building2,
     destino: "/empresa",
   },
   {
     titulo: "Vagas Disponíveis",
-    valor: "15",
+    chave: "vagas",
     tom: "info",
     Icon: Briefcase,
     destino: "/Vaga",
   },
   {
     titulo: "Alunos em Estágio",
-    valor: "42",
+    chave: "alunosEmEstagio",
     tom: "brand",
     Icon: Users,
     destino: "/alunos-em-estagio",
   },
   {
     titulo: "Alunos do 3° ano sem Estágio",
-    valor: "8",
+    chave: "alunosSemEstagio",
     tom: "danger",
     Icon: AlertCircle,
     destino: "/alunos-sem-estagio",
   },
   {
     titulo: "Relatórios 2° ano",
-    valor: "8",
+    chave: "relatoriosSegundoAno",
     tom: "warning",
     Icon: FileText,
     destino: "/relatorio-segundo-ano",
   },
 ];
 
-const ALERTAS = [
-  {
-    tom: "danger",
-    titulo: "8 alunos do 3° ano sem estágio",
-    subtitulo: "Requer atenção imediata",
-  },
-  {
-    tom: "warning",
-    titulo: "12 alunos na lista de espera",
-    subtitulo: "Verificar vagas disponíveis",
-  },
-  {
-    tom: "info",
-    titulo: "5 estágios terminam este mês",
-    subtitulo: "Preparar documentação",
-  },
-];
-
 export default function Painel() {
   const navigate = useNavigate();
+  const [indicadores, setIndicadores] = useState(null);
+  const [erro, setErro] = useState(null);
+  const [carregando, setCarregando] = useState(true);
 
   const scrollRef = useRef(null);
+  const ativoRef = useRef(true);
 
   const [mostrarSeta, setMostrarSeta] = useState(false);
   const [fimScroll, setFimScroll] = useState(false);
+
+  const carregarIndicadores = useCallback(async () => {
+    if (!ativoRef.current) return;
+    setCarregando(true);
+    setErro(null);
+    try {
+      const dados = await buscarIndicadoresPainel();
+      if (ativoRef.current) setIndicadores(dados);
+    } catch (error) {
+      if (ativoRef.current) setErro(error);
+    } finally {
+      if (ativoRef.current) setCarregando(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const tarefa = Promise.resolve().then(carregarIndicadores);
+    return () => {
+      ativoRef.current = false;
+      tarefa.catch(() => {});
+    };
+  }, [carregarIndicadores]);
 
   // VERIFICA SCROLL
   useEffect(() => {
@@ -141,7 +162,7 @@ export default function Painel() {
           ref={scrollRef}
         >
           <div className={styles.cards}>
-            {INDICADORES.map(({ titulo, valor, tom, Icon, destino }) => (
+            {INDICADORES.map(({ titulo, chave, tom, Icon, destino }) => (
               <Card
                 key={titulo}
                 elevated
@@ -158,11 +179,22 @@ export default function Painel() {
 
                 <h3 className={styles.indicadorTitulo}>{titulo}</h3>
 
-                <span className={styles.indicadorValor}>{valor}</span>
+                <span className={styles.indicadorValor} aria-label={carregando ? "Carregando" : undefined}>
+                  {carregando ? "..." : erro ? "-" : obterValorIndicador(indicadores, chave)}
+                </span>
               </Card>
             ))}
           </div>
         </div>
+
+        {carregando && <LoadingState message="Carregando indicadores..." />}
+        {erro && (
+          <ErrorState
+            title="Não foi possível carregar os indicadores"
+            message="Verifique sua conexão e tente novamente."
+            onRetry={carregarIndicadores}
+          />
+        )}
 
         {/* SETA */}
         {mostrarSeta && !fimScroll && (
@@ -182,7 +214,23 @@ export default function Painel() {
       <Card elevated className={styles.alertas}>
         <h3 className={styles.alertasTitulo}>Alertas e Pendências</h3>
 
-        {ALERTAS.map(({ tom, titulo, subtitulo }) => (
+        {[
+          {
+            tom: "danger",
+            titulo: `${indicadores?.alunosSemEstagio ?? 0} alunos do 3° ano sem estágio`,
+            subtitulo: "Requer atenção imediata",
+          },
+          {
+            tom: "warning",
+            titulo: `${indicadores?.alunosListaEspera ?? 0} alunos na lista de espera`,
+            subtitulo: "Verificar vagas disponíveis",
+          },
+          {
+            tom: "info",
+            titulo: `${indicadores?.estagiosQueTerminamEsteMes ?? 0} estágios terminam este mês`,
+            subtitulo: "Preparar documentação",
+          },
+        ].map(({ tom, titulo, subtitulo }) => (
           <div
             key={titulo}
             className={[styles.alerta, TONS.get(`alerta-${tom}`)]

@@ -1,4 +1,5 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
+const REQUEST_BASE_URL = import.meta.env.DEV ? "/api/v1" : BASE_URL;
 
 if (!BASE_URL) {
   throw new Error(
@@ -81,7 +82,9 @@ function isAuthEndpoint(url) {
 }
 
 async function apiFetch(endpoint, options = {}) {
-  const url = endpoint.startsWith("http") ? endpoint : `${BASE_URL}${endpoint}`;
+  const url = endpoint.startsWith("http")
+    ? endpoint
+    : `${REQUEST_BASE_URL}${endpoint}`;
   const headers = { ...options.headers };
 
   if (options.body && !(options.body instanceof FormData) && !headers["Content-Type"]) {

@@ -1,10 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Painel from "./Painel";
 
 const mocks = vi.hoisted(() => ({ navigate: vi.fn() }));
+const apiMocks = vi.hoisted(() => ({ buscarIndicadoresPainel: vi.fn() }));
+
+vi.mock("../../utils/dashboardApi", () => apiMocks);
 
 vi.mock("react-router-dom", async (importOriginal) => {
   const original = await importOriginal();
@@ -21,11 +24,21 @@ function renderizar() {
 
 beforeEach(() => {
   mocks.navigate.mockReset();
+  apiMocks.buscarIndicadoresPainel.mockResolvedValue({
+    empresas: 24,
+    vagas: 15,
+    alunosEmEstagio: 42,
+    alunosSemEstagio: 8,
+    relatoriosSegundoAno: 8,
+    alunosListaEspera: 12,
+    estagiosQueTerminamEsteMes: 5,
+  });
 });
 
 describe("Painel", () => {
-  it("renderiza título, subtítulo e os cinco indicadores com valores preservados", () => {
+  it("renderiza título, subtítulo e os cinco indicadores com valores da API", async () => {
     renderizar();
+    await waitFor(() => expect(screen.getByText("24")).toBeInTheDocument());
 
     expect(screen.getByRole("heading", { name: "Painel CIEC" })).toBeInTheDocument();
     expect(
@@ -51,6 +64,7 @@ describe("Painel", () => {
   it("navega para os destinos exatos ao clicar em cada indicador", async () => {
     const user = userEvent.setup();
     renderizar();
+    await waitFor(() => expect(screen.getByText("24")).toBeInTheDocument());
 
     const destinos = [
       ["Empresas Cadastradas", "/empresa"],
@@ -73,6 +87,7 @@ describe("Painel", () => {
   it("os indicadores são botões focáveis e acionáveis por teclado", async () => {
     const user = userEvent.setup();
     renderizar();
+    await waitFor(() => expect(screen.getByText("24")).toBeInTheDocument());
 
     const primeiro = screen.getByRole("button", { name: /Empresas Cadastradas/ });
     primeiro.focus();
@@ -89,6 +104,7 @@ describe("Painel", () => {
 
   it("os indicadores respondem a toque (clique sintético) como os demais botões", async () => {
     renderizar();
+    await waitFor(() => expect(screen.getByText("24")).toBeInTheDocument());
 
     const card = screen.getByRole("button", { name: /Vagas Disponíveis/ });
     card.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
@@ -96,8 +112,9 @@ describe("Painel", () => {
     expect(mocks.navigate).toHaveBeenCalledWith("/Vaga");
   });
 
-  it("renderiza os três alertas com título e subtítulo preservados", () => {
+  it("renderiza os três alertas com título e subtítulo da API", async () => {
     renderizar();
+    await waitFor(() => expect(screen.getByText("8 alunos do 3° ano sem estágio")).toBeInTheDocument());
 
     expect(screen.getByRole("heading", { name: "Alertas e Pendências" })).toBeInTheDocument();
     expect(screen.getByText("8 alunos do 3° ano sem estágio")).toBeInTheDocument();
@@ -134,6 +151,7 @@ describe("Painel", () => {
     HTMLElement.prototype.scrollBy = scrollBy;
 
     renderizar();
+    await waitFor(() => expect(screen.getByText("24")).toBeInTheDocument());
 
     const seta = await screen.findByRole("button", { name: "Ver mais indicadores" });
     await user.click(seta);
@@ -143,5 +161,25 @@ describe("Painel", () => {
     delete HTMLElement.prototype.scrollWidth;
     delete HTMLElement.prototype.clientWidth;
     delete HTMLElement.prototype.scrollBy;
+  });
+
+  it("diferencia erro da API e permite tentar novamente", async () => {
+    apiMocks.buscarIndicadoresPainel
+      .mockRejectedValueOnce(new Error("falha"))
+      .mockResolvedValueOnce({
+        empresas: 0,
+        vagas: 0,
+        alunosEmEstagio: 0,
+        alunosSemEstagio: 0,
+        relatoriosSegundoAno: 0,
+        alunosListaEspera: 0,
+        estagiosQueTerminamEsteMes: 0,
+      });
+    const user = userEvent.setup();
+    renderizar();
+
+    await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
+    await user.click(screen.getByRole("button", { name: "Tentar novamente" }));
+    await waitFor(() => expect(screen.getByText("0 alunos na lista de espera")).toBeInTheDocument());
   });
 });

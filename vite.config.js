@@ -6,6 +6,15 @@ import svgr from 'vite-plugin-svgr';
 // https://vite.dev/config/
 export default defineConfig({
   base: '/estagios/',
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://dev.ladesa.com.br',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] }),
