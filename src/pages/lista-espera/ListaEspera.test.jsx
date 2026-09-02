@@ -1,10 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ListaEspera from "./ListaEspera";
 
 const mocks = vi.hoisted(() => ({ navigate: vi.fn() }));
+const apiMocks = vi.hoisted(() => ({ buscarListaDeEspera: vi.fn() }));
+
+vi.mock("../../utils/dashboardApi", () => apiMocks);
 
 vi.mock("react-router-dom", async (importOriginal) => {
   const original = await importOriginal();
@@ -21,11 +24,19 @@ function renderizar() {
 
 beforeEach(() => {
   mocks.navigate.mockReset();
+  apiMocks.buscarListaDeEspera.mockResolvedValue([
+    { id: "1", matricula: "1", nome: "Ana Cristina Souza", empresa: "-", curso: "Informática" },
+    { id: "2", matricula: "2", nome: "Uriel Luiz", empresa: "-", curso: "Química" },
+    { id: "3", matricula: "3", nome: "Victor Henrique", empresa: "-", curso: "Química" },
+    { id: "4", matricula: "4", nome: "Arthur Braga", empresa: "-", curso: "Florestas" },
+    { id: "5", matricula: "5", nome: "Juliana Rodrigues", empresa: "-", curso: "Informática" },
+  ]);
 });
 
 describe("ListaEspera", () => {
-  it("renderiza título, filtros e todos os alunos por padrão", () => {
+  it("renderiza título, filtros e todos os alunos por padrão", async () => {
     renderizar();
+    await waitFor(() => expect(screen.getAllByRole("row")).toHaveLength(6));
 
     expect(screen.getByRole("heading", { name: "Lista de espera" })).toBeInTheDocument();
     expect(screen.getAllByRole("row")).toHaveLength(6); // cabeçalho + 5 alunos
@@ -35,6 +46,7 @@ describe("ListaEspera", () => {
   it("volta para a página anterior ao clicar no botão Voltar", async () => {
     const user = userEvent.setup();
     renderizar();
+    await waitFor(() => expect(screen.getAllByRole("row")).toHaveLength(6));
 
     await user.click(screen.getByRole("button", { name: "Voltar" }));
     expect(mocks.navigate).toHaveBeenCalledWith(-1);
@@ -43,6 +55,7 @@ describe("ListaEspera", () => {
   it("filtra os alunos por curso ao clicar no card e alterna aria-pressed", async () => {
     const user = userEvent.setup();
     renderizar();
+    await waitFor(() => expect(screen.getAllByRole("row")).toHaveLength(6));
 
     const filtro = screen.getByRole("button", { name: "Filtrar por Química" });
     expect(filtro).toHaveAttribute("aria-pressed", "false");
@@ -57,6 +70,7 @@ describe("ListaEspera", () => {
   it("remove o filtro ao clicar novamente no mesmo card", async () => {
     const user = userEvent.setup();
     renderizar();
+    await waitFor(() => expect(screen.getAllByRole("row")).toHaveLength(6));
 
     const filtro = screen.getByRole("button", { name: "Filtrar por Florestas" });
     await user.click(filtro);
@@ -70,6 +84,7 @@ describe("ListaEspera", () => {
   it("é operável por teclado com Enter e Space", async () => {
     const user = userEvent.setup();
     renderizar();
+    await waitFor(() => expect(screen.getAllByRole("row")).toHaveLength(6));
 
     const filtro = screen.getByRole("button", { name: "Filtrar por Informática" });
     filtro.focus();
