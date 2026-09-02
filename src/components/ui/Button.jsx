@@ -44,8 +44,11 @@ export default function Button({
       {...rest}
     >
       {loading && <span className={styles.spinner} aria-hidden="true" />}
-      {loading ? <span className="sr-only">{loadingLabel}</span> : null}
-      {children}
+      {loading ? (
+        <span className="sr-only">{loadingLabel}</span>
+      ) : (
+        children
+      )}
     </button>
   );
 }

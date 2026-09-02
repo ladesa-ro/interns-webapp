@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Styles from './tabelaRegistros.module.css';
 import Pesquisa from '../icons_Components/Icon_Pesquisa_Comp';
 import Editar from '../icons_Components/Icon_Editar_Comp';
 import Deletar from '../icons_Components/Icon_Deletar_Comp';
 import { useNavigate } from 'react-router-dom';
 import apiFetch from '../../utils/api';
+import { Button, ConfirmDialog, EmptyState, ErrorState, Input, LoadingState } from '../ui';
 
 export default function TabelaRegistros() {
   const navigate = useNavigate();
@@ -16,6 +17,9 @@ export default function TabelaRegistros() {
   const [busca, setBusca] = useState('');
   const [pagina, setPagina] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
+  // Força uma nova busca quando o erro ocorre já na página 1, onde setPagina(1)
+  // não mudaria o estado nem dispararia o efeito novamente.
+  const [tentativa, setTentativa] = useState(0);
   const limite = 10;
 
   // Modal de confirmação de exclusão
@@ -82,7 +86,15 @@ export default function TabelaRegistros() {
     return () => {
       cancelado = true;
     };
-  }, [pagina, busca]);
+  }, [pagina, busca, tentativa]);
+
+  function tentarNovamente() {
+    if (pagina === 1) {
+      setTentativa((t) => t + 1);
+    } else {
+      setPagina(1);
+    }
+  }
 
   // Executa exclusão da empresa selecionada
   async function deletarEmpresa() {
@@ -115,141 +127,136 @@ export default function TabelaRegistros() {
     }
   }
 
+  const nomeEmpresaSelecionada =
+    empresaSelecionada?.nomeFantasia || empresaSelecionada?.razaoSocial || '';
+
   return (
     <div className={Styles.container}>
       {/* Barra de busca */}
       <div className={Styles.searchContainer}>
-        <Pesquisa size={40} />
-        <input
-          type="text"
+        <Pesquisa size={40} aria-hidden="true" />
+        <Input
+          aria-label="Buscar empresa por nome ou CNPJ"
           placeholder="Buscar por nome ou CNPJ..."
           value={busca}
           onChange={(e) => {
             setBusca(e.target.value);
             setPagina(1); // Reinicia para a página 1 ao filtrar
           }}
+          className={Styles.searchInput}
         />
       </div>
 
       {/* Tabela de Empresas */}
       {loading ? (
-        <p className={Styles.mensagem}>Carregando empresas...</p>
+        <LoadingState message="Carregando empresas..." rows={4} />
       ) : erro ? (
-        <div className={Styles.erroContainer}>
-          <p className={Styles.mensagem}>{erro}</p>
-          <button className={Styles.btnTentar} onClick={() => setPagina(1)}>
-            Tentar novamente
-          </button>
-        </div>
+        <ErrorState
+          title="Não foi possível carregar as empresas"
+          message={erro}
+          onRetry={tentarNovamente}
+          retryLabel="Tentar novamente"
+        />
+      ) : empresas.length === 0 ? (
+        <EmptyState
+          title={busca ? `Nenhuma empresa encontrada para "${busca}".` : 'Nenhuma empresa cadastrada.'}
+        />
       ) : (
         <>
-          <table className={Styles.table}>
-            <thead>
-              <tr>
-                <th>Nome Fantasia</th>
-                <th>CNPJ</th>
-                <th>Telefone</th>
-                <th>Email</th>
-                <th>Cidade</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {empresas.length === 0 ? (
+          <div className={Styles.tableWrapper}>
+            <table className={Styles.table}>
+              <caption className="sr-only">Lista de empresas cadastradas</caption>
+              <thead>
                 <tr>
-                  <td colSpan={6} className={Styles.semResultados}>
-                    {busca
-                      ? `Nenhuma empresa encontrada para "${busca}".`
-                      : 'Nenhuma empresa cadastrada.'}
-                  </td>
+                  <th scope="col">Nome Fantasia</th>
+                  <th scope="col">CNPJ</th>
+                  <th scope="col">Telefone</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Cidade</th>
+                  <th scope="col">Ações</th>
                 </tr>
-              ) : (
-                empresas.map((empresa) => (
-                  <tr key={empresa.id}>
-                    <td>{empresa.nomeFantasia || empresa.razaoSocial}</td>
-                    <td>{empresa.cnpj || '-'}</td>
-                    <td>{empresa.telefone || '-'}</td>
-                    <td>{empresa.email || '-'}</td>
-                    <td>{empresa.endereco?.cidade?.nome || 'Não informada'}</td>
-                    <td className={Styles.actions}>
-                      <button
-                        title="Editar empresa"
-                        onClick={() => navigate(`/editar-empresa/${empresa.id}`)}
-                      >
-                        <Editar />
-                      </button>
+              </thead>
+              <tbody>
+                {empresas.map((empresa) => {
+                  const nome = empresa.nomeFantasia || empresa.razaoSocial || 'empresa';
+                  return (
+                    <tr key={empresa.id}>
+                      <td>{nome}</td>
+                      <td>{empresa.cnpj || '-'}</td>
+                      <td>{empresa.telefone || '-'}</td>
+                      <td>{empresa.email || '-'}</td>
+                      <td>{empresa.endereco?.cidade?.nome || 'Não informada'}</td>
+                      <td className={Styles.actions}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          aria-label={`Editar ${nome}`}
+                          onClick={() => navigate(`/editar-empresa/${empresa.id}`)}
+                        >
+                          <Editar aria-hidden="true" />
+                        </Button>
 
-                      <button
-                        title="Excluir empresa"
-                        onClick={() => {
-                          setEmpresaSelecionada(empresa);
-                          setModalAberto(true);
-                        }}
-                      >
-                        <Deletar />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          aria-label={`Excluir ${nome}`}
+                          onClick={() => {
+                            setEmpresaSelecionada(empresa);
+                            setModalAberto(true);
+                          }}
+                        >
+                          <Deletar aria-hidden="true" />
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
           {/* Paginação Server-side */}
           <div className={Styles.pagination}>
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               disabled={pagina === 1 || loading}
               onClick={() => setPagina((p) => Math.max(1, p - 1))}
             >
               Anterior
-            </button>
+            </Button>
 
             <span>
               Página {pagina} de {totalPaginas}
             </span>
 
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               disabled={pagina >= totalPaginas || loading}
               onClick={() => setPagina((p) => p + 1)}
             >
               Próxima
-            </button>
+            </Button>
           </div>
         </>
       )}
 
       {/* Modal de confirmação de exclusão */}
-      {modalAberto && (
-        <div className={Styles.overlay}>
-          <div className={Styles.modal}>
-            <h3>Excluir empresa</h3>
-            <p>
-              Tem certeza que deseja excluir{' '}
-              <strong>{empresaSelecionada?.nomeFantasia || empresaSelecionada?.razaoSocial}</strong>? Essa ação
-              não pode ser desfeita.
-            </p>
-            <div className={Styles.modalButtons}>
-              <button
-                className={Styles.cancelButton}
-                onClick={() => {
-                  setModalAberto(false);
-                  setEmpresaSelecionada(null);
-                }}
-                disabled={deletando}
-              >
-                Cancelar
-              </button>
-              <button
-                className={Styles.deleteButton}
-                onClick={deletarEmpresa}
-                disabled={deletando}
-              >
-                {deletando ? 'Excluindo...' : 'Excluir'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        open={modalAberto}
+        onCancel={() => {
+          setModalAberto(false);
+          setEmpresaSelecionada(null);
+        }}
+        onConfirm={deletarEmpresa}
+        title="Excluir empresa"
+        description={`Tem certeza que deseja excluir ${nomeEmpresaSelecionada}? Essa ação não pode ser desfeita.`}
+        confirmLabel="Excluir"
+        cancelLabel="Cancelar"
+        tone="danger"
+        loading={deletando}
+      />
     </div>
   );
 }

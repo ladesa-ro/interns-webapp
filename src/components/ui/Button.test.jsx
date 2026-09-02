@@ -28,9 +28,22 @@ describe("Button", () => {
     const botao = screen.getByRole("button", { name: /carregando/i });
     expect(botao).toBeDisabled();
     expect(botao).toHaveAttribute("aria-busy", "true");
+    expect(botao).toHaveAccessibleName("Carregando");
 
     await userEvent.click(botao);
     expect(aoClicar).not.toHaveBeenCalled();
+  });
+
+  it("expõe um único nome acessível durante o loading, sem duplicar o rótulo", () => {
+    render(
+      <Button loading loadingLabel="Excluindo">
+        Excluir
+      </Button>
+    );
+
+    const botao = screen.getByRole("button", { name: "Excluindo" });
+    expect(botao).toHaveAccessibleName("Excluindo");
+    expect(botao).not.toHaveTextContent("Excluir");
   });
 
   it("usa type button por padrão para não submeter formulários", () => {
