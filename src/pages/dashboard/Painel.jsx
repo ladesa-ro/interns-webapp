@@ -10,9 +10,69 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useRef, useEffect, useState } from "react";
 
-import Cards from "../../components/global_Components/Cards.jsx";
+import { Card, PageHeader } from "../../components/ui";
 
 import styles from "./Painel.module.css";
+
+const TONS = new Map(Object.entries(styles));
+
+// Roxo e laranja não têm token semântico dedicado; reaproveitam marca e aviso.
+// A distinção entre indicadores não depende só da cor: ícone e título diferem.
+const INDICADORES = [
+  {
+    titulo: "Empresas Cadastradas",
+    valor: "24",
+    tom: "brandStrong",
+    Icon: Building2,
+    destino: "/empresa",
+  },
+  {
+    titulo: "Vagas Disponíveis",
+    valor: "15",
+    tom: "info",
+    Icon: Briefcase,
+    destino: "/Vaga",
+  },
+  {
+    titulo: "Alunos em Estágio",
+    valor: "42",
+    tom: "brand",
+    Icon: Users,
+    destino: "/alunos-em-estagio",
+  },
+  {
+    titulo: "Alunos do 3° ano sem Estágio",
+    valor: "8",
+    tom: "danger",
+    Icon: AlertCircle,
+    destino: "/alunos-sem-estagio",
+  },
+  {
+    titulo: "Relatórios 2° ano",
+    valor: "8",
+    tom: "warning",
+    Icon: FileText,
+    destino: "/relatorio-segundo-ano",
+  },
+];
+
+const ALERTAS = [
+  {
+    tom: "danger",
+    titulo: "8 alunos do 3° ano sem estágio",
+    subtitulo: "Requer atenção imediata",
+  },
+  {
+    tom: "warning",
+    titulo: "12 alunos na lista de espera",
+    subtitulo: "Verificar vagas disponíveis",
+  },
+  {
+    tom: "info",
+    titulo: "5 estágios terminam este mês",
+    subtitulo: "Preparar documentação",
+  },
+];
 
 export default function Painel() {
   const navigate = useNavigate();
@@ -67,11 +127,10 @@ export default function Painel() {
 
   return (
     <div className={styles.painel}>
-      <h1>Painel CIEC</h1>
-
-      <p className={styles.sub}>
-        Visão geral do Sistema de Gerenciamento de Estágios
-      </p>
+      <PageHeader
+        title="Painel CIEC"
+        description="Visão geral do Sistema de Gerenciamento de Estágios"
+      />
 
       {/* WRAPPER */}
       <div className={styles.cardsWrapper}>
@@ -82,122 +141,63 @@ export default function Painel() {
           ref={scrollRef}
         >
           <div className={styles.cards}>
+            {INDICADORES.map(({ titulo, valor, tom, Icon, destino }) => (
+              <Card
+                key={titulo}
+                elevated
+                onClick={() => navigate(destino)}
+                className={styles.indicadorCard}
+              >
+                <span
+                  className={[styles.indicadorIcone, TONS.get(tom)]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
+                  {Icon && <Icon aria-hidden="true" className={styles.iconCard} />}
+                </span>
 
-            <Cards
-              titulo="Empresas Cadastradas"
-              valor="24"
-              cor="green"
-              Icon={Building2}
-              onClick={() => navigate("/empresa")}
-            />
+                <h3 className={styles.indicadorTitulo}>{titulo}</h3>
 
-            <Cards
-              titulo="Vagas Disponíveis"
-              valor="15"
-              cor="blue"
-              Icon={Briefcase}
-              onClick={() => navigate("/Vaga")}
-            />
-
-            <Cards
-              titulo="Alunos em Estágio"
-              valor="42"
-              cor="purple"
-              Icon={Users}
-              onClick={() => navigate("/alunos-em-estagio")}
-            />
-
-            <Cards
-              titulo="Alunos do 3° ano sem Estágio"
-              valor="8"
-              cor="red"
-              Icon={AlertCircle}
-              onClick={() => navigate("/alunos-sem-estagio")}
-            />
-
-            <Cards
-              titulo="Relatórios 2° ano"
-              valor="8"
-              cor="orange"
-              Icon={FileText}
-              onClick={() => navigate("/relatorio-segundo-ano")}
-            />
-
+                <span className={styles.indicadorValor}>{valor}</span>
+              </Card>
+            ))}
           </div>
         </div>
 
         {/* SETA */}
         {mostrarSeta && !fimScroll && (
           <button
+            type="button"
             className={styles.setaScroll}
             onClick={scrollCards}
+            aria-label="Ver mais indicadores"
           >
-            <ChevronRight size={30} />
+            <ChevronRight size={30} aria-hidden="true" />
           </button>
         )}
 
       </div>
 
       {/* ALERTAS */}
-      <div className={styles.alertas}>
+      <Card elevated className={styles.alertas}>
+        <h3 className={styles.alertasTitulo}>Alertas e Pendências</h3>
 
-        <h3>Alertas e Pendências</h3>
-
-        <div className={`${styles.alertVermelho} ${styles.redAlert}`}>
-          <div className={styles.alertContent}>
-
-            <span className={styles.icon}>⚠</span>
-
-            <div>
-              <p className={styles.vermelhoTitulo}>
-                8 alunos do 3° ano sem estágio
-              </p>
-
-              <p className={styles.vermelhoSubtitulo}>
-                Requer atenção imediata
-              </p>
-            </div>
-
-          </div>
-        </div>
-
-        <div className={`${styles.alertAmarelo} ${styles.yellowAlert}`}>
-          <div className={styles.alertContent}>
-
-            <span className={styles.icon}>⚠</span>
+        {ALERTAS.map(({ tom, titulo, subtitulo }) => (
+          <div
+            key={titulo}
+            className={[styles.alerta, TONS.get(`alerta-${tom}`)]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            <AlertCircle aria-hidden="true" className={styles.alertaIcone} />
 
             <div>
-              <p className={styles.amareloTitulo}>
-                12 alunos na lista de espera
-              </p>
-
-              <p className={styles.amareloSubtitulo}>
-                Verificar vagas disponíveis
-              </p>
+              <p className={styles.alertaTitulo}>{titulo}</p>
+              <p className={styles.alertaSubtitulo}>{subtitulo}</p>
             </div>
-
           </div>
-        </div>
-
-        <div className={`${styles.alertAzul} ${styles.blueAlert}`}>
-          <div className={styles.alertContent}>
-
-            <span className={styles.icon}>⚠</span>
-
-            <div>
-              <p className={styles.azulTitulo}>
-                5 estágios terminam este mês
-              </p>
-
-              <p className={styles.azulSubtitulo}>
-                Preparar documentação
-              </p>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
+        ))}
+      </Card>
     </div>
   );
-} 
+}

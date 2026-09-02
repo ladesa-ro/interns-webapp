@@ -1,12 +1,7 @@
-.painel h1 {
-  margin-bottom: 5px;
-  color: #0f6d3a;
-}
-
-.sub {
-  color: #4A5565;
-  font-weight: 600;
-  margin-bottom: 20px;
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
 }
 
 /* WRAPPER */
@@ -22,9 +17,9 @@
   overflow-x: auto;
   overflow-y: hidden;
 
-  padding: 15px 12px;
-  margin-top: -15px;
-  margin-bottom: -15px;
+  padding: var(--space-4) var(--space-3);
+  margin-top: calc(var(--space-4) * -1);
+  margin-bottom: calc(var(--space-4) * -1);
 
   scroll-behavior: smooth;
   scrollbar-width: none;
@@ -37,146 +32,172 @@
 /* CARDS */
 .cards {
   display: flex;
-  gap: 16px;
+  gap: var(--space-4);
 
   flex-wrap: nowrap;
   width: max-content;
 }
 
+.indicadorCard {
+  flex: 0 0 20rem;
+  min-height: 160px;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.indicadorIcone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-10);
+  height: var(--space-10);
+  border-radius: var(--radius-md);
+}
+
+.iconCard {
+  width: var(--space-5);
+  height: var(--space-5);
+}
+
+.indicadorTitulo {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+.indicadorValor {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+/* Tons dos indicadores. Roxo e laranja não têm token dedicado; reaproveitam
+   marca e aviso. A distinção também vem do ícone e do título, não só da cor. */
+.brandStrong {
+  background-color: var(--color-brand-subtle);
+  color: var(--color-brand-strong);
+}
+
+.brand {
+  background-color: var(--color-brand-subtle);
+  color: var(--color-brand);
+}
+
+.info {
+  background-color: var(--color-info-surface);
+  color: var(--color-info);
+}
+
+.danger {
+  background-color: var(--color-danger-surface);
+  color: var(--color-danger);
+}
+
+.warning {
+  background-color: var(--color-warning-surface);
+  color: var(--color-warning);
+}
+
 /* SETA */
 .setaScroll {
   position: absolute;
-  right: 20px;
+  right: var(--space-5);
   top: 50%;
   transform: translateY(-50%);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: var(--space-12);
+  height: var(--space-12);
+  border-radius: var(--radius-full);
   border: none;
-  background: #0f6d3a;
-  color: white;
+  background-color: var(--color-brand-strong);
+  color: var(--color-text-on-brand);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 10;
+  box-shadow: var(--shadow-md);
+  z-index: var(--z-sticky);
   padding: 0;
-  animation: pulse 1.5s infinite;
-  transition: background 0.3s ease;
+  transition: background-color var(--transition-fast);
 }
 
 .setaScroll:hover {
-  background: #0a4d29;
-}
-
-@keyframes pulse {
-  0% {
-    transform: translateY(-50%) scale(1);
-  }
-
-  50% {
-    transform: translateY(-50%) scale(1.08);
-  }
-
-  100% {
-    transform: translateY(-50%) scale(1);
-  }
+  background-color: var(--color-brand-hover);
 }
 
 /* ALERTAS */
 .alertas {
-  width: 40%;
-  margin-top: 30px;
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.09);
+  width: 100%;
+  max-width: 32rem;
 }
 
-.alertas h3{
-  color: #0f6d3a ;
+.alertasTitulo {
+  color: var(--color-text);
 }
 
-.alertVermelho {
-  margin-top: 15px;
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #FFC9C9;
-}
-
-.alertAmarelo {
-  margin-top: 15px;
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #FFF085;
-}
-
-.alertAzul {
-  margin-top: 15px;
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #BEDBFF;
-}
-
-.redAlert {
-  background: #fdecea;
-  color: #c0392b;
-}
-
-.yellowAlert {
-  background: #fff8e5;
-  color: #b7950b;
-}
-
-.blueAlert {
-  background: #eaf3fb;
-  color: blue;
-}
-
-.alertContent {
+.alerta {
   display: flex;
   align-items: center;
-  gap: 10px;
-  
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
 }
 
-.icon {
-  font-size: 20px;
+.alerta-danger {
+  background-color: var(--color-danger-surface);
+  border-color: var(--color-danger);
 }
 
-.vermelhoTitulo {
-  color: #A5151F;
-  font-weight: 600;
-  font-size: 1rem;
+.alerta-warning {
+  background-color: var(--color-warning-surface);
+  border-color: var(--color-warning);
 }
 
-.amareloTitulo {
-  color: #B38A53;
-  font-weight: 600;
-  font-size: 1rem;
+.alerta-info {
+  background-color: var(--color-info-surface);
+  border-color: var(--color-info);
 }
 
-.azulTitulo {
-  color: #2244BB;
-  font-weight: 600;
-  font-size: 1rem;
+.alertaIcone {
+  flex-shrink: 0;
+  width: var(--space-5);
+  height: var(--space-5);
 }
 
-.vermelhoSubtitulo {
-  color: #ED434B;
-  font-weight: 600;
-  font-size: 0.8rem;
+.alerta-danger .alertaIcone {
+  color: var(--color-danger-text);
 }
 
-.amareloSubtitulo {
-  color: #E4BA64;
-  font-weight: 600;
-  font-size: 0.8rem;
+.alerta-warning .alertaIcone {
+  color: var(--color-warning-text);
 }
 
-.azulSubtitulo {
-  color: #6293FD;
-  font-weight: 600;
-  font-size: 0.8rem;
+.alerta-info .alertaIcone {
+  color: var(--color-info-text);
+}
+
+.alertaTitulo {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+}
+
+.alertaSubtitulo {
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 768px) {
+  .indicadorCard {
+    flex-basis: 16rem;
+  }
+
+  .alertas {
+    max-width: 100%;
+  }
 }
