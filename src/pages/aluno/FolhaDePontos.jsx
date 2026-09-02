@@ -59,11 +59,11 @@ const FolhaDePontos = () => {
         <button className={styles.backButton} onClick={() => navigate(-1)}>
           &larr; Painel aluno
         </button>
-        <h2 className={styles.subtitle}>Folha de pontos</h2>
+        <h2 className={styles.subtitle}>Registrar frequência</h2>
       </header>
 
       <main className={styles.content}>
-        {loading && <p className={styles.loadingText}>Carregando folha de pontos...</p>}
+        {loading && <p className={styles.loadingText}>Carregando registros de frequência...</p>}
         {erro && <div className={styles.errorMessage}>{erro}</div>}
         
         {!loading && !erro && (

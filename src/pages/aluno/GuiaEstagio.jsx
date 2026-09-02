@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './GuiaEstagio.module.css';
-import { List, FileDown, Phone, Star } from 'lucide-react';
+import { FileDown, Phone, Star } from 'lucide-react';
 
 export default function GuiaEstagio() {
   const navigate = useNavigate();
@@ -13,10 +13,6 @@ export default function GuiaEstagio() {
   const handleAvaliarEmpresa = () => {
     // Podemos passar um ID de empresa/estágio fictício ou que esteja no contexto
     navigate('/aluno/avaliar/1');
-  };
-
-  const handleFolhaDePontos = () => {
-    navigate('/aluno/folha-pontos');
   };
 
   return (
@@ -43,17 +39,6 @@ export default function GuiaEstagio() {
 
       <section className={styles.contentArea}>
         <div className={styles.grid}>
-          <button 
-            className={styles.card} 
-            aria-label="Folha de pontos"
-            onClick={handleFolhaDePontos}
-          >
-            <div className={styles.iconWrapper}>
-              <List size={40} strokeWidth={2.5} />
-            </div>
-            <span className={styles.cardTitle}>Folha de pontos</span>
-          </button>
-
           <button className={styles.card} aria-label="Modelo de relatório">
             <div className={styles.iconWrapper}>
               <FileDown size={40} strokeWidth={2.5} />
