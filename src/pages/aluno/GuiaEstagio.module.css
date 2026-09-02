@@ -1,6 +1,6 @@
 .container {
   padding: 40px 60px;
-  background-color: #FFFFFF;
+  background-color: var(--color-surface);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -12,7 +12,7 @@
 
 .title {
   font-size: 20px;
-  color: #006B2D;
+  color: var(--color-brand-strong);
   font-weight: 700;
   margin: 0 0 2px 0;
 }
@@ -20,7 +20,7 @@
 .subtitle {
   font-size: 14px;
   font-weight: 600;
-  color: #4B5563;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
@@ -40,8 +40,8 @@
 }
 
 .card {
-  background-color: #FFFFFF;
-  border: 1px solid #006B2D;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-brand-strong);
   border-radius: 6px;
   height: 130px;
   width: 280px;
@@ -57,13 +57,13 @@
 }
 
 .card:hover, .card:focus-visible {
-  background-color: #F8FBF8;
+  background-color: var(--color-surface-muted);
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 107, 45, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
 .iconWrapper {
-  color: #006B2D;
+  color: var(--color-brand-strong);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,7 +72,7 @@
 .cardTitle {
   font-size: 14px;
   font-weight: 700;
-  color: #006B2D;
+  color: var(--color-brand-strong);
   text-align: center;
 }
 

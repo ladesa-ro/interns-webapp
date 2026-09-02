@@ -1,6 +1,6 @@
 .container {
   padding: 40px 60px;
-  background-color: #FFFFFF;
+  background-color: var(--color-surface);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -18,7 +18,7 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  color: #006B2D;
+  color: var(--color-brand-strong);
   font-size: 20px;
   font-weight: 700;
   transition: opacity 0.2s ease;
@@ -32,7 +32,7 @@
 .subtitle {
   font-size: 14px;
   font-weight: 600;
-  color: #4B5563;
+  color: var(--color-text-muted);
   margin: 4px 0 0 32px;
 }
 
@@ -45,7 +45,7 @@
 }
 
 .card {
-  background-color: #F2FAF2;
+  background-color: var(--color-surface-muted);
   border-radius: 12px;
   padding: 24px 30px;
   display: flex;
@@ -58,12 +58,12 @@
 
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 107, 45, 0.08);
-  border-color: rgba(0, 107, 45, 0.2);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-border-brand);
 }
 
 .iconWrapper {
-  color: #006B2D;
+  color: var(--color-brand-strong);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -79,13 +79,13 @@
 .cardTitle {
   font-size: 18px;
   font-weight: 700;
-  color: #006B2D;
+  color: var(--color-brand-strong);
 }
 
 .cardValue {
   font-size: 15px;
   font-weight: 700;
-  color: #006B2D;
+  color: var(--color-brand-strong);
 }
 
 @media (max-width: 768px) {
