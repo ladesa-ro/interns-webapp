@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Styles from "./tabelaVagas.module.css";
@@ -6,6 +6,15 @@ import PesquisaIcon from "../icons_Components/Icon_Pesquisa_Comp";
 import EditarIcon from "../icons_Components/Icon_Editar_Comp";
 import DeletarIcon from "../icons_Components/Icon_Deletar_Comp";
 import apiFetch from "../../utils/api";
+import {
+  Badge,
+  Button,
+  ConfirmDialog,
+  EmptyState,
+  ErrorState,
+  Input,
+  LoadingState,
+} from "../ui";
 
 export default function TabelaVagas() {
   const navigate = useNavigate();
@@ -184,11 +193,11 @@ export default function TabelaVagas() {
   function renderBadgeStatus(status) {
     switch (status) {
       case "DISPONIVEL":
-        return <span className={`${Styles.badge} ${Styles.statusAberta}`}>Aberta</span>;
+        return <Badge tone="success">Aberta</Badge>;
       case "EM_ANDAMENTO":
-        return <span className={`${Styles.badge} ${Styles.statusAndamento}`}>Em Andamento</span>;
+        return <Badge tone="info">Em Andamento</Badge>;
       default:
-        return <span className={`${Styles.badge} ${Styles.statusFechada}`}>Fechada</span>;
+        return <Badge tone="danger">Fechada</Badge>;
     }
   }
 
@@ -196,27 +205,25 @@ export default function TabelaVagas() {
     <div className={Styles.container}>
       {/* Barra de Pesquisa */}
       <div className={Styles.searchContainer}>
-        <PesquisaIcon size={36} className={Styles.searchIcon} />
-        <input
-          type="text"
+        <PesquisaIcon size={36} className={Styles.searchIcon} aria-hidden="true" />
+        <Input
+          aria-label="Buscar por empresa, curso, campus ou supervisor"
           placeholder="Buscar por empresa, curso, campus ou supervisor..."
           value={busca}
           onChange={(e) => handleBusca(e.target.value)}
+          className={Styles.searchInput}
         />
       </div>
 
       {loading ? (
-        <p style={{ textAlign: "center", margin: "20px 0" }}>Carregando vagas...</p>
+        <LoadingState message="Carregando vagas..." rows={4} />
       ) : erro ? (
-        <div className={Styles.erroContainer}>
-          <p className={Styles.mensagem}>{erro}</p>
-          <button
-            className={Styles.btnTentar}
-            onClick={() => window.location.reload()}
-          >
-            Tentar novamente
-          </button>
-        </div>
+        <ErrorState
+          title="Não foi possível carregar as vagas"
+          message={erro}
+          onRetry={() => window.location.reload()}
+          retryLabel="Tentar novamente"
+        />
       ) : (
         <>
           {/* Contador de resultados */}
@@ -226,114 +233,108 @@ export default function TabelaVagas() {
               : `${todasVagas.length} vaga(s) cadastrada(s) no total`}
           </p>
 
-          {/* Tabela de Vagas */}
-          <table className={Styles.table}>
-            <thead>
-              <tr>
-                <th>Campus</th>
-                <th>Empresa</th>
-                <th>Curso</th>
-                <th>Carga Horária</th>
-                <th>Supervisor</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {vagasPaginadas.length === 0 ? (
-                <tr>
-                  <td colSpan="7" style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}>
-                    {busca
-                      ? `Nenhuma vaga encontrada para "${busca}".`
-                      : "Nenhuma vaga cadastrada."}
-                  </td>
-                </tr>
-              ) : (
-                vagasPaginadas.map((vaga) => (
-                  <tr key={vaga.id}>
-                    <td>{vaga.campusNome}</td>
-                    <td>{vaga.empresaNome}</td>
-                    <td>{vaga.cursoNome}</td>
-                    <td>{vaga.cargaHoraria}h</td>
-                    <td>{vaga.nomeSupervisor}</td>
-                    <td>{renderBadgeStatus(vaga.status)}</td>
-                    <td className={Styles.actions}>
-                      <button onClick={() => navigate(`/vagas/editar/${vaga.id}`)}>
-                        <EditarIcon size={20} />
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setVagaSelecionada(vaga);
-                          setModalAberto(true);
-                        }}
-                      >
-                        <DeletarIcon size={20} />
-                      </button>
-                    </td>
+          {vagasPaginadas.length === 0 ? (
+            <EmptyState
+              title={busca ? `Nenhuma vaga encontrada para "${busca}".` : "Nenhuma vaga cadastrada."}
+            />
+          ) : (
+            <div className={Styles.tableWrapper}>
+              <table className={Styles.table}>
+                <caption className="sr-only">Lista de vagas de estágio</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Campus</th>
+                    <th scope="col">Empresa</th>
+                    <th scope="col">Curso</th>
+                    <th scope="col">Carga Horária</th>
+                    <th scope="col">Supervisor</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Ações</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                </thead>
+
+                <tbody>
+                  {vagasPaginadas.map((vaga) => (
+                    <tr key={vaga.id}>
+                      <td>{vaga.campusNome}</td>
+                      <td>{vaga.empresaNome}</td>
+                      <td>{vaga.cursoNome}</td>
+                      <td>{vaga.cargaHoraria}h</td>
+                      <td>{vaga.nomeSupervisor}</td>
+                      <td>{renderBadgeStatus(vaga.status)}</td>
+                      <td className={Styles.actions}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          aria-label={`Editar vaga de ${vaga.empresaNome}`}
+                          onClick={() => navigate(`/vagas/editar/${vaga.id}`)}
+                        >
+                          <EditarIcon size={20} aria-hidden="true" />
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          aria-label={`Excluir vaga de ${vaga.empresaNome}`}
+                          onClick={() => {
+                            setVagaSelecionada(vaga);
+                            setModalAberto(true);
+                          }}
+                        >
+                          <DeletarIcon size={20} aria-hidden="true" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {/* Paginação Client-side */}
           {totalPaginas > 1 && (
             <div className={Styles.pagination}>
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 disabled={pagina === 1}
                 onClick={() => setPagina((p) => Math.max(1, p - 1))}
               >
                 Anterior
-              </button>
+              </Button>
 
               <span>
                 Página {pagina} de {totalPaginas}
               </span>
 
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 disabled={pagina >= totalPaginas}
                 onClick={() => setPagina((p) => p + 1)}
               >
                 Próxima
-              </button>
+              </Button>
             </div>
           )}
         </>
       )}
 
       {/* Modal de Confirmação de Exclusão */}
-      {modalAberto && (
-        <div className={Styles.overlay}>
-          <div className={Styles.modal}>
-            <h3>Confirmar Exclusão</h3>
-            <p>
-              Tem certeza de que deseja excluir a vaga da empresa{" "}
-              <strong>{vagaSelecionada?.empresaNome}</strong>? Esta ação é irreversível.
-            </p>
-            <div className={Styles.modalButtons}>
-              <button
-                className={Styles.cancelButton}
-                onClick={() => {
-                  setModalAberto(false);
-                  setVagaSelecionada(null);
-                }}
-                disabled={deletando}
-              >
-                Cancelar
-              </button>
-              <button
-                className={Styles.deleteButton}
-                onClick={handleDeletar}
-                disabled={deletando}
-              >
-                {deletando ? "Excluindo..." : "Excluir"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        open={modalAberto}
+        onCancel={() => {
+          setModalAberto(false);
+          setVagaSelecionada(null);
+        }}
+        onConfirm={handleDeletar}
+        title="Confirmar exclusão"
+        description={`Tem certeza de que deseja excluir a vaga da empresa ${vagaSelecionada?.empresaNome ?? ""}? Esta ação é irreversível.`}
+        confirmLabel="Excluir"
+        cancelLabel="Cancelar"
+        tone="danger"
+        loading={deletando}
+      />
     </div>
   );
 }
