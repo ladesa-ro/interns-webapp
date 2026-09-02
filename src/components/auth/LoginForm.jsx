@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Eye, EyeOff, Moon, Sun } from "lucide-react";
+import { Eye, EyeOff, Moon, Sparkle, Sun } from "lucide-react";
 import { Button, Card, Input } from "../ui";
 import { useTheme } from "../../contexts/ThemeContext";
 import styles from "./LoginForm.module.css";
 import Titulo from "../icons_Components/Icon_Logo_Comp";
+import Mascote from "../image_Components/Mascote_Login_Comp";
 
 const ERRO_CAMPOS_OBRIGATORIOS = "Informe matrícula e senha.";
 const ID_ERRO_LOGIN = "erro-login";
@@ -19,20 +20,18 @@ export default function LoginForm({ form, onChange, onSubmit, erro, enviando }) 
 
   return (
     <main className={styles.page}>
-      <div className={styles.brandShapeStart} aria-hidden="true" />
-      <div className={styles.brandShapeEnd} aria-hidden="true" />
+      <div className={styles.formSide}>
+        <button
+          type="button"
+          className={styles.themeButton}
+          onClick={alternarTema}
+          aria-label={escuro ? "Ativar tema claro" : "Ativar tema escuro"}
+          aria-pressed={escuro}
+        >
+          {escuro ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
+        </button>
 
-      <button
-        type="button"
-        className={styles.themeButton}
-        onClick={alternarTema}
-        aria-label={escuro ? "Ativar tema claro" : "Ativar tema escuro"}
-        aria-pressed={escuro}
-      >
-        {escuro ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
-      </button>
-
-      <Card padding="none" elevated className={styles.card}>
+        <Card padding="none" elevated className={styles.card}>
         <form
           onSubmit={onSubmit}
           className={styles.form}
@@ -111,7 +110,16 @@ export default function LoginForm({ form, onChange, onSubmit, erro, enviando }) 
             {enviando ? null : "Entrar"}
           </Button>
         </form>
-      </Card>
+        </Card>
+      </div>
+
+      <div className={styles.illustrationSide} aria-hidden="true">
+        <div className={styles.brandShapeStart} />
+        <div className={styles.brandShapeEnd} />
+        <Sparkle className={styles.sparkleStart} />
+        <Sparkle className={styles.sparkleEnd} />
+        <Mascote className={styles.mascote} width="320" />
+      </div>
     </main>
   );
 }

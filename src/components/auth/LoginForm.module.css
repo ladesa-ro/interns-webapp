@@ -1,36 +1,74 @@
 .page {
   position: relative;
   isolation: isolate;
-  display: grid;
+  display: flex;
   min-height: 100vh;
   min-height: 100dvh;
-  place-items: center;
   overflow: hidden;
-  padding: var(--space-16) var(--space-6);
   background-color: var(--color-bg);
+}
+
+.formSide {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 480px;
+  display: grid;
+  place-items: center;
+  padding: var(--space-16) var(--space-6);
+}
+
+.illustrationSide {
+  position: relative;
+  flex: 1 1 480px;
+  display: grid;
+  place-items: center;
 }
 
 .brandShapeStart,
 .brandShapeEnd {
   position: absolute;
   z-index: var(--z-base);
-  width: 42vw;
-  height: 42vw;
-  max-width: calc(var(--breakpoint-sm) + var(--sidebar-width));
-  max-height: calc(var(--breakpoint-sm) + var(--sidebar-width));
+  width: 55%;
+  aspect-ratio: 1;
   background-color: var(--color-brand-strong);
   border-radius: var(--radius-full);
   pointer-events: none;
+  opacity: 0.9;
 }
 
 .brandShapeStart {
-  top: -28vw;
-  left: -18vw;
+  top: -18%;
+  left: -12%;
 }
 
 .brandShapeEnd {
-  right: -18vw;
-  bottom: -28vw;
+  right: -12%;
+  bottom: -18%;
+}
+
+.sparkleStart,
+.sparkleEnd {
+  position: absolute;
+  z-index: var(--z-sticky);
+  width: var(--space-8);
+  height: var(--space-8);
+  color: var(--color-brand-strong);
+  fill: var(--color-brand-strong);
+}
+
+.sparkleStart {
+  top: 30%;
+  left: 20%;
+}
+
+.sparkleEnd {
+  bottom: 28%;
+  right: 18%;
+}
+
+.mascote {
+  position: relative;
+  z-index: var(--z-sticky);
 }
 
 .themeButton {
@@ -66,7 +104,7 @@
 
 .card {
   z-index: var(--z-base);
-  width: min(100%, var(--breakpoint-sm));
+  width: min(100%, 27.5rem);
   border-color: var(--color-border);
 }
 
@@ -154,15 +192,13 @@
 }
 
 @media (max-width: 1024px) {
-  .brandShapeStart,
-  .brandShapeEnd {
-    width: 52vw;
-    height: 52vw;
+  .illustrationSide {
+    display: none;
   }
 }
 
 @media (max-width: 768px) {
-  .page {
+  .formSide {
     padding: var(--space-12) var(--space-5);
   }
 
@@ -170,17 +206,10 @@
     top: var(--space-4);
     right: var(--space-4);
   }
-
-  .brandShapeStart,
-  .brandShapeEnd {
-    width: 68vw;
-    height: 68vw;
-  }
 }
 
 @media (max-width: 390px) {
-  .page {
-    align-items: center;
+  .formSide {
     padding: var(--space-10) var(--space-4);
   }
 
@@ -191,11 +220,5 @@
 
   .logo {
     margin-bottom: var(--space-2);
-  }
-
-  .brandShapeStart,
-  .brandShapeEnd {
-    width: 82vw;
-    height: 82vw;
   }
 }
