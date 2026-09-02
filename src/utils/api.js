@@ -14,6 +14,9 @@ const AUTH_MODE = import.meta.env.VITE_AUTH_MODE === "cookie" ? "cookie" : "bear
 
 export const authMode = AUTH_MODE;
 
+// Exposta para fluxos públicos que não podem passar pelo apiFetch autenticado.
+export const requestBaseUrl = REQUEST_BASE_URL;
+
 export const ApiErrorKind = {
   NETWORK: "network",
   TIMEOUT: "timeout",

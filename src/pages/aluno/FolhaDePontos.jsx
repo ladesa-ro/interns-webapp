@@ -1,95 +1,417 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import RegistroPontoCard from '../../components/aluno/RegistroPontoCard';
-import styles from './FolhaDePontos.module.css';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const FolhaDePontos = () => {
+import styles from "./FolhaDePontos.module.css";
+import RegistroPontoCard from "../../components/aluno/RegistroPontoCard";
+import {
+  Button,
+  ConfirmDialog,
+  EmptyState,
+  ErrorState,
+  Input,
+  LoadingState,
+  PageHeader,
+  Select,
+  Textarea,
+} from "../../components/ui";
+import { mensagemDeErro } from "../../utils/api";
+import {
+  LIMITE_OBSERVACOES,
+  ROTULOS_STATUS,
+  STATUS_FOLHA_PONTO,
+  buscarEstagiosDoAluno,
+  cancelarFolhaPonto,
+  criarFolhaPonto,
+  formatarData,
+  listarFolhasPonto,
+  podeCancelar,
+  validarFolhaPonto,
+} from "../../utils/folhaPontoApi";
+
+const ITENS_POR_PAGINA = 10;
+const FORMULARIO_VAZIO = { data: "", horaInicio: "", horaFim: "", observacoes: "" };
+
+const OPCOES_STATUS = [
+  { value: "", label: "Todas as situações" },
+  ...Object.values(STATUS_FOLHA_PONTO).map((status) => ({
+    value: status,
+    label: ROTULOS_STATUS.get(status) ?? status,
+  })),
+];
+
+function descreverEstagio(estagio) {
+  const empresa = estagio?.empresa?.nome ?? estagio?.empresa?.razaoSocial;
+  return empresa ? `Estágio — ${empresa}` : `Estágio ${estagio.id}`;
+}
+
+export default function FolhaDePontos() {
   const navigate = useNavigate();
+
+  const [estagios, setEstagios] = useState([]);
+  const [estagioId, setEstagioId] = useState("");
+  const [estagiosResolvidos, setEstagiosResolvidos] = useState(false);
+  const [erroEstagios, setErroEstagios] = useState(null);
+
   const [registros, setRegistros] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [erro, setErro] = useState('');
+  const [meta, setMeta] = useState(null);
+  const [pagina, setPagina] = useState(1);
+  const [busca, setBusca] = useState("");
+  const [termoBusca, setTermoBusca] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("");
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(null);
 
-  // Busca inicial dos registros (Mock da API)
+  const [formulario, setFormulario] = useState(FORMULARIO_VAZIO);
+  const [errosFormulario, setErrosFormulario] = useState({});
+  const [enviando, setEnviando] = useState(false);
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
+  const [erroAcao, setErroAcao] = useState("");
+
+  const [folhaParaCancelar, setFolhaParaCancelar] = useState(null);
+  const [cancelando, setCancelando] = useState(false);
+
+  const [recarga, setRecarga] = useState(0);
+  const montadoRef = useRef(true);
+
   useEffect(() => {
-    const fetchRegistros = async () => {
-      try {
-        // Simulando delay da rede (ex: fetch('/api/estagio/pontos'))
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // Dados mocados simulando resposta da API
-        const mockData = [
-          { id: 1, data: '15/06/2026', horario: '13:30 - 17:30', enviado: false, frequenciaMarcada: false },
-          { id: 2, data: '17/06/2026', horario: '13:30 - 17:30', enviado: false, frequenciaMarcada: false },
-          { id: 3, data: '19/06/2026', horario: '13:30 - 17:30', enviado: false, frequenciaMarcada: false },
-          { id: 4, data: '22/06/2026', horario: '13:30 - 17:30', enviado: false, frequenciaMarcada: false },
-        ];
-        
-        setRegistros(mockData);
-      } catch {
-        setErro('Ocorreu um erro ao carregar a folha de pontos. Tente novamente mais tarde.');
-      } finally {
-        setLoading(false);
-      }
+    montadoRef.current = true;
+    return () => {
+      montadoRef.current = false;
     };
-
-    fetchRegistros();
   }, []);
 
-  const handleMarcarFrequencia = (id, valor) => {
-    setRegistros(prev => 
-      prev.map(reg => reg.id === id ? { ...reg, frequenciaMarcada: valor } : reg)
-    );
-  };
+  useEffect(() => {
+    const controlador = new AbortController();
 
-  // A API ainda nao expoe endpoint de envio de frequencia: nao marcar como
-  // enviado, o que faria a interface afirmar uma persistencia inexistente.
-  const enviarFrequencia = async () => {
-    setErro(
-      'Funcionalidade em desenvolvimento: o envio de frequência ainda não está disponível.'
-    );
-  };
+    async function resolverEstagios() {
+      try {
+        const lista = await buscarEstagiosDoAluno({ signal: controlador.signal });
+        if (controlador.signal.aborted) return;
+        setEstagios(lista);
+        setEstagioId(lista.length === 1 ? lista[0].id : "");
+      } catch (error) {
+        if (controlador.signal.aborted) return;
+        setErroEstagios(error);
+      } finally {
+        if (!controlador.signal.aborted) setEstagiosResolvidos(true);
+      }
+    }
 
-  // Encontra qual é o índice do primeiro registro que AINDA NÃO FOI ENVIADO.
-  // Assim, a gente só habilita o botão deste registro específico.
-  const primeiroPendenteIndex = registros.findIndex(reg => !reg.enviado);
+    resolverEstagios();
+
+    return () => controlador.abort();
+  }, []);
+
+  useEffect(() => {
+    if (!estagiosResolvidos) return undefined;
+
+    const controlador = new AbortController();
+
+    async function carregar() {
+      setCarregando(true);
+      setErro(null);
+
+      try {
+        const resultado = await listarFolhasPonto({
+          page: pagina,
+          limit: ITENS_POR_PAGINA,
+          search: busca,
+          status: filtroStatus ? [filtroStatus] : [],
+          estagioId,
+          signal: controlador.signal,
+        });
+
+        if (controlador.signal.aborted) return;
+        setRegistros(resultado.registros);
+        setMeta(resultado.meta);
+      } catch (error) {
+        if (controlador.signal.aborted) return;
+        // Erro não é lista vazia: a página informa a falha em vez de sugerir
+        // que o aluno não possui registros.
+        setErro(error);
+        setRegistros([]);
+        setMeta(null);
+      } finally {
+        if (!controlador.signal.aborted) setCarregando(false);
+      }
+    }
+
+    carregar();
+
+    return () => controlador.abort();
+  }, [estagiosResolvidos, pagina, busca, filtroStatus, estagioId, recarga]);
+
+  const recarregar = useCallback(() => setRecarga((valor) => valor + 1), []);
+
+  const atualizarCampo = useCallback((campo, valor) => {
+    setFormulario((atual) => ({ ...atual, [campo]: valor }));
+  }, []);
+
+  const totalPaginas = Math.max(meta?.totalPages ?? 1, 1);
+  const totalItens = meta?.totalItems ?? 0;
+
+  const opcoesEstagio = useMemo(
+    () => [
+      { value: "", label: "Selecione o estágio" },
+      ...estagios.map((estagio) => ({
+        value: estagio.id,
+        label: descreverEstagio(estagio),
+      })),
+    ],
+    [estagios]
+  );
+
+  async function enviarFormulario(evento) {
+    evento.preventDefault();
+    if (enviando) return;
+
+    setMensagemSucesso("");
+    setErroAcao("");
+
+    const erros = validarFolhaPonto({ ...formulario, estagioId });
+    setErrosFormulario(erros);
+    if (Object.keys(erros).length > 0) return;
+
+    setEnviando(true);
+    try {
+      await criarFolhaPonto({ ...formulario, estagioId });
+      if (!montadoRef.current) return;
+      setFormulario(FORMULARIO_VAZIO);
+      setMensagemSucesso("Registro enviado para confirmação do supervisor.");
+      setPagina(1);
+      recarregar();
+    } catch (error) {
+      if (montadoRef.current) setErroAcao(mensagemDeErro(error));
+    } finally {
+      if (montadoRef.current) setEnviando(false);
+    }
+  }
+
+  async function confirmarCancelamento() {
+    if (!folhaParaCancelar || cancelando) return;
+
+    setCancelando(true);
+    setErroAcao("");
+    setMensagemSucesso("");
+
+    try {
+      await cancelarFolhaPonto(folhaParaCancelar.id);
+      if (!montadoRef.current) return;
+      setFolhaParaCancelar(null);
+      setMensagemSucesso("Registro cancelado.");
+      recarregar();
+    } catch (error) {
+      if (montadoRef.current) setErroAcao(mensagemDeErro(error));
+    } finally {
+      if (montadoRef.current) setCancelando(false);
+    }
+  }
+
+  const restanteObservacoes = LIMITE_OBSERVACOES - formulario.observacoes.length;
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <button className={styles.backButton} onClick={() => navigate(-1)}>
-          &larr; Painel aluno
-        </button>
-        <h2 className={styles.subtitle}>Folha de pontos</h2>
-      </header>
+    <div className={styles.pagina}>
+      <PageHeader
+        title="Registrar frequência"
+        description="Registre o turno cumprido no estágio e acompanhe a confirmação do supervisor."
+        actions={
+          <Button variant="ghost" onClick={() => navigate(-1)} aria-label="Voltar">
+            <ArrowLeft size={20} aria-hidden="true" />
+          </Button>
+        }
+      />
 
-      <main className={styles.content}>
-        {loading && <p className={styles.loadingText}>Carregando folha de pontos...</p>}
-        {erro && <div className={styles.errorMessage}>{erro}</div>}
-        
-        {!loading && !erro && (
-          <div className={styles.listaRegistros}>
-            {registros.map((registro, index) => {
-              // Habilita para envio apenas o primeiro registro pendente na ordem cronológica
-              const habilitadoParaEnvio = index === primeiroPendenteIndex;
+      {erroEstagios ? (
+        <ErrorState
+          title="Não foi possível identificar seu estágio"
+          message={mensagemDeErro(erroEstagios)}
+        />
+      ) : null}
 
-              return (
-                <RegistroPontoCard
-                  key={registro.id}
-                  data={registro.data}
-                  horario={registro.horario}
-                  frequenciaMarcada={registro.frequenciaMarcada}
-                  enviado={registro.enviado}
-                  onMarcarFrequencia={(valor) => handleMarcarFrequencia(registro.id, valor)}
-                  habilitadoParaEnvio={habilitadoParaEnvio}
-                  onEnviar={() => enviarFrequencia(registro.id)}
-                />
-              );
-            })}
+      {estagiosResolvidos && !erroEstagios && estagios.length === 0 ? (
+        <EmptyState
+          title="Nenhum estágio vinculado"
+          message="Só é possível registrar frequência quando há um estágio ativo vinculado ao seu perfil. Procure o CIEC."
+        />
+      ) : null}
+
+      {estagios.length > 0 ? (
+        <section className={styles.secao} aria-labelledby="titulo-novo-registro">
+          <h2 className={styles.tituloSecao} id="titulo-novo-registro">
+            Novo registro
+          </h2>
+
+          <form className={styles.formulario} onSubmit={enviarFormulario} noValidate>
+            {estagios.length > 1 ? (
+              <Select
+                label="Estágio"
+                required
+                value={estagioId}
+                options={opcoesEstagio}
+                error={errosFormulario.estagio}
+                onChange={(evento) => setEstagioId(evento.target.value)}
+                fieldClassName={styles.campoLargo}
+              />
+            ) : null}
+
+            <Input
+              label="Data"
+              type="date"
+              required
+              value={formulario.data}
+              error={errosFormulario.data}
+              onChange={(evento) => atualizarCampo("data", evento.target.value)}
+            />
+
+            <Input
+              label="Hora de início"
+              type="time"
+              required
+              value={formulario.horaInicio}
+              error={errosFormulario.horaInicio}
+              onChange={(evento) => atualizarCampo("horaInicio", evento.target.value)}
+            />
+
+            <Input
+              label="Hora de fim"
+              type="time"
+              required
+              value={formulario.horaFim}
+              error={errosFormulario.horaFim}
+              onChange={(evento) => atualizarCampo("horaFim", evento.target.value)}
+            />
+
+            <Textarea
+              label="Observações"
+              rows={3}
+              maxLength={LIMITE_OBSERVACOES}
+              value={formulario.observacoes}
+              error={errosFormulario.observacoes}
+              hint={`${restanteObservacoes} caracteres restantes`}
+              onChange={(evento) => atualizarCampo("observacoes", evento.target.value)}
+              fieldClassName={styles.campoLargo}
+            />
+
+            <div className={styles.acoesFormulario}>
+              <Button type="submit" loading={enviando}>
+                Registrar frequência
+              </Button>
+            </div>
+          </form>
+
+          <div aria-live="polite" className={styles.avisos}>
+            {mensagemSucesso ? (
+              <p className={styles.sucesso}>{mensagemSucesso}</p>
+            ) : null}
+            {erroAcao ? <p className={styles.erro}>{erroAcao}</p> : null}
           </div>
+        </section>
+      ) : null}
+
+      <section className={styles.secao} aria-labelledby="titulo-registros">
+        <h2 className={styles.tituloSecao} id="titulo-registros">
+          Meus registros
+        </h2>
+
+        <form
+          className={styles.filtros}
+          onSubmit={(evento) => {
+            evento.preventDefault();
+            setPagina(1);
+            setBusca(termoBusca);
+          }}
+        >
+          <Input
+            label="Buscar"
+            type="search"
+            value={termoBusca}
+            placeholder="Data, observação..."
+            onChange={(evento) => setTermoBusca(evento.target.value)}
+          />
+
+          <Select
+            label="Situação"
+            value={filtroStatus}
+            options={OPCOES_STATUS}
+            onChange={(evento) => {
+              setPagina(1);
+              setFiltroStatus(evento.target.value);
+            }}
+          />
+
+          <div className={styles.acoesFiltro}>
+            <Button type="submit" variant="secondary">
+              Aplicar busca
+            </Button>
+          </div>
+        </form>
+
+        {carregando ? (
+          <LoadingState message="Carregando registros de frequência..." rows={3} />
+        ) : erro ? (
+          <ErrorState message={mensagemDeErro(erro)} onRetry={recarregar} />
+        ) : registros.length === 0 ? (
+          <EmptyState
+            title="Nenhum registro encontrado"
+            message="Nenhuma folha de ponto corresponde aos filtros selecionados."
+          />
+        ) : (
+          <>
+            <ul className={styles.lista}>
+              {registros.map((folha) => (
+                <li key={folha.id}>
+                  <RegistroPontoCard
+                    folha={folha}
+                    cancelavel={podeCancelar(folha)}
+                    onCancelar={() => setFolhaParaCancelar(folha)}
+                  />
+                </li>
+              ))}
+            </ul>
+
+            <nav className={styles.paginacao} aria-label="Paginação dos registros">
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={pagina <= 1}
+                onClick={() => setPagina((atual) => Math.max(atual - 1, 1))}
+              >
+                Anterior
+              </Button>
+
+              <p className={styles.infoPaginacao} aria-live="polite">
+                Página {pagina} de {totalPaginas} — {totalItens} registro(s)
+              </p>
+
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={pagina >= totalPaginas}
+                onClick={() => setPagina((atual) => Math.min(atual + 1, totalPaginas))}
+              >
+                Próxima
+              </Button>
+            </nav>
+          </>
         )}
-      </main>
+      </section>
+
+      <ConfirmDialog
+        open={Boolean(folhaParaCancelar)}
+        tone="danger"
+        title="Cancelar registro de frequência"
+        description={
+          folhaParaCancelar
+            ? `O registro de ${formatarData(folhaParaCancelar.data)} será cancelado. Esta ação não pode ser desfeita.`
+            : undefined
+        }
+        confirmLabel="Cancelar registro"
+        cancelLabel="Manter registro"
+        loading={cancelando}
+        onCancel={() => (cancelando ? undefined : setFolhaParaCancelar(null))}
+        onConfirm={confirmarCancelamento}
+      />
     </div>
   );
-};
-
-export default FolhaDePontos;
+}

@@ -27,7 +27,10 @@ export default function Inicio() {
         <h2>Assinar folha de ponto</h2>
 
         <div className="cards-area">
-          <div className="inicio-card">
+          <div
+            className="inicio-card"
+            onClick={() => navigate("folha-pontos")}
+          >
             <ClipboardCheck size={42} />
             <span>
               Registrar
