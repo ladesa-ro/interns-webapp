@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Tabela from "../../components/global_Components/Tabela";
 import Cards from "../../components/global_Components/Cards.jsx";
 import apiFetch from "../../utils/api";
+import { EmptyState, LoadingState, PageHeader } from "../../components/ui";
 
 import styles from "./vaga.module.css";
 import logoQuimica from "../../assets/imagems/quimica.png";
@@ -115,59 +116,67 @@ export default function Vaga() {
   return (
     <div className={styles.layout}>
       <main className={styles.vagaContainer}>
-        <div className={styles.topo}>
-          <div className={styles.tituloArea}>
-            <button className={styles.voltar} onClick={() => navigate("/")}>
-              <ArrowLeft size={20} />
+        <PageHeader
+          title="Painel CIEC"
+          description="Vagas Disponíveis"
+          actions={
+            <button
+              type="button"
+              className={styles.voltar}
+              onClick={() => navigate("/")}
+              aria-label="Voltar ao painel"
+            >
+              <ArrowLeft size={20} aria-hidden="true" />
             </button>
-            <div>
-              <h1>Painel CIEC</h1>
-              <p>Vagas Disponíveis</p>
-            </div>
-          </div>
-        </div>
+          }
+        />
 
         <div className={styles.conteudoCentral}>
           <div className={styles.cards}>
-            <div
-              className={`${styles.cardWrapper} ${filtroCurso === "Informática" ? styles.cardAtivo : ""}`}
+            <button
+              type="button"
+              className={[styles.cardWrapper, filtroCurso === "Informática" ? styles.cardAtivo : ""]
+                .filter(Boolean)
+                .join(" ")}
               onClick={() => selecionarFiltroCurso("Informática")}
+              aria-pressed={filtroCurso === "Informática"}
+              aria-label="Filtrar por Informática"
             >
               <Cards imagem={logoinformtica} titulo="Informática" valor={countInformatica} />
-            </div>
+            </button>
 
-            <div
-              className={`${styles.cardWrapper} ${filtroCurso === "Química" ? styles.cardAtivo : ""}`}
+            <button
+              type="button"
+              className={[styles.cardWrapper, filtroCurso === "Química" ? styles.cardAtivo : ""]
+                .filter(Boolean)
+                .join(" ")}
               onClick={() => selecionarFiltroCurso("Química")}
+              aria-pressed={filtroCurso === "Química"}
+              aria-label="Filtrar por Química"
             >
               <Cards imagem={logoQuimica} titulo="Química" valor={countQuimica} />
-            </div>
+            </button>
 
-            <div
-              className={`${styles.cardWrapper} ${filtroCurso === "Floresta" ? styles.cardAtivo : ""}`}
+            <button
+              type="button"
+              className={[styles.cardWrapper, filtroCurso === "Floresta" ? styles.cardAtivo : ""]
+                .filter(Boolean)
+                .join(" ")}
               onClick={() => selecionarFiltroCurso("Floresta")}
+              aria-pressed={filtroCurso === "Floresta"}
+              aria-label="Filtrar por Floresta"
             >
               <Cards imagem={logofloresta} titulo="Floresta" valor={countFloresta} />
-            </div>
+            </button>
           </div>
 
           <div className={styles.tabelaContainer}>
             {loading ? (
-              <p style={{ textAlign: "center", marginTop: "20px" }}>Carregando vagas...</p>
+              <LoadingState message="Carregando vagas..." rows={4} />
             ) : vagasFiltradas.length > 0 ? (
               <Tabela colunas={colunas} dados={vagasFiltradas} />
             ) : (
-              <div
-                style={{
-                  background: "#fff",
-                  padding: "30px",
-                  borderRadius: "10px",
-                  textAlign: "center",
-                  boxShadow: "0px 4px 12px rgba(0,0,0,.08)",
-                }}
-              >
-                Nenhuma vaga encontrada para o curso selecionado.
-              </div>
+              <EmptyState title="Nenhuma vaga encontrada para o curso selecionado." />
             )}
           </div>
         </div>
