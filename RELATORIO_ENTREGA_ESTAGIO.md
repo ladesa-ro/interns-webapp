@@ -211,6 +211,26 @@ O DTO resumido de estágio dentro da candidatura não documenta `tipoEstagio`. E
 - `gitleaks dir . --config .gitleaks.toml --redact`: executar no gate final.
 - `git diff --check`: executar no gate final.
 
+## Revisão de pendências em 2026-09-07
+
+### Evidências coletadas
+
+- `GET /estagios?page=1&limit=1000000` sem Bearer retornou `401` com `{"statusCode":401,"code":"HTTP.UNAUTHORIZED","message":"Unauthorized"}`; não foi possível confirmar amostra real nem exclusividade campus/empresa.
+- `GET /perfis?page=1&limit=100&filter.cargo.nome=professor` sem Bearer retornou `401`.
+- `GET /autenticacao/quem-sou-eu` sem Bearer retornou `401`.
+- `POST /solicitacoes-estagio/interno` com `professorConselheiro` string, sem Bearer, retornou `401`; o backend não chegou à validação do formato.
+- A OpenAPI confirma `GET /perfis` com `filter.cargo.nome` e `filter.campus.id`, e perfis retornam `campus` e `usuario`.
+- A OpenAPI não confirma `tipoEstagio`, não define as propriedades de `professorConselheiro` e não possui endpoint de presença diária.
+- `QUEUE_FOLHA_PONTO_WHATSAPP` não existe no frontend; o contrato público de WhatsApp não declara vínculo automático com folha de ponto.
+
+### Decisões
+
+1. A pendência de modalidade foi unificada com a ausência de modalidade no DTO de candidatura e rebaixada para baixa prioridade, mas não removida.
+2. A pendência de `professorConselheiro` permanece, com severidade reduzida para confirmação de formato. O frontend agora carrega professores elegíveis, mas não envia payload não confirmado.
+3. A folha de ponto continua sendo usada para registros persistidos de data/horário/status. A necessidade de presença diária e a integração WhatsApp continuam parcialmente confirmadas e exigem documentação do backend.
+4. A consulta de professores foi implementada pelos filtros documentados, com campus derivado de `perfisAtivos` da sessão. A validação ao vivo ficou bloqueada por `401`.
+5. Os limites de `local` e `descricao` permanecem pendência de baixa prioridade.
+
 ## 9. Arquivos de segurança preservados
 
 Não foram alterados autenticação, Bearer token, derivação de perfil, autorização, AppShell ou tokens do design system.

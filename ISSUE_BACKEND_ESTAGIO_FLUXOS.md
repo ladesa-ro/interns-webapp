@@ -121,3 +121,56 @@ Definir também GET por estágio/período, alteração/cancelamento, estados, id
 O frontend não deve usar `POST /estagios` no fluxo do aluno: a operação retorna `403` para autorização inadequada e representa criação administrativa de estágio. O aluno deve usar as solicitações `/solicitacoes-estagio/interno` ou `/solicitacoes-estagio/externo`; o CIEC deve deferir a solicitação para gerar o estágio.
 
 Publicar claramente as permissões por operação na OpenAPI e manter o backend como autoridade final.
+
+## Revisão de pendências em 2026-09-07
+
+### Item 1 e Item 5: tipo do estágio
+
+**Alegação revisada:** campus implica interno e empresa implica externo.
+
+**Verificação:** a OpenAPI continua sem `tipoEstagio`; `campus` e `empresa` são propriedades independentes no `EstagioFindOneOutputDto`. Tentamos obter a maior página de `GET /estagios?page=1&limit=1000000`, mas o ambiente retornou literalmente `401 Unauthorized`, portanto não foi possível confirmar uma amostra real. Também não há constraint de exclusividade publicada no schema.
+
+**Decisão:** parcialmente confirmado como regra de negócio verbal, não confirmado como garantia do sistema. A pendência foi rebaixada para prioridade baixa, mas permanece: confirmar com o backend se existe constraint de banco/aplicação que proíba campus e empresa simultaneamente ou ambos ausentes. Se o sistema atender múltiplos institutos, recomenda-se `tipoEstagio: INTERNO | EXTERNO`.
+
+O Item 5 foi unificado neste item: o DTO resumido de candidatura também não possui modalidade.
+
+### Item 2: `professorConselheiro`
+
+**Alegação revisada:** o campo seria um nome textual.
+
+**Verificação:** a OpenAPI continua declarando:
+
+```json
+"professorConselheiro": {
+  "type": "object",
+  "description": "Professor conselheiro / orientador institucional"
+}
+```
+
+Tentamos `POST /solicitacoes-estagio/interno` com string, mas sem credencial de aluno o ambiente retornou literalmente `401 Unauthorized`; portanto a API não chegou à validação do campo.
+
+**Decisão:** não confirmado. A prioridade foi rebaixada para “aguardando confirmação de formato”, mas o schema permanece pendente. O frontend agora consulta professores por GET, mas não envia a solicitação interna até o formato ser confirmado.
+
+### Item 3: presença diária e folha de ponto
+
+**Verificação:** a API publica `POST /folha-ponto` com `data`, `horaInicio`, `horaFim` e `observacoes`, além de status PENDING/APPROVED/REJECTED/EXPIRED/CANCELLED e confirmação por token. Não existe endpoint documentado com `status PRESENTE/AUSENTE` por dia. A tela atual registra uma folha real e exibe histórico, status e cancelamento; não grava presença localmente.
+
+Não encontramos `QUEUE_FOLHA_PONTO_WHATSAPP` no frontend. A OpenAPI atual expõe apenas pairing code, envio, status e webhook de WhatsApp, sem declarar a relação automática com folha de ponto.
+
+**Decisão:** parcialmente confirmado. Não é correto afirmar que WhatsApp cobre presença diária sem documentação do fluxo. Remover a proposta de endpoint novo somente se o backend declarar explicitamente que folha de ponto é o mecanismo oficial; até lá, a pendência passa a ser documentação de integração e semântica.
+
+### Item 4: professores elegíveis
+
+**Verificação de contrato:** `GET /perfis` aceita `filter.cargo.nome` e `filter.campus.id`. `PerfilFindOneOutputDto` retorna `cargo`, `campus` e `usuario`. `GET /autenticacao/quem-sou-eu` retorna `perfisAtivos`, cujo campus pode ser usado para montar o filtro.
+
+**Verificação ao vivo:** sem sessão, tanto `/perfis` quanto `quem-sou-eu` retornaram `401 Unauthorized`. Portanto o caminho foi confirmado no contrato, mas não validado com dados reais.
+
+**Implementação:** o formulário interno carrega a lista com `GET /autenticacao/quem-sou-eu` e `GET /perfis?filter.cargo.nome=professor&filter.campus.id=...`. A submissão continua bloqueada pela pendência de `professorConselheiro`.
+
+### Item 6: WhatsApp
+
+**Decisão:** não houve alteração de código. A OpenAPI não documenta o vínculo automático com folha de ponto. Permanece pendência de documentação: descrever queue, gatilho, payload, retries e estados do envio.
+
+### Item 7: limites de `local` e `descricao`
+
+Mantida como pendência de baixa prioridade. O schema atual não publica limites de tamanho nem validações suficientes para esses campos.
