@@ -64,14 +64,20 @@ describe("SolicitarEstagio", () => {
     expect(await screen.findByText(/candidatura enviada/i)).toBeInTheDocument();
   });
 
-  it("mostra a solicitação interna como pendente de contrato de API", async () => {
+  it("carrega a solicitação interna e mantém o envio pendente de contrato", async () => {
     const usuario = userEvent.setup();
+    instalarFetch({
+      "/autenticacao/quem-sou-eu": () => ({ status: 200, body: { perfisAtivos: [{ campus: { id: "camp-1" } }] } }),
+      "/perfis": () => ({ status: 200, body: { data: [{ id: "prof-1", usuario: { nome: "Professora Teste" } }] } }),
+      "/minhas-solicitacoes": () => ({ status: 200, body: [] }),
+    });
     renderizar();
 
     await usuario.click(screen.getByRole("button", { name: "Estágio interno" }));
 
-    expect(screen.getByText(/depende do contrato de API/i)).toBeInTheDocument();
-    expect(screen.getByLabelText("Professor conselheiro")).toBeDisabled();
+    expect(await screen.findByRole("option", { name: "Professora Teste" })).toBeInTheDocument();
+    expect(screen.getByText(/aguardando a definição do formato/i)).toBeInTheDocument();
+    expect(screen.getByLabelText("Local do estágio")).not.toBeDisabled();
   });
 
   it("envia uma solicitação externa com o DTO documentado", async () => {

@@ -1,5 +1,16 @@
 import { apiJson } from "./api";
 
+export async function listarProfessoresElegiveis({ signal } = {}) {
+  const sessao = await apiJson("/autenticacao/quem-sou-eu", { signal });
+  const campusId = sessao?.perfisAtivos?.find((perfil) => perfil?.campus?.id)?.campus.id;
+  const parametros = new URLSearchParams({ limit: "100" });
+  parametros.append("filter.cargo.nome", "professor");
+  if (campusId) parametros.append("filter.campus.id", campusId);
+
+  const resposta = await apiJson(`/perfis?${parametros.toString()}`, { signal });
+  return Array.isArray(resposta?.data) ? resposta.data : [];
+}
+
 export const SITUACAO_CANDIDATURA = Object.freeze({
   PENDING: "PENDING",
   OFFERED: "OFFERED",

@@ -20,6 +20,7 @@ import {
   ROTULOS_SOLICITACAO,
   TONS_SOLICITACAO,
   cancelarSolicitacao,
+  listarProfessoresElegiveis,
   listarMinhasSolicitacoes,
   solicitacaoPodeSerCancelada,
   validarSolicitacaoExterna,
@@ -68,6 +69,12 @@ export default function SolicitarEstagio() {
   const [solicitacaoParaCancelar, setSolicitacaoParaCancelar] = useState(null);
   const [cancelando, setCancelando] = useState(false);
   const [recarga, setRecarga] = useState(0);
+  const [professores, setProfessores] = useState([]);
+  const [professorId, setProfessorId] = useState("");
+  const [localInterno, setLocalInterno] = useState("");
+  const [descricaoInterna, setDescricaoInterna] = useState("");
+  const [carregandoProfessores, setCarregandoProfessores] = useState(true);
+  const [erroProfessores, setErroProfessores] = useState(null);
 
   useEffect(() => {
     const controlador = new AbortController();
@@ -88,6 +95,22 @@ export default function SolicitarEstagio() {
     carregarSolicitacoes();
     return () => controlador.abort();
   }, [recarga]);
+
+  useEffect(() => {
+    const controlador = new AbortController();
+    async function carregarProfessores() {
+      try {
+        const lista = await listarProfessoresElegiveis({ signal: controlador.signal });
+        if (!controlador.signal.aborted) setProfessores(lista);
+      } catch (error) {
+        if (!controlador.signal.aborted) setErroProfessores(error);
+      } finally {
+        if (!controlador.signal.aborted) setCarregandoProfessores(false);
+      }
+    }
+    carregarProfessores();
+    return () => controlador.abort();
+  }, []);
 
   function atualizar(campo, valor) {
     setDadosExternos((atual) => ({ ...atual, [campo]: valor }));
@@ -224,11 +247,25 @@ export default function SolicitarEstagio() {
               <h2 id="titulo-interno">Estágio no IFRO</h2>
             </div>
             <p className="aviso-formulario">
-              A solicitação de estágio interno depende do contrato de API para envio e aprovação.
+              A lista de professores usa `GET /perfis` filtrado por cargo e campus. O envio permanece aguardando a definição do formato de `professorConselheiro` na API.
             </p>
-            <Input label="Professor conselheiro" disabled />
-            <Input label="Local do estágio" disabled />
-            <Textarea label="Descrição" rows={5} disabled />
+            {erroProfessores ? <ErrorState message={mensagemDeErro(erroProfessores)} /> : null}
+            <label className="campo-interno">
+              <span>Professor conselheiro</span>
+              <select value={professorId} onChange={(evento) => setProfessorId(evento.target.value)} disabled={carregandoProfessores}>
+                <option value="">Selecione um professor</option>
+                {professores.map((professor) => (
+                  <option key={professor.id} value={professor.id}>
+                    {professor.usuario?.nome ?? professor.usuario?.matricula ?? professor.id}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <Input label="Local do estágio" value={localInterno} onChange={(evento) => setLocalInterno(evento.target.value)} />
+            <Textarea label="Descrição" rows={5} value={descricaoInterna} onChange={(evento) => setDescricaoInterna(evento.target.value)} />
+            <p className="aviso-formulario">
+              O botão de envio será habilitado quando o backend publicar as propriedades aceitas de `professorConselheiro`.
+            </p>
           </section>
         )}
 
