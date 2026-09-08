@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import styles from "./Perfil.module.css";
 
@@ -14,7 +14,8 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../../contexts/AuthContext";
-import apiFetch from "../../utils/api";
+import apiFetch, { mensagemDeErro } from "../../utils/api";
+import { atualizarImagemPerfil, buscarImagemPerfilUrl } from "../../utils/imagemPerfilApi";
 
 export default function Perfil() {
 
@@ -50,6 +51,63 @@ export default function Perfil() {
 
   const [erro, setErro] =
     useState("");
+
+  const [fotoUrl, setFotoUrl] = useState(null);
+  const [enviandoFoto, setEnviandoFoto] = useState(false);
+  const [erroFoto, setErroFoto] = useState("");
+  const inputFotoRef = useRef(null);
+
+
+  // =====================================================
+  // BUSCAR FOTO DE PERFIL DO USUÁRIO LOGADO
+  // =====================================================
+
+  useEffect(() => {
+    if (!usuarioId) return undefined;
+
+    const controlador = new AbortController();
+    let urlAtual = null;
+
+    async function carregarFoto() {
+      try {
+        const url = await buscarImagemPerfilUrl(usuarioId, { signal: controlador.signal });
+        if (controlador.signal.aborted) return;
+        urlAtual = url;
+        setFotoUrl(url);
+      } catch (error) {
+        if (!controlador.signal.aborted) setErroFoto(mensagemDeErro(error));
+      }
+    }
+
+    carregarFoto();
+
+    return () => {
+      controlador.abort();
+      if (urlAtual) URL.revokeObjectURL(urlAtual);
+    };
+  }, [usuarioId]);
+
+  async function selecionarNovaFoto(evento) {
+    const arquivo = evento.target.files?.[0];
+    evento.target.value = "";
+    if (!arquivo || !usuarioId || enviandoFoto) return;
+
+    setEnviandoFoto(true);
+    setErroFoto("");
+
+    try {
+      await atualizarImagemPerfil(usuarioId, arquivo);
+      const novaUrl = await buscarImagemPerfilUrl(usuarioId);
+      setFotoUrl((anterior) => {
+        if (anterior) URL.revokeObjectURL(anterior);
+        return novaUrl;
+      });
+    } catch (error) {
+      setErroFoto(mensagemDeErro(error));
+    } finally {
+      setEnviandoFoto(false);
+    }
+  }
 
 
   // =====================================================
@@ -497,18 +555,43 @@ export default function Perfil() {
             }
           >
 
-            <img
-              src="/image.png"
-              alt="Foto de perfil"
-              className={
-                styles.fotoPerfil
-              }
+            {fotoUrl ? (
+              <img
+                src={fotoUrl}
+                alt="Foto de perfil"
+                className={
+                  styles.fotoPerfil
+                }
+              />
+            ) : (
+              <div
+                className={styles.fotoPlaceholder}
+                role="img"
+                aria-label="Sem foto de perfil"
+              >
+                <User size={90} aria-hidden="true" />
+              </div>
+            )}
+
+            <input
+              ref={inputFotoRef}
+              type="file"
+              accept="image/*"
+              className={styles.inputFotoOculto}
+              onChange={selecionarNovaFoto}
+              aria-hidden="true"
+              tabIndex={-1}
+              data-testid="input-foto-perfil"
             />
 
             <button
+              type="button"
               className={
                 styles.cameraBtn
               }
+              onClick={() => inputFotoRef.current?.click()}
+              disabled={enviandoFoto || !usuarioId}
+              aria-label="Alterar foto de perfil"
             >
 
               <Camera size={18} />
@@ -516,6 +599,10 @@ export default function Perfil() {
             </button>
 
           </div>
+
+          {erroFoto ? (
+            <p className={styles.erroFoto} role="alert">{erroFoto}</p>
+          ) : null}
 
 
           <h2>

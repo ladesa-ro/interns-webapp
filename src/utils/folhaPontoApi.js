@@ -141,10 +141,30 @@ export function podeCancelar(folha) {
   return folha?.status === STATUS_FOLHA_PONTO.PENDING;
 }
 
-// A API não expõe "meus estágios": o vínculo é resolvido pelos filtros
-// documentados perfil -> estagiário -> estágio.
+// A API não expõe "meus estágios" diretamente. O filtro documentado
+// filter.estagiario.perfil.usuario.matricula resolve o vínculo em uma única
+// chamada; o encadeamento perfil -> estagiário -> estágio fica como reserva
+// para quando a matrícula não estiver disponível na sessão.
 export async function buscarEstagiosDoAluno({ signal } = {}) {
   const sessao = await apiJson("/autenticacao/quem-sou-eu", { signal });
+  const matricula = sessao?.usuario?.matricula;
+
+  if (matricula) {
+    const filtroPorMatricula = new URLSearchParams({ limit: "50" });
+    filtroPorMatricula.append("filter.estagiario.perfil.usuario.matricula", matricula);
+
+    const estagiosPorMatricula = await apiJson(
+      `/estagios?${filtroPorMatricula.toString()}`,
+      { signal }
+    );
+    const encontrados = (estagiosPorMatricula?.data ?? []).filter((estagio) => estagio?.id);
+    if (encontrados.length > 0) return encontrados;
+  }
+
+  return buscarEstagiosDoAlunoPorPerfil(sessao, { signal });
+}
+
+async function buscarEstagiosDoAlunoPorPerfil(sessao, { signal } = {}) {
   const perfis = (sessao?.perfisAtivos ?? []).filter(
     (perfil) => perfil?.id && perfil.ativo !== false
   );

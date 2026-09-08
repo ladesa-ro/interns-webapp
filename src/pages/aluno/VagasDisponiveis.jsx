@@ -6,19 +6,20 @@ import styles from "./VagasDisponiveis.module.css";
 import { Button, Card, EmptyState, ErrorState, Input, LoadingState, PageHeader } from "../../components/ui";
 import { mensagemDeErro } from "../../utils/api";
 import {
-  listarVagasDisponiveis,
+  listarEmpresasComVagas,
   localizacaoDaVaga,
-  nomeDaEmpresa,
+  localizacaoDoEndereco,
   nomeDoCurso,
+  nomeEmpresa,
   vagaInterna,
 } from "../../utils/vagasDisponiveisApi";
 
 export default function VagasDisponiveis() {
   const navigate = useNavigate();
-  const [vagas, setVagas] = useState([]);
+  const [itens, setItens] = useState([]);
   const [pagina, setPagina] = useState(1);
   const [total, setTotal] = useState(0);
-  const [limite, setLimite] = useState(12);
+  const [totalPaginas, setTotalPaginas] = useState(1);
   const [busca, setBusca] = useState("");
   const [termoBusca, setTermoBusca] = useState("");
   const [carregando, setCarregando] = useState(true);
@@ -28,21 +29,21 @@ export default function VagasDisponiveis() {
   useEffect(() => {
     const controlador = new AbortController();
 
-    async function carregarVagas() {
+    async function carregar() {
       setCarregando(true);
       setErro(null);
 
       try {
-        const resultado = await listarVagasDisponiveis({
+        const resultado = await listarEmpresasComVagas({
           page: pagina,
           search: busca,
           signal: controlador.signal,
         });
         if (controlador.signal.aborted) return;
-        setVagas(resultado.vagas);
+        setItens(resultado.itens);
         setPagina(resultado.pagina);
         setTotal(resultado.total);
-        setLimite(resultado.limite);
+        setTotalPaginas(resultado.totalPaginas);
       } catch (error) {
         if (!controlador.signal.aborted) setErro(error);
       } finally {
@@ -50,24 +51,25 @@ export default function VagasDisponiveis() {
       }
     }
 
-    carregarVagas();
+    carregar();
     return () => controlador.abort();
   }, [pagina, busca, recarga]);
 
   const recarregar = useCallback(() => setRecarga((valor) => valor + 1), []);
-  const totalPaginas = Math.max(Math.ceil(total / limite), 1);
 
-  function selecionarVaga(vaga) {
-    navigate("/aluno/solicitar-estagio", {
-      state: { vagaSelecionada: vaga },
-    });
+  function candidatarNaVaga(vaga) {
+    navigate("/aluno/solicitar-estagio", { state: { vagaSelecionada: vaga } });
+  }
+
+  function solicitarNaEmpresa(empresa) {
+    navigate("/aluno/solicitar-estagio", { state: { vagaSelecionada: { empresa } } });
   }
 
   return (
     <div className={styles.pagina}>
       <PageHeader
-        title="Vagas disponíveis"
-        description="Candidate-se a uma vaga aberta de uma empresa parceira."
+        title="Candidatar-se a uma vaga"
+        description="As vagas abertas e as empresas parceiras vêm diretamente da API de estágios."
         actions={
           <Button variant="ghost" onClick={() => navigate(-1)} aria-label="Voltar">
             <ArrowLeft size={20} aria-hidden="true" />
@@ -84,9 +86,9 @@ export default function VagasDisponiveis() {
         }}
       >
         <Input
-          label="Buscar vaga"
+          label="Buscar empresa"
           type="search"
-          placeholder="Empresa ou termo da vaga"
+          placeholder="Nome da empresa"
           value={termoBusca}
           onChange={(evento) => setTermoBusca(evento.target.value)}
         />
@@ -97,67 +99,76 @@ export default function VagasDisponiveis() {
       </form>
 
       {carregando ? (
-        <LoadingState message="Carregando vagas disponíveis..." rows={4} />
+        <LoadingState message="Carregando empresas e vagas..." rows={4} />
       ) : erro ? (
         <ErrorState message={mensagemDeErro(erro)} onRetry={recarregar} />
-      ) : vagas.length === 0 ? (
+      ) : itens.length === 0 ? (
         <EmptyState
-          title="Nenhuma vaga disponível"
-          message="Não há vagas abertas para os filtros informados neste momento."
+          title="Nenhuma empresa encontrada"
+          message="Não há empresas cadastradas para os filtros informados."
         />
       ) : (
         <>
           <ul className={styles.lista}>
-            {vagas.map((vaga) => (
-              <li key={vaga.id}>
-                <Card className={styles.vaga} padding="lg">
-                  <div className={styles.conteudoVaga}>
-                    <Building2 className={styles.icone} size={24} aria-hidden="true" />
-                    <div>
-                      <h2>{nomeDaEmpresa(vaga)}</h2>
-                      <p>Vaga disponível</p>
-                    </div>
-                  </div>
+            {itens.map((item) => {
+              const { empresa, vagaPrincipal, vagasDisponiveis } = item;
+              const localizacao = vagaPrincipal
+                ? localizacaoDaVaga(vagaPrincipal)
+                : localizacaoDoEndereco(empresa.endereco);
 
-                  <dl className={styles.detalhes}>
-                    <div>
-                      <dt>Curso</dt>
-                      <dd>{nomeDoCurso(vaga)}</dd>
-                    </div>
-                    <div>
-                      <dt>Carga horária semanal</dt>
-                      <dd>{vaga.cargaHoraria ? `${vaga.cargaHoraria} horas` : "Não informada"}</dd>
-                    </div>
-                    <div>
-                      <dt>Localização</dt>
-                      <dd>
-                        <MapPin size={16} aria-hidden="true" />
-                        {localizacaoDaVaga(vaga)}
-                      </dd>
-                    </div>
-                    {vagaInterna(vaga) ? (
+              return (
+                <li key={empresa.id}>
+                  <Card className={styles.vaga} padding="lg">
+                    <div className={styles.conteudoVaga}>
+                      <Building2 className={styles.icone} size={24} aria-hidden="true" />
                       <div>
-                        <dt>Campus</dt>
-                        <dd>{vaga.campus?.nomeFantasia ?? vaga.campus?.razaoSocial ?? "Não informado"}</dd>
+                        <h2>{nomeEmpresa(empresa)}</h2>
+                        <p>
+                          {vagasDisponiveis > 0
+                            ? `${vagasDisponiveis} vaga(s) disponível(is)`
+                            : "Nenhuma vaga disponível no momento"}
+                        </p>
                       </div>
-                    ) : null}
-                    <div>
-                      <dt>Supervisor</dt>
-                      <dd>{vaga.nomeSupervisor ?? "Não informado"}</dd>
                     </div>
-                  </dl>
 
-                  <Button
-                    onClick={() => selecionarVaga(vaga)}
-                  >
-                    Candidatar-se
-                  </Button>
-                </Card>
-              </li>
-            ))}
+                    <dl className={styles.detalhes}>
+                      <div>
+                        <dt>Curso</dt>
+                        <dd>{vagaPrincipal ? nomeDoCurso(vagaPrincipal) : "Não informado"}</dd>
+                      </div>
+                      <div>
+                        <dt>Localização</dt>
+                        <dd>
+                          <MapPin size={16} aria-hidden="true" />
+                          {localizacao}
+                        </dd>
+                      </div>
+                      {vagaPrincipal && vagaInterna(vagaPrincipal) ? (
+                        <div>
+                          <dt>Campus</dt>
+                          <dd>
+                            {vagaPrincipal.campus?.nomeFantasia ?? vagaPrincipal.campus?.razaoSocial ?? "Não informado"}
+                          </dd>
+                        </div>
+                      ) : null}
+                    </dl>
+
+                    {vagasDisponiveis > 0 ? (
+                      <Button onClick={() => candidatarNaVaga(vagaPrincipal)}>
+                        Candidatar-se
+                      </Button>
+                    ) : (
+                      <Button variant="secondary" onClick={() => solicitarNaEmpresa(empresa)}>
+                        Solicitar estágio nesta empresa
+                      </Button>
+                    )}
+                  </Card>
+                </li>
+              );
+            })}
           </ul>
 
-          <nav className={styles.paginacao} aria-label="Paginação das vagas">
+          <nav className={styles.paginacao} aria-label="Paginação das empresas">
             <Button
               variant="secondary"
               size="sm"
@@ -166,7 +177,7 @@ export default function VagasDisponiveis() {
             >
               Anterior
             </Button>
-            <p>Página {pagina} de {totalPaginas} ({total} vaga(s))</p>
+            <p>Página {pagina} de {totalPaginas} ({total} empresa(s))</p>
             <Button
               variant="secondary"
               size="sm"
