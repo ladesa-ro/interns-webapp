@@ -133,7 +133,28 @@ describe("AuthContext", () => {
     expect(login.options?.headers?.Authorization).toBeUndefined();
   });
 
-  it("logout limpa o estado local", async () => {
+  it("logout limpa o estado local mesmo quando o endpoint retorna 404", async () => {
+    // POST /autenticacao/logout nao esta mapeado: mock retorna 404, apiJson lanca erro.
+    // O bloco finally em AuthContext.logout() chama encerrarSessaoLocal() de qualquer forma.
+    // (ver ISSUE_BACKEND_AUTH_COOKIE.md secao 5: endpoint nao existe ainda)
+    instalarFetch({
+      "/autenticacao/login": () => ({ status: 201, body: { access_token: "token-de-teste" } }),
+      "/autenticacao/quem-sou-eu": () => ({ status: 200, body: sessaoAluno() }),
+      // /autenticacao/logout intencionalmente ausente — simula endpoint inexistente
+    });
+
+    montar();
+    await screen.findByTestId("estado");
+    await userEvent.click(screen.getByRole("button", { name: "entrar" }));
+    await waitFor(() => expect(screen.getByTestId("estado")).toHaveTextContent("autenticado"));
+
+    await userEvent.click(screen.getByRole("button", { name: "sair" }));
+
+    await waitFor(() => expect(screen.getByTestId("estado")).toHaveTextContent("anonimo"));
+    expect(screen.getByTestId("perfil")).toHaveTextContent("sem-perfil");
+  });
+
+  it("logout limpa o estado local mesmo quando a rede falha completamente", async () => {
     instalarFetch({
       "/autenticacao/login": () => ({ status: 201, body: { access_token: "token-de-teste" } }),
       "/autenticacao/quem-sou-eu": () => ({ status: 200, body: sessaoAluno() }),
@@ -144,8 +165,12 @@ describe("AuthContext", () => {
     await userEvent.click(screen.getByRole("button", { name: "entrar" }));
     await waitFor(() => expect(screen.getByTestId("estado")).toHaveTextContent("autenticado"));
 
+    // Substitui o fetch por um que rejeita em qualquer chamada (sem rede)
+    vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("Failed to fetch"); }));
+
     await userEvent.click(screen.getByRole("button", { name: "sair" }));
 
+    // Estado local deve ser limpo independente da falha de rede
     await waitFor(() => expect(screen.getByTestId("estado")).toHaveTextContent("anonimo"));
     expect(screen.getByTestId("perfil")).toHaveTextContent("sem-perfil");
   });

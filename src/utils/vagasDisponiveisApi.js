@@ -97,6 +97,9 @@ export function nomeDoCurso(vaga) {
 }
 
 export function vagaInterna(vaga) {
+  if (vaga?.tipoEstagio) {
+    return vaga.tipoEstagio === "INTERNO";
+  }
   return Boolean(vaga?.campus);
 }
 

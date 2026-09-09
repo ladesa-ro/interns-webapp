@@ -204,3 +204,20 @@ export function formatarQuantidadeHoras(valor) {
   if (typeof valor !== "number" || !Number.isFinite(valor)) return "-";
   return `${valor.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} h`;
 }
+
+// TODO: Endpoint ausente na API no momento da auditoria. 
+// A função deve ser consumida para registrar PRESENÇA / AUSÊNCIA diária,
+// separando-se da lógica de folhas de ponto se for o caso.
+// eslint-disable-next-line no-unused-vars
+export async function registrarFrequenciaDiaria(estagioId, { data, status, observacoes }, { signal } = {}) {
+  // Simula o erro estruturalmente correto caso seja chamado antes do backend liberar a rota
+  throw new Error("A API ainda não publicou o endpoint de frequência diária.");
+
+  /*
+  return apiJson(`/estagios/${encodeURIComponent(estagioId)}/frequencia`, {
+    method: "POST",
+    body: JSON.stringify({ data, status, observacoes }),
+    signal,
+  });
+  */
+}

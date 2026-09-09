@@ -70,9 +70,10 @@ describe("Perfil (aluno) — foto de perfil", () => {
   });
 
   it("envia o arquivo selecionado e atualiza a foto exibida", async () => {
-    buscarImagemPerfilUrlMock
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce("blob:foto-nova");
+    const originalCreateObjectURL = URL.createObjectURL;
+    URL.createObjectURL = vi.fn(() => "blob:foto-nova");
+
+    buscarImagemPerfilUrlMock.mockResolvedValueOnce(null);
     atualizarImagemPerfilMock.mockResolvedValue(true);
     instalarSessaoEPerfil();
     const usuario = userEvent.setup();
@@ -84,7 +85,10 @@ describe("Perfil (aluno) — foto de perfil", () => {
     await usuario.upload(screen.getByTestId("input-foto-perfil"), arquivo);
 
     await waitFor(() => expect(atualizarImagemPerfilMock).toHaveBeenCalledWith("u-aluno", arquivo));
+    expect(URL.createObjectURL).toHaveBeenCalledWith(arquivo);
     expect(await screen.findByAltText("Foto de perfil")).toHaveAttribute("src", "blob:foto-nova");
+
+    URL.createObjectURL = originalCreateObjectURL;
   });
 
   it("mostra mensagem de erro quando a foto não pode ser carregada", async () => {

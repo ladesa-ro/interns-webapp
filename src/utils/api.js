@@ -22,6 +22,7 @@ export const ApiErrorKind = {
   TIMEOUT: "timeout",
   UNAUTHORIZED: "unauthorized",
   FORBIDDEN: "forbidden",
+  INVALID_CREDENTIALS: "invalid_credentials",
   NOT_FOUND: "not_found",
   SERVER: "server",
   UNKNOWN: "unknown",
@@ -36,6 +37,7 @@ const MENSAGENS = new Map([
   [ApiErrorKind.TIMEOUT, "O servidor demorou demais para responder. Tente novamente."],
   [ApiErrorKind.UNAUTHORIZED, "Sua sessão expirou. Faça login novamente."],
   [ApiErrorKind.FORBIDDEN, "Você não tem permissão para acessar este recurso."],
+  [ApiErrorKind.INVALID_CREDENTIALS, "Matrícula ou senha inválidos."],
   [ApiErrorKind.NOT_FOUND, "Recurso não encontrado."],
   [ApiErrorKind.SERVER, "O servidor apresentou um erro. Tente novamente mais tarde."],
   [ApiErrorKind.UNKNOWN, "Não foi possível concluir a operação."],
@@ -82,6 +84,14 @@ function getCsrfToken() {
 
 function isAuthEndpoint(url) {
   return url.includes("/autenticacao/login");
+}
+
+// A API retorna 403 com "Credenciais inválidas." quando a matrícula/senha estão
+// errados. Traduzimos para INVALID_CREDENTIALS apenas no endpoint de login para
+// que endpoints protegidos continuem recebendo FORBIDDEN.
+function kindFromStatusForEndpoint(status, url) {
+  if (status === 403 && isAuthEndpoint(url)) return ApiErrorKind.INVALID_CREDENTIALS;
+  return kindFromStatus(status);
 }
 
 async function apiFetch(endpoint, options = {}) {
@@ -143,7 +153,7 @@ export async function apiJson(endpoint, options = {}) {
   const response = await apiFetch(endpoint, options);
 
   if (!response.ok) {
-    throw new ApiError(kindFromStatus(response.status), response.status);
+    throw new ApiError(kindFromStatusForEndpoint(response.status, endpoint), response.status);
   }
 
   if (response.status === 204) {

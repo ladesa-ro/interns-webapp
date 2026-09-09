@@ -9,6 +9,8 @@ export async function buscarImagemPerfilUrl(usuarioId, { signal } = {}) {
 
   const resposta = await apiFetch(ENDPOINT(usuarioId), { signal });
 
+  const contentType = resposta.headers.get("Content-Type") ?? "";
+
   if (resposta.status === 404) return null;
 
   if (!resposta.ok) {
@@ -19,6 +21,12 @@ export async function buscarImagemPerfilUrl(usuarioId, { signal } = {}) {
           ? ApiErrorKind.SERVER
           : ApiErrorKind.UNKNOWN;
     throw new ApiError(kind, resposta.status);
+  }
+
+  // Garante que a resposta é uma imagem antes de criar a blob URL.
+  // Evita exibir <img> quebrado quando a API retorna JSON ou outro conteúdo.
+  if (!contentType.startsWith("image/")) {
+    return null;
   }
 
   const blob = await resposta.blob();

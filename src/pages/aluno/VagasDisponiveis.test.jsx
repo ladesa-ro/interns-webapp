@@ -118,7 +118,7 @@ describe("VagasDisponiveis", () => {
     await usuario.click(screen.getByRole("button", { name: "Buscar" }));
 
     await waitFor(() => {
-      const ultima = chamadas.find((chamada) => String(chamada.url).includes("/empresas?"));
+      const ultima = chamadas.findLast((chamada) => String(chamada.url).includes("/empresas?"));
       expect(new URL(String(ultima.url), "http://localhost").searchParams.get("search")).toBe("acme");
     });
   });

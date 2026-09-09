@@ -24,8 +24,16 @@ import {
   listarMinhasSolicitacoes,
   solicitacaoPodeSerCancelada,
   validarSolicitacaoExterna,
+  validarSolicitacaoInterna,
+  solicitarEstagioInterno,
 } from "../../../../utils/solicitacoesEstagioApi";
 import "./SolicitarEstagio.css";
+
+// O schema de `professorConselheiro` na API ainda é "type: object" sem propriedades
+// definidas (ver ISSUE_BACKEND_ESTAGIO_FLUXOS.md §Revisão item 2).
+// Mantenha como false até o backend publicar o schema e o formato ser testado
+// com sessão autenticada real.
+const PROFESSOR_CONSELHEIRO_CONFIRMADO = false;
 
 const CAMPOS_EXTERNOS_VAZIOS = {
   razaoSocial: "",
@@ -39,15 +47,18 @@ const CAMPOS_EXTERNOS_VAZIOS = {
 };
 
 function camposDaVaga(vaga) {
+  // Aceita tanto uma vaga completa (com .id) quanto um wrapper { empresa }
+  const empresa = vaga?.empresa ?? {};
+  const supervisor = vaga?.supervisor ?? vaga?.nomeSupervisor ?? "";
   return {
-    razaoSocial: vaga?.empresa?.razaoSocial ?? vaga?.empresa?.nomeFantasia ?? "",
-    nomeFantasia: vaga?.empresa?.nomeFantasia ?? "",
-    cnpj: vaga?.empresa?.cnpj ?? "",
-    telefone: vaga?.empresa?.telefone ?? "",
-    email: vaga?.empresa?.email ?? "",
-    supervisorNome: vaga?.supervisor ?? "",
-    supervisorEmail: vaga?.emailSupervisor ?? "",
-    supervisorTelefone: vaga?.telefoneSupervisor ?? "",
+    razaoSocial: empresa.razaoSocial ?? empresa.nomeFantasia ?? "",
+    nomeFantasia: empresa.nomeFantasia ?? "",
+    cnpj: empresa.cnpj ?? "",
+    telefone: empresa.telefone ?? "",
+    email: empresa.email ?? "",
+    supervisorNome: supervisor,
+    supervisorEmail: vaga?.emailSupervisor ?? empresa.emailSupervisor ?? "",
+    supervisorTelefone: vaga?.telefoneSupervisor ?? empresa.telefoneSupervisor ?? "",
   };
 }
 
@@ -55,9 +66,14 @@ export default function SolicitarEstagio() {
   const location = useLocation();
   const navigate = useNavigate();
   const vagaSelecionada = location.state?.vagaSelecionada;
+
+  // O aluno escolhe manualmente a modalidade — não inferimos tipo pelo schema da API
+  // (ver ISSUE_BACKEND_ESTAGIO_FLUXOS.md §Revisão item 1: campus não é garantia de INTERNO)
   const [tipo, setTipo] = useState("externo");
+
+  // Pré-preenche com dados disponíveis da vaga/empresa, independente de ter .id
   const [dadosExternos, setDadosExternos] = useState(() => (
-    vagaSelecionada?.id ? camposDaVaga(vagaSelecionada) : CAMPOS_EXTERNOS_VAZIOS
+    vagaSelecionada ? camposDaVaga(vagaSelecionada) : CAMPOS_EXTERNOS_VAZIOS
   ));
   const [erros, setErros] = useState({});
   const [enviando, setEnviando] = useState(false);
@@ -150,6 +166,44 @@ export default function SolicitarEstagio() {
     }
   }
 
+  async function enviarInterno(evento) {
+    evento.preventDefault();
+    if (enviando) return;
+
+    // Bloqueio: formato de professorConselheiro nao confirmado pelo backend.
+    // (ver ISSUE_BACKEND_ESTAGIO_FLUXOS.md §Revisão item 2)
+    if (!PROFESSOR_CONSELHEIRO_CONFIRMADO) {
+      setMensagem(
+        "Envio de soliçitação interna aguardando confirmação do backend: " +
+        "o formato do campo \u2018professorConselheiro\u2019 ainda não está documentado na API. " +
+        "Entre em contato com o CIEC para prosseguir."
+      );
+      return;
+    }
+
+    const professorConselheiro = professorId ? { id: professorId } : undefined;
+    const payload = { professorConselheiro, local: localInterno, descricao: descricaoInterna };
+    
+    const novosErros = validarSolicitacaoInterna(payload);
+    setErros(novosErros);
+    setMensagem("");
+    if (Object.keys(novosErros).length) return;
+
+    setEnviando(true);
+    try {
+      await solicitarEstagioInterno(payload);
+      setMensagem("Solicitação interna enviada para análise do CIEC.");
+      setProfessorId("");
+      setLocalInterno("");
+      setDescricaoInterna("");
+      setRecarga((valor) => valor + 1);
+    } catch (error) {
+      setMensagem(mensagemDeErro(error));
+    } finally {
+      setEnviando(false);
+    }
+  }
+
   async function candidatarNaVaga() {
     if (!vagaSelecionada?.id || candidaturaEnviando) return;
     setCandidaturaEnviando(true);
@@ -188,6 +242,22 @@ export default function SolicitarEstagio() {
       />
 
       <section className="conteudo-centralizado" aria-label="Modalidade de estágio">
+        {/* Banner de vaga: aparece em qualquer aba, pois o aluno escolhe a modalidade */}
+        {vagaSelecionada ? (
+          <div className="vaga-selecionada" role="status">
+            <span>
+              {vagaSelecionada.id
+                ? "Dados disponíveis da vaga foram pré-preenchidos no formulário."
+                : `Dados disponíveis de ${vagaSelecionada.empresa?.nomeFantasia ?? vagaSelecionada.empresa?.razaoSocial ?? "empresa selecionada"} foram pré-preenchidos.`}
+            </span>
+            {vagaSelecionada.id ? (
+              <Button type="button" onClick={candidatarNaVaga} loading={candidaturaEnviando}>
+                Candidatar-se nesta vaga
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
+
         <div className="tipo-estagio" role="group" aria-label="Tipo de estágio">
           <button
             className={`tipo-card ${tipo === "interno" ? "ativo" : ""}`}
@@ -219,15 +289,6 @@ export default function SolicitarEstagio() {
               </Button>
             </div>
 
-            {vagaSelecionada?.id ? (
-              <div className="vaga-selecionada" role="status">
-                <span>Os dados retornados da vaga foram preenchidos quando disponíveis.</span>
-                <Button type="button" onClick={candidatarNaVaga} loading={candidaturaEnviando}>
-                  Candidatar-se nesta vaga
-                </Button>
-              </div>
-            ) : null}
-
             <Input label="Razão social" required value={dadosExternos.razaoSocial} error={erros.razaoSocial} onChange={(e) => atualizar("razaoSocial", e.target.value)} />
             <Input label="Nome fantasia" value={dadosExternos.nomeFantasia} onChange={(e) => atualizar("nomeFantasia", e.target.value)} />
             <Input label="CNPJ" required value={dadosExternos.cnpj} error={erros.cnpj} onChange={(e) => atualizar("cnpj", e.target.value)} />
@@ -242,17 +303,14 @@ export default function SolicitarEstagio() {
             <div className="mensagem-formulario" aria-live="polite">{mensagem}</div>
           </form>
         ) : (
-          <section className="form-estagio" aria-labelledby="titulo-interno">
+          <form className="form-estagio" aria-labelledby="titulo-interno" onSubmit={enviarInterno} noValidate>
             <div className="cabecalho-formulario">
               <h2 id="titulo-interno">Estágio no IFRO</h2>
             </div>
-            <p className="aviso-formulario">
-              A lista de professores usa `GET /perfis` filtrado por cargo e campus. O envio permanece aguardando a definição do formato de `professorConselheiro` na API.
-            </p>
             {erroProfessores ? <ErrorState message={mensagemDeErro(erroProfessores)} /> : null}
-            <label className="campo-interno">
+            <label className={`campo-interno ${erros.professorId ? "com-erro" : ""}`}>
               <span>Professor conselheiro</span>
-              <select value={professorId} onChange={(evento) => setProfessorId(evento.target.value)} disabled={carregandoProfessores}>
+              <select value={professorId} required onChange={(evento) => setProfessorId(evento.target.value)} disabled={carregandoProfessores}>
                 <option value="">Selecione um professor</option>
                 {professores.map((professor) => (
                   <option key={professor.id} value={professor.id}>
@@ -260,13 +318,16 @@ export default function SolicitarEstagio() {
                   </option>
                 ))}
               </select>
+              {erros.professorId && <span className="mensagem-erro">{erros.professorId}</span>}
             </label>
-            <Input label="Local do estágio" value={localInterno} onChange={(evento) => setLocalInterno(evento.target.value)} />
-            <Textarea label="Descrição" rows={5} value={descricaoInterna} onChange={(evento) => setDescricaoInterna(evento.target.value)} />
-            <p className="aviso-formulario">
-              O botão de envio será habilitado quando o backend publicar as propriedades aceitas de `professorConselheiro`.
-            </p>
-          </section>
+            <Input label="Local do estágio" required maxLength={255} error={erros.local} value={localInterno} onChange={(evento) => setLocalInterno(evento.target.value)} />
+            <Textarea label="Descrição" required rows={5} maxLength={500} error={erros.descricao} value={descricaoInterna} onChange={(evento) => setDescricaoInterna(evento.target.value)} />
+            
+            <div className="acoes-formulario">
+              <Button type="submit" loading={enviando}>Enviar solicitação interna</Button>
+            </div>
+            <div className="mensagem-formulario" aria-live="polite">{mensagem}</div>
+          </form>
         )}
 
         {tipo === "externo" && !vagaSelecionada?.id ? (

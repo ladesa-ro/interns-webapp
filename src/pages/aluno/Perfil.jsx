@@ -56,6 +56,26 @@ export default function Perfil() {
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [erroFoto, setErroFoto] = useState("");
   const inputFotoRef = useRef(null);
+  // Ref que rastreia a blob URL ativa para garantir que ela seja revogada ao
+  // desmontar o componente, mesmo que tenha sido atualizada pelo upload.
+  const fotoUrlRef = useRef(null);
+
+  function revogarFotoAtual() {
+    if (fotoUrlRef.current) {
+      URL.revokeObjectURL(fotoUrlRef.current);
+      fotoUrlRef.current = null;
+    }
+    // Limpa o estado para evitar que a <img> fique com src de URL revogada
+    // (mostraria o alt text como imagem quebrada ao invés do placeholder).
+    setFotoUrl(null);
+  }
+
+  function atualizarFotoUrl(novaUrl) {
+    // Revoga a URL anterior antes de definir a nova.
+    if (fotoUrlRef.current) URL.revokeObjectURL(fotoUrlRef.current);
+    fotoUrlRef.current = novaUrl;
+    setFotoUrl(novaUrl);
+  }
 
 
   // =====================================================
@@ -66,14 +86,12 @@ export default function Perfil() {
     if (!usuarioId) return undefined;
 
     const controlador = new AbortController();
-    let urlAtual = null;
 
     async function carregarFoto() {
       try {
         const url = await buscarImagemPerfilUrl(usuarioId, { signal: controlador.signal });
         if (controlador.signal.aborted) return;
-        urlAtual = url;
-        setFotoUrl(url);
+        atualizarFotoUrl(url);
       } catch (error) {
         if (!controlador.signal.aborted) setErroFoto(mensagemDeErro(error));
       }
@@ -83,7 +101,9 @@ export default function Perfil() {
 
     return () => {
       controlador.abort();
-      if (urlAtual) URL.revokeObjectURL(urlAtual);
+      // Revoga e limpa o estado — garante que nenhuma blob URL revogada
+      // apareça como imagem quebrada enquanto o próximo fetch carrega.
+      revogarFotoAtual();
     };
   }, [usuarioId]);
 
@@ -97,11 +117,11 @@ export default function Perfil() {
 
     try {
       await atualizarImagemPerfil(usuarioId, arquivo);
-      const novaUrl = await buscarImagemPerfilUrl(usuarioId);
-      setFotoUrl((anterior) => {
-        if (anterior) URL.revokeObjectURL(anterior);
-        return novaUrl;
-      });
+      // Usa o próprio arquivo selecionado para criar o blob URL — garante que o
+      // tipo é sempre uma imagem válida (o que o usuário acabou de selecionar).
+      // Evita um GET extra que pode retornar JSON ou redirect no lugar do binário.
+      const novaUrl = URL.createObjectURL(arquivo);
+      atualizarFotoUrl(novaUrl);
     } catch (error) {
       setErroFoto(mensagemDeErro(error));
     } finally {

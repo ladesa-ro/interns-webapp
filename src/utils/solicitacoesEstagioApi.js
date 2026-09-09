@@ -100,6 +100,14 @@ export function solicitarEstagioExterno({ empresa, supervisor }, { signal } = {}
   });
 }
 
+export function solicitarEstagioInterno({ professorConselheiro, local, descricao }, { signal } = {}) {
+  return apiJson("/solicitacoes-estagio/interno", {
+    method: "POST",
+    body: JSON.stringify({ professorConselheiro, local, descricao }),
+    signal,
+  });
+}
+
 export const ROTULOS_SOLICITACAO = new Map([
   ["PENDENTE", "Pendente"],
   ["EM_ANALISE", "Em análise"],
@@ -137,5 +145,17 @@ export function validarSolicitacaoExterna({ empresa, supervisor }) {
   if (!empresa?.razaoSocial?.trim()) erros.razaoSocial = "Informe a razão social da empresa.";
   if (!empresa?.cnpj?.trim()) erros.cnpj = "Informe o CNPJ da empresa.";
   if (!supervisor?.nome?.trim()) erros.supervisorNome = "Informe o nome do supervisor.";
+  return erros;
+}
+
+export function validarSolicitacaoInterna({ professorConselheiro, local, descricao }) {
+  const erros = {};
+  if (!professorConselheiro?.id) erros.professorId = "Selecione um professor conselheiro.";
+  if (!local?.trim()) erros.local = "Informe o local do estágio.";
+  else if (local.length > 255) erros.local = "O local não pode ter mais que 255 caracteres.";
+  
+  if (!descricao?.trim()) erros.descricao = "Forneça uma breve descrição do estágio.";
+  else if (descricao.length > 500) erros.descricao = "A descrição não pode ter mais que 500 caracteres.";
+  
   return erros;
 }
