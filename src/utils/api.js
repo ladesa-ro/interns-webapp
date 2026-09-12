@@ -147,12 +147,22 @@ async function apiFetch(endpoint, options = {}) {
   return response;
 }
 
-// Lê o corpo JSON e converte respostas de erro em ApiError, sem repassar
-// mensagens internas do backend para a interface.
 export async function apiJson(endpoint, options = {}) {
   const response = await apiFetch(endpoint, options);
 
   if (!response.ok) {
+    if (response.status === 422) {
+      try {
+        const body = await response.json();
+        const msg = body.message || body.mensagem || "Dados inválidos";
+        const error = new ApiError(ApiErrorKind.UNKNOWN, response.status);
+        error.message = msg;
+        throw error;
+      } catch (e) {
+        if (e instanceof ApiError) throw e;
+        // Ignore JSON parse error, fallback to default behavior
+      }
+    }
     throw new ApiError(kindFromStatusForEndpoint(response.status, endpoint), response.status);
   }
 

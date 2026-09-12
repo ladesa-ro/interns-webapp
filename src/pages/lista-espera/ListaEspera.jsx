@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { ArrowLeft, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import styles from "./listaEspera.module.css";
@@ -21,65 +21,90 @@ function pertenceAoCurso(nomeCurso, curso) {
     .includes(curso.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase());
 }
 
+function normalizarTexto(texto) {
+  return String(texto)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
 export default function ListaEspera() {
   const navigate = useNavigate();
 
   const [cursoSelecionado, setCursoSelecionado] = useState(null);
+  const [busca, setBusca] = useState("");
 
   const [alunos, setAlunos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
-  const ativoRef = useRef(true);
+  const [recarga, setRecarga] = useState(0);
 
-  const carregarAlunos = useCallback(async () => {
-    if (!ativoRef.current) return;
-    setCarregando(true);
-    setErro(null);
-    try {
-      const dados = await buscarListaDeEspera();
-      if (ativoRef.current) setAlunos(dados);
-    } catch (error) {
-      if (ativoRef.current) setErro(error);
-    } finally {
-      if (ativoRef.current) setCarregando(false);
-    }
-  }, []);
+  // FIX BUG 1: usa variável local `ativo` ao invés de ref compartilhada.
+  // A ref era definida como false no cleanup mas nunca voltava a true no
+  // próximo effect — causando carregamentos silenciosamente abortados.
+  const recarregar = useCallback(() => setRecarga((v) => v + 1), []);
 
   useEffect(() => {
-    const tarefa = Promise.resolve().then(carregarAlunos);
-    return () => {
-      ativoRef.current = false;
-      tarefa.catch(() => {});
-    };
-  }, [carregarAlunos]);
+    let ativo = true;
 
-  const alunosFiltrados = cursoSelecionado
+    async function carregar() {
+      setCarregando(true);
+      setErro(null);
+      try {
+        const dados = await buscarListaDeEspera();
+        if (ativo) setAlunos(dados);
+      } catch (error) {
+        if (ativo) setErro(error);
+      } finally {
+        if (ativo) setCarregando(false);
+      }
+    }
+
+    carregar();
+    return () => {
+      ativo = false;
+    };
+  }, [recarga]);
+
+  // FIX BUG 2: usa "Florestas" (com 's') em todos os filtros.
+  // O counter do card usava "Floresta" (sem 's') e o filtro usava "Florestas",
+  // causando contagem diferente da tabela filtrada.
+  const contarPorCurso = (curso) =>
+    alunos.filter((aluno) => pertenceAoCurso(aluno.curso, curso)).length;
+
+  const alunosFiltradosPorCurso = cursoSelecionado
     ? alunos.filter((aluno) => pertenceAoCurso(aluno.curso, cursoSelecionado))
     : alunos;
 
+  // Melhoria 1: busca client-side por nome ou matrícula.
+  const termoBusca = normalizarTexto(busca);
+  const alunosFiltrados = termoBusca
+    ? alunosFiltradosPorCurso.filter(
+        (aluno) =>
+          normalizarTexto(aluno.nome).includes(termoBusca) ||
+          normalizarTexto(aluno.matricula).includes(termoBusca)
+      )
+    : alunosFiltradosPorCurso;
+
+  // Melhoria 2: coluna "Curso" adicionada.
   const colunas = [
-    {
-      label: "Matrícula",
-      chave: "matricula",
-    },
-    {
-      label: "Nome",
-      chave: "nome",
-    },
-    {
-      label: "Empresa",
-      chave: "empresa",
-    },
+    { label: "Matrícula", chave: "matricula" },
+    { label: "Nome", chave: "nome" },
+    { label: "Curso", chave: "curso" },
+    { label: "Empresa", chave: "empresa" },
   ];
 
   const selecionarCurso = (curso) => {
-    if (cursoSelecionado === curso) {
-      setCursoSelecionado(null);
-      return;
-    }
-
-    setCursoSelecionado(curso);
+    setCursoSelecionado((atual) => (atual === curso ? null : curso));
   };
+
+  // FIX BUG 3: mensagem diferenciada para lista vazia sem filtro.
+  function mensagemVazia() {
+    if (termoBusca) return `Nenhum resultado para "${busca}"`;
+    if (cursoSelecionado) return `Nenhum aluno de ${cursoSelecionado} na lista de espera`;
+    return "Nenhum aluno na lista de espera";
+  }
 
   return (
     <div className={styles.layout}>
@@ -108,7 +133,7 @@ export default function ListaEspera() {
             aria-pressed={cursoSelecionado === "Informática"}
             aria-label="Filtrar por Informática"
           >
-            <Cards titulo="Informática" valor={alunos.filter((aluno) => pertenceAoCurso(aluno.curso, "Informática")).length} imagem={logoinformtica} />
+            <Cards titulo="Informática" valor={contarPorCurso("Informática")} imagem={logoinformtica} />
           </button>
 
           <button
@@ -120,7 +145,7 @@ export default function ListaEspera() {
             aria-pressed={cursoSelecionado === "Química"}
             aria-label="Filtrar por Química"
           >
-            <Cards titulo="Química" valor={alunos.filter((aluno) => pertenceAoCurso(aluno.curso, "Química")).length} imagem={logoQuimica} />
+            <Cards titulo="Química" valor={contarPorCurso("Química")} imagem={logoQuimica} />
           </button>
 
           <button
@@ -132,7 +157,7 @@ export default function ListaEspera() {
             aria-pressed={cursoSelecionado === "Florestas"}
             aria-label="Filtrar por Florestas"
           >
-            <Cards titulo="Florestas" valor={alunos.filter((aluno) => pertenceAoCurso(aluno.curso, "Floresta")).length} imagem={logofloresta} />
+            <Cards titulo="Florestas" valor={contarPorCurso("Florestas")} imagem={logofloresta} />
           </button>
         </div>
 
@@ -142,17 +167,29 @@ export default function ListaEspera() {
           <ErrorState
             title="Não foi possível carregar a lista de espera"
             message="Verifique sua conexão e tente novamente."
-            onRetry={carregarAlunos}
-          />
-        ) : alunosFiltrados.length > 0 ? (
-          <Tabela
-            colunas={colunas}
-            dados={alunosFiltrados}
+            onRetry={recarregar}
           />
         ) : (
-          <EmptyState
-            title={`Nenhum aluno de ${cursoSelecionado} na lista de espera`}
-          />
+          <>
+            <div className={styles.barraBusca}>
+              <Search size={18} aria-hidden="true" className={styles.iconeBusca} />
+              <input
+                id="busca-lista-espera"
+                type="search"
+                className={styles.inputBusca}
+                placeholder="Buscar por nome ou matrícula…"
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                aria-label="Buscar aluno por nome ou matrícula"
+              />
+            </div>
+
+            {alunosFiltrados.length > 0 ? (
+              <Tabela colunas={colunas} dados={alunosFiltrados} />
+            ) : (
+              <EmptyState title={mensagemVazia()} />
+            )}
+          </>
         )}
       </main>
     </div>

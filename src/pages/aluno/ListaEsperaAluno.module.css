@@ -8,6 +8,18 @@
   padding: var(--space-6) var(--space-4);
 }
 
+.controles {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: calc(var(--space-2) * -1); /* aproxima o seletor da mensagem */
+}
+
+.filtro {
+  width: 100%;
+  max-width: 280px;
+}
+
 .mensagem {
   min-height: var(--space-5);
   color: var(--color-text-subtle);
@@ -87,9 +99,29 @@
   align-items: center;
 }
 
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.paginaAtual {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
 @media (max-width: 480px) {
   .pagina {
     padding: var(--space-4) var(--space-3);
+  }
+
+  .filtro {
+    max-width: 100%;
   }
 
   .acoes > button {
