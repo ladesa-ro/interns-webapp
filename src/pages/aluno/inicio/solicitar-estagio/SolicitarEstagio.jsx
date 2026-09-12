@@ -29,11 +29,9 @@ import {
 } from "../../../../utils/solicitacoesEstagioApi";
 import "./SolicitarEstagio.css";
 
-// O schema de `professorConselheiro` na API ainda é "type: object" sem propriedades
-// definidas (ver ISSUE_BACKEND_ESTAGIO_FLUXOS.md §Revisão item 2).
-// Mantenha como false até o backend publicar o schema e o formato ser testado
-// com sessão autenticada real.
-const PROFESSOR_CONSELHEIRO_CONFIRMADO = false;
+// Schema de professorConselheiro confirmado em 12/09/2026 via auditoria independente
+// do openapi.v3.json (EstagioSolicitacaoProfessorConselheiroRefInputDto).
+// Formato: { professorConselheiro: { id: uuid }, local: string, descricao: string }
 
 const CAMPOS_EXTERNOS_VAZIOS = {
   razaoSocial: "",
@@ -170,20 +168,9 @@ export default function SolicitarEstagio() {
     evento.preventDefault();
     if (enviando) return;
 
-    // Bloqueio: formato de professorConselheiro nao confirmado pelo backend.
-    // (ver ISSUE_BACKEND_ESTAGIO_FLUXOS.md §Revisão item 2)
-    if (!PROFESSOR_CONSELHEIRO_CONFIRMADO) {
-      setMensagem(
-        "Envio de soliçitação interna aguardando confirmação do backend: " +
-        "o formato do campo \u2018professorConselheiro\u2019 ainda não está documentado na API. " +
-        "Entre em contato com o CIEC para prosseguir."
-      );
-      return;
-    }
-
     const professorConselheiro = professorId ? { id: professorId } : undefined;
     const payload = { professorConselheiro, local: localInterno, descricao: descricaoInterna };
-    
+
     const novosErros = validarSolicitacaoInterna(payload);
     setErros(novosErros);
     setMensagem("");
@@ -198,7 +185,13 @@ export default function SolicitarEstagio() {
       setDescricaoInterna("");
       setRecarga((valor) => valor + 1);
     } catch (error) {
-      setMensagem(mensagemDeErro(error));
+      if (error?.status === 409 || error?.statusCode === 409) {
+        setMensagem(
+          "Você já possui solicitações em análise. Aguarde a conclusão antes de enviar uma nova."
+        );
+      } else {
+        setMensagem(mensagemDeErro(error));
+      }
     } finally {
       setEnviando(false);
     }

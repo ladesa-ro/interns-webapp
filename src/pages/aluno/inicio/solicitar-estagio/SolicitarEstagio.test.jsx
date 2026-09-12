@@ -93,36 +93,67 @@ describe("SolicitarEstagio", () => {
     expect(await screen.findByText(/candidatura enviada/i)).toBeInTheDocument();
   });
 
-  it("bloqueia envio de solicitação interna enquanto schema de professorConselheiro não confirmado", async () => {
-    // PROFESSOR_CONSELHEIRO_CONFIRMADO = false em SolicitarEstagio.jsx
-    // (ver ISSUE_BACKEND_ESTAGIO_FLUXOS.md §Revisão item 2)
+  it("envia solicitação interna com o DTO confirmado e exibe sucesso", async () => {
+    // Schema confirmado em 12/09/2026: { professorConselheiro: { id: uuid }, local, descricao }
     const { chamadas } = instalarFetch({
       "/autenticacao/quem-sou-eu": () => ({ status: 200, body: { perfisAtivos: [{ campus: { id: "camp-1" } }] } }),
       "/perfis": () => ({ status: 200, body: { data: [{ id: "prof-1", usuario: { nome: "Professora Teste" } }] } }),
       "/minhas-solicitacoes": () => ({ status: 200, body: [] }),
-      // /solicitacoes-estagio/interno intencionalmente ausente — não deve ser chamado
+      "/solicitacoes-estagio/interno": () => ({ status: 201, body: { id: "sol-interno-1" } }),
     });
     const usuario = userEvent.setup();
     renderizar();
 
-    // Aluno navega para aba interna manualmente
     await usuario.click(screen.getByRole("button", { name: "Estágio interno" }));
 
     expect(await screen.findByRole("option", { name: "Professora Teste" })).toBeInTheDocument();
 
     await usuario.selectOptions(screen.getByLabelText(/Professor conselheiro/i), "prof-1");
-    await usuario.type(screen.getByLabelText(/Local do estágio/i), "Laboratório 2");
-    await usuario.type(screen.getByLabelText(/Descrição/i), "Atividades de desenvolvimento.");
+    await usuario.type(screen.getByLabelText(/Local do estágio/i), "Laboratório de Redes");
+    await usuario.type(screen.getByLabelText(/Descrição/i), "Apoio em manutenção de equipamentos.");
 
     await usuario.click(screen.getByRole("button", { name: /enviar solicitação interna/i }));
 
-    // Deve exibir mensagem de bloqueio, não de sucesso
-    expect(await screen.findByText(/aguardando confirmação do backend/i)).toBeInTheDocument();
-    expect(screen.queryByText(/enviada para análise do CIEC/i)).not.toBeInTheDocument();
+    // Confirma mensagem de sucesso
+    expect(await screen.findByText(/enviada para análise do CIEC/i)).toBeInTheDocument();
 
-    // Não deve ter chamado a API de solicitação interna
+    // Confirma que o corpo enviado bate exatamente com o DTO documentado
     const chamadaEnvio = chamadas.find((c) => String(c.url).includes("/solicitacoes-estagio/interno"));
-    expect(chamadaEnvio).toBeUndefined();
+    expect(chamadaEnvio).toBeDefined();
+    expect(chamadaEnvio.options.method).toBe("POST");
+    const corpo = JSON.parse(chamadaEnvio.options.body);
+    expect(corpo).toEqual({
+      professorConselheiro: { id: "prof-1" },
+      local: "Laboratório de Redes",
+      descricao: "Apoio em manutenção de equipamentos.",
+    });
+  });
+
+  it("exibe mensagem específica ao aluno quando API retorna 409 (limite de solicitações)", async () => {
+    instalarFetch({
+      "/autenticacao/quem-sou-eu": () => ({ status: 200, body: { perfisAtivos: [{ campus: { id: "camp-1" } }] } }),
+      "/perfis": () => ({ status: 200, body: { data: [{ id: "prof-1", usuario: { nome: "Professora Teste" } }] } }),
+      "/minhas-solicitacoes": () => ({ status: 200, body: [] }),
+      "/solicitacoes-estagio/interno": () => ({ status: 409, body: { mensagem: "Limite atingido" } }),
+    });
+    const usuario = userEvent.setup();
+    renderizar();
+
+    await usuario.click(screen.getByRole("button", { name: "Estágio interno" }));
+
+    expect(await screen.findByRole("option", { name: "Professora Teste" })).toBeInTheDocument();
+
+    await usuario.selectOptions(screen.getByLabelText(/Professor conselheiro/i), "prof-1");
+    await usuario.type(screen.getByLabelText(/Local do estágio/i), "Laboratório de Redes");
+    await usuario.type(screen.getByLabelText(/Descrição/i), "Apoio em manutenção de equipamentos.");
+
+    await usuario.click(screen.getByRole("button", { name: /enviar solicitação interna/i }));
+
+    // Mensagem clara e específica para o aluno — não a genérica de "operação não concluída"
+    expect(
+      await screen.findByText(/você já possui solicitações em análise/i)
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/enviada para análise do CIEC/i)).not.toBeInTheDocument();
   });
 
   it("envia solicitação externa com o DTO documentado", async () => {
