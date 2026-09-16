@@ -28,7 +28,7 @@ export default function LayoutAluno() {
           <Route path="lista-espera" element={<ListaEsperaAluno />} />
           <Route path="guia-estagio" element={<GuiaEstagio />} />
           <Route path="contato-ciec" element={<ContatoCIEC />} />
-          <Route path="avaliar/:estagioId" element={<AvaliarEmpresa />} />
+          <Route path="avaliar/:empresaId" element={<AvaliarEmpresa />} />
           <Route path="folha-pontos" element={<FolhaDePontos />} />
           <Route path="vagas-disponiveis" element={<VagasDisponiveis />} />
           <Route
