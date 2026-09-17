@@ -10,6 +10,7 @@ import ContatoCIEC from "../../pages/aluno/ContatoCIEC";
 import SolicitarEstagio from "../../pages/aluno/inicio/solicitar-estagio/SolicitarEstagio";
 import AvaliarEmpresa from "../../pages/aluno/AvaliarEmpresa";
 import FolhaDePontos from "../../pages/aluno/FolhaDePontos";
+import VagasDisponiveis from "../../pages/aluno/VagasDisponiveis";
 
 const NAV_ALUNO = [
   { to: "/aluno", label: "Início", icon: House, end: true },
@@ -27,8 +28,9 @@ export default function LayoutAluno() {
           <Route path="lista-espera" element={<ListaEsperaAluno />} />
           <Route path="guia-estagio" element={<GuiaEstagio />} />
           <Route path="contato-ciec" element={<ContatoCIEC />} />
-          <Route path="avaliar/:estagioId" element={<AvaliarEmpresa />} />
+          <Route path="avaliar/:empresaId" element={<AvaliarEmpresa />} />
           <Route path="folha-pontos" element={<FolhaDePontos />} />
+          <Route path="vagas-disponiveis" element={<VagasDisponiveis />} />
           <Route
             path="solicitar-estagio"
             element={<SolicitarEstagio />}

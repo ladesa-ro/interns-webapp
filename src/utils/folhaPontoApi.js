@@ -141,10 +141,30 @@ export function podeCancelar(folha) {
   return folha?.status === STATUS_FOLHA_PONTO.PENDING;
 }
 
-// A API não expõe "meus estágios": o vínculo é resolvido pelos filtros
-// documentados perfil -> estagiário -> estágio.
+// A API não expõe "meus estágios" diretamente. O filtro documentado
+// filter.estagiario.perfil.usuario.matricula resolve o vínculo em uma única
+// chamada; o encadeamento perfil -> estagiário -> estágio fica como reserva
+// para quando a matrícula não estiver disponível na sessão.
 export async function buscarEstagiosDoAluno({ signal } = {}) {
   const sessao = await apiJson("/autenticacao/quem-sou-eu", { signal });
+  const matricula = sessao?.usuario?.matricula;
+
+  if (matricula) {
+    const filtroPorMatricula = new URLSearchParams({ limit: "50" });
+    filtroPorMatricula.append("filter.estagiario.perfil.usuario.matricula", matricula);
+
+    const estagiosPorMatricula = await apiJson(
+      `/estagios?${filtroPorMatricula.toString()}`,
+      { signal }
+    );
+    const encontrados = (estagiosPorMatricula?.data ?? []).filter((estagio) => estagio?.id);
+    if (encontrados.length > 0) return encontrados;
+  }
+
+  return buscarEstagiosDoAlunoPorPerfil(sessao, { signal });
+}
+
+async function buscarEstagiosDoAlunoPorPerfil(sessao, { signal } = {}) {
   const perfis = (sessao?.perfisAtivos ?? []).filter(
     (perfil) => perfil?.id && perfil.ativo !== false
   );
@@ -183,4 +203,21 @@ export function formatarHorario(horaInicio, horaFim) {
 export function formatarQuantidadeHoras(valor) {
   if (typeof valor !== "number" || !Number.isFinite(valor)) return "-";
   return `${valor.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} h`;
+}
+
+// TODO: Endpoint ausente na API no momento da auditoria. 
+// A função deve ser consumida para registrar PRESENÇA / AUSÊNCIA diária,
+// separando-se da lógica de folhas de ponto se for o caso.
+// eslint-disable-next-line no-unused-vars
+export async function registrarFrequenciaDiaria(estagioId, { data, status, observacoes }, { signal } = {}) {
+  // Simula o erro estruturalmente correto caso seja chamado antes do backend liberar a rota
+  throw new Error("A API ainda não publicou o endpoint de frequência diária.");
+
+  /*
+  return apiJson(`/estagios/${encodeURIComponent(estagioId)}/frequencia`, {
+    method: "POST",
+    body: JSON.stringify({ data, status, observacoes }),
+    signal,
+  });
+  */
 }

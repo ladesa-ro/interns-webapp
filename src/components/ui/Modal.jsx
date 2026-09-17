@@ -32,6 +32,11 @@ export default function Modal({
     []
   );
 
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
   useEffect(() => {
     if (!open) return undefined;
 
@@ -44,7 +49,7 @@ export default function Modal({
     function handleKeyDown(event) {
       if (event.key === "Escape") {
         event.stopPropagation();
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -56,15 +61,15 @@ export default function Modal({
         return;
       }
 
-      const first = items[0];
-      const last = items[items.length - 1];
+      const firstItem = items[0];
+      const lastItem = items[items.length - 1];
 
-      if (event.shiftKey && document.activeElement === first) {
+      if (event.shiftKey && document.activeElement === firstItem) {
         event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
+        lastItem.focus();
+      } else if (!event.shiftKey && document.activeElement === lastItem) {
         event.preventDefault();
-        first.focus();
+        firstItem.focus();
       }
     }
 
@@ -75,7 +80,7 @@ export default function Modal({
       delete document.body.dataset.scrollLocked;
       previouslyFocused.current?.focus?.();
     };
-  }, [open, onClose, focusables]);
+  }, [open, focusables]);
 
   if (!open) return null;
 

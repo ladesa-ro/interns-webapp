@@ -1,92 +1,200 @@
 .solicitacao-container {
-  min-height: 100vh;
   display: flex;
-  justify-content: center;
-  padding-top: 40px;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
 }
 
 .conteudo-centralizado {
   width: 100%;
-  max-width: 700px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .tipo-estagio {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  margin-bottom: 40px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
 }
 
 .tipo-card {
-  width: 280px;
-  height: 120px;
-
-  border: 1px solid #0f6d3a;
-  border-radius: 12px;
-
-  background: white;
-  color: #0f6d3a;
-
-  cursor: pointer;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: var(--space-2);
+  min-height: 128px;
+  padding: var(--space-4);
+  color: var(--color-brand-strong);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-brand);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
 
-  font-weight: 600;
-  font-size: 16px;
+.tipo-card:hover {
+  background: var(--color-brand-subtle);
+}
 
-  transition: 0.3s;
+.tipo-card:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .tipo-card.ativo {
-  background: #0f6d3a;
-  color: white;
+  color: var(--color-text-on-brand);
+  background: var(--color-brand-strong);
 }
 
 .form-estagio {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.cabecalho-formulario,
+.vaga-selecionada,
+.aviso-formulario {
+  grid-column: 1 / -1;
+}
+
+.campo-interno {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-2);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 }
 
-.form-estagio label {
-  font-weight: 600;
-  color: #444;
+.campo-interno select {
+  min-height: 2.75rem;
+  padding: 0 var(--space-3);
+  color: var(--color-text);
+  font: inherit;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }
 
-.form-estagio input {
-  width: 100%;
-  padding: 12px;
-
-  border: 1px solid #ccc;
-  border-radius: 6px;
+.cabecalho-formulario,
+.vaga-selecionada {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
 }
 
-.btn-enviar {
-  margin-top: 20px;
-  padding: 14px;
-
-  border: none;
-  border-radius: 6px;
-
-  background: #0f6d3a;
-  color: white;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  cursor: pointer;
+.cabecalho-formulario h2 {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
 }
 
-.form-estagio textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #dcdcdc;
-  border-radius: 10px;
-  resize: vertical;
-  min-height: 120px;
-  font-size: 14px;
+.vaga-selecionada {
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-brand-strong);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  background: var(--color-brand-subtle);
+  border: 1px solid var(--color-border-brand);
+  border-radius: var(--radius-md);
+}
+
+.aviso-formulario {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  background: var(--color-surface-muted);
+  border-left: 3px solid var(--color-info);
+}
+
+.acoes-formulario,
+.mensagem-formulario {
+  grid-column: 1 / -1;
+}
+
+.acoes-formulario {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mensagem-formulario {
+  min-height: var(--space-5);
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-sm);
+}
+
+.historico-solicitacoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.historico-solicitacoes h2 {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+}
+
+.lista-solicitacoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-solicitacoes li,
+.lista-solicitacoes li > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.lista-solicitacoes li {
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.lista-solicitacoes strong {
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 640px) {
+  .solicitacao-container {
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .tipo-estagio,
+  .form-estagio {
+    grid-template-columns: 1fr;
+  }
+
+  .cabecalho-formulario > button {
+    width: 100%;
+  }
 }

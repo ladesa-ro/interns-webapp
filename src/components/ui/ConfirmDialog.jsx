@@ -11,6 +11,7 @@ export default function ConfirmDialog({
   cancelLabel = "Cancelar",
   tone = "primary",
   loading = false,
+  confirmDisabled = false,
   children,
 }) {
   return (
@@ -26,7 +27,7 @@ export default function ConfirmDialog({
           <Button variant="secondary" onClick={onCancel} disabled={loading}>
             {cancelLabel}
           </Button>
-          <Button variant={tone} onClick={onConfirm} loading={loading}>
+          <Button variant={tone} onClick={onConfirm} loading={loading} disabled={loading || confirmDisabled}>
             {confirmLabel}
           </Button>
         </>

@@ -57,7 +57,51 @@
 
 .actions {
   display: flex;
-  gap: var(--space-2);
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.actionBtn,
+.actionBtnDanger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.actionBtn {
+  color: #155DFC;
+}
+
+.actionBtn:hover {
+  background-color: #dbeafe;
+  transform: scale(1.1);
+}
+
+.actionBtn:active {
+  transform: scale(0.95);
+}
+
+.actionBtnDanger {
+  color: #E7000B;
+}
+
+.actionBtnDanger:hover {
+  background-color: #fee2e2;
+  transform: scale(1.1);
+}
+
+.actionBtnDanger:active {
+  transform: scale(0.95);
 }
 
 .pagination {

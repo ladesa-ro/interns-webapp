@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import styles from "./Perfil.module.css";
 
@@ -14,7 +14,8 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../../contexts/AuthContext";
-import apiFetch from "../../utils/api";
+import apiFetch, { mensagemDeErro } from "../../utils/api";
+import { atualizarImagemPerfil, buscarImagemPerfilUrl } from "../../utils/imagemPerfilApi";
 
 export default function Perfil() {
 
@@ -50,6 +51,83 @@ export default function Perfil() {
 
   const [erro, setErro] =
     useState("");
+
+  const [fotoUrl, setFotoUrl] = useState(null);
+  const [enviandoFoto, setEnviandoFoto] = useState(false);
+  const [erroFoto, setErroFoto] = useState("");
+  const inputFotoRef = useRef(null);
+  // Ref que rastreia a blob URL ativa para garantir que ela seja revogada ao
+  // desmontar o componente, mesmo que tenha sido atualizada pelo upload.
+  const fotoUrlRef = useRef(null);
+
+  function revogarFotoAtual() {
+    if (fotoUrlRef.current) {
+      URL.revokeObjectURL(fotoUrlRef.current);
+      fotoUrlRef.current = null;
+    }
+    // Limpa o estado para evitar que a <img> fique com src de URL revogada
+    // (mostraria o alt text como imagem quebrada ao invés do placeholder).
+    setFotoUrl(null);
+  }
+
+  function atualizarFotoUrl(novaUrl) {
+    // Revoga a URL anterior antes de definir a nova.
+    if (fotoUrlRef.current) URL.revokeObjectURL(fotoUrlRef.current);
+    fotoUrlRef.current = novaUrl;
+    setFotoUrl(novaUrl);
+  }
+
+
+  // =====================================================
+  // BUSCAR FOTO DE PERFIL DO USUÁRIO LOGADO
+  // =====================================================
+
+  useEffect(() => {
+    if (!usuarioId) return undefined;
+
+    const controlador = new AbortController();
+
+    async function carregarFoto() {
+      try {
+        const url = await buscarImagemPerfilUrl(usuarioId, { signal: controlador.signal });
+        if (controlador.signal.aborted) return;
+        atualizarFotoUrl(url);
+      } catch (error) {
+        if (!controlador.signal.aborted) setErroFoto(mensagemDeErro(error));
+      }
+    }
+
+    carregarFoto();
+
+    return () => {
+      controlador.abort();
+      // Revoga e limpa o estado — garante que nenhuma blob URL revogada
+      // apareça como imagem quebrada enquanto o próximo fetch carrega.
+      revogarFotoAtual();
+    };
+  }, [usuarioId]);
+
+  async function selecionarNovaFoto(evento) {
+    const arquivo = evento.target.files?.[0];
+    evento.target.value = "";
+    if (!arquivo || !usuarioId || enviandoFoto) return;
+
+    setEnviandoFoto(true);
+    setErroFoto("");
+
+    try {
+      await atualizarImagemPerfil(usuarioId, arquivo);
+      // Usa o próprio arquivo selecionado para criar o blob URL — garante que o
+      // tipo é sempre uma imagem válida (o que o usuário acabou de selecionar).
+      // Evita um GET extra que pode retornar JSON ou redirect no lugar do binário.
+      const novaUrl = URL.createObjectURL(arquivo);
+      atualizarFotoUrl(novaUrl);
+    } catch (error) {
+      setErroFoto(mensagemDeErro(error));
+    } finally {
+      setEnviandoFoto(false);
+    }
+  }
 
 
   // =====================================================
@@ -497,18 +575,43 @@ export default function Perfil() {
             }
           >
 
-            <img
-              src="/image.png"
-              alt="Foto de perfil"
-              className={
-                styles.fotoPerfil
-              }
+            {fotoUrl ? (
+              <img
+                src={fotoUrl}
+                alt="Foto de perfil"
+                className={
+                  styles.fotoPerfil
+                }
+              />
+            ) : (
+              <div
+                className={styles.fotoPlaceholder}
+                role="img"
+                aria-label="Sem foto de perfil"
+              >
+                <User size={90} aria-hidden="true" />
+              </div>
+            )}
+
+            <input
+              ref={inputFotoRef}
+              type="file"
+              accept="image/*"
+              className={styles.inputFotoOculto}
+              onChange={selecionarNovaFoto}
+              aria-hidden="true"
+              tabIndex={-1}
+              data-testid="input-foto-perfil"
             />
 
             <button
+              type="button"
               className={
                 styles.cameraBtn
               }
+              onClick={() => inputFotoRef.current?.click()}
+              disabled={enviandoFoto || !usuarioId}
+              aria-label="Alterar foto de perfil"
             >
 
               <Camera size={18} />
@@ -516,6 +619,10 @@ export default function Perfil() {
             </button>
 
           </div>
+
+          {erroFoto ? (
+            <p className={styles.erroFoto} role="alert">{erroFoto}</p>
+          ) : null}
 
 
           <h2>
