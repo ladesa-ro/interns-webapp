@@ -7,7 +7,7 @@ const CARGOS_ALUNO = new Set(["aluno"]);
 const CARGOS_ADMIN = new Set(["dape", "professor"]);
 
 export const ERRO_PERFIL_INDEFINIDO =
-  "Não foi possível identificar seu perfil de acesso. Procure o CIEC.";
+  "Não foi possível identificar seu perfil de acesso. Procure o CIEEC.";
 
 function normalizar(cargo) {
   return typeof cargo === "string" ? cargo.trim().toLowerCase() : "";

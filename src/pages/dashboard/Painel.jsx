@@ -149,7 +149,7 @@ export default function Painel() {
   return (
     <div className={styles.painel}>
       <PageHeader
-        title="Painel CIEC"
+        title="Painel CIEEC"
         description="Visão geral do Sistema de Gerenciamento de Estágios"
       />
 

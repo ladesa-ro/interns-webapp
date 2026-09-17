@@ -232,7 +232,7 @@ export default function FolhaDePontos() {
       {estagiosResolvidos && !erroEstagios && estagios.length === 0 ? (
         <EmptyState
           title="Nenhum estágio vinculado"
-          message="Só é possível registrar frequência quando há um estágio ativo vinculado ao seu perfil. Procure o CIEC."
+          message="Só é possível registrar frequência quando há um estágio ativo vinculado ao seu perfil. Procure o CIEEC."
         />
       ) : null}
 

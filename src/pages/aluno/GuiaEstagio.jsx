@@ -6,8 +6,8 @@ import { FileDown, Phone, Star } from 'lucide-react';
 export default function GuiaEstagio() {
   const navigate = useNavigate();
 
-  const handleContatoCIEC = () => {
-    navigate('/aluno/contato-ciec');
+  const handleContatoCIEEC = () => {
+    navigate('/aluno/contato-cieec');
   };
 
   const handleAvaliarEmpresa = () => {
@@ -21,7 +21,7 @@ export default function GuiaEstagio() {
         <h1 className={styles.title}>
           <button
             type="button"
-            onClick={handleContatoCIEC}
+            onClick={handleContatoCIEEC}
             style={{
               background: 'none',
               border: 'none',
@@ -48,13 +48,13 @@ export default function GuiaEstagio() {
 
           <button
             className={styles.card}
-            aria-label="Contato CIEC"
-            onClick={handleContatoCIEC}
+            aria-label="Contato CIEEC"
+            onClick={handleContatoCIEEC}
           >
             <div className={styles.iconWrapper}>
               <Phone size={40} strokeWidth={2.5} />
             </div>
-            <span className={styles.cardTitle}>Contato CIEC</span>
+            <span className={styles.cardTitle}>Contato CIEEC</span>
           </button>
 
           <button

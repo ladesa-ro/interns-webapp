@@ -40,7 +40,7 @@ describe("Painel", () => {
     renderizar();
     await waitFor(() => expect(screen.getByText("24")).toBeInTheDocument());
 
-    expect(screen.getByRole("heading", { name: "Painel CIEC" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Painel CIEEC" })).toBeInTheDocument();
     expect(
       screen.getByText("Visão geral do Sistema de Gerenciamento de Estágios")
     ).toBeInTheDocument();

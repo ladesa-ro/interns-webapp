@@ -80,7 +80,7 @@ export default function AlunosEmEstagio() {
             </button>
 
             <div>
-              <h1>Painel CIEC</h1>
+              <h1>Painel CIEEC</h1>
               <p>Alunos em Estágio</p>
             </div>
           </div>

@@ -49,7 +49,7 @@ export const MENSAGENS_TOKEN = new Map([
   ],
   [
     ResultadoToken.INVALIDO,
-    "Este link de confirmação não é válido. Solicite um novo link ao CIEC.",
+    "Este link de confirmação não é válido. Solicite um novo link ao CIEEC",
   ],
   [
     ResultadoToken.INDISPONIVEL,

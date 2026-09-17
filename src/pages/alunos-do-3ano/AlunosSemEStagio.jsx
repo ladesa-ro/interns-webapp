@@ -108,7 +108,7 @@ export default function AlunosSemEstagio() {
             </button>
 
             <div>
-              <h1>Painel CIEC</h1>
+              <h1>Painel CIEEC</h1>
               <p>Alunos do 3º Ano sem estágio</p>
             </div>
           </div>

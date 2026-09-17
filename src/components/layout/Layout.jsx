@@ -20,7 +20,7 @@ import EditarVaga from "../../pages/editarVaga/EditarVaga";
 import AlunosSemEstagio from "../../pages/alunos-do-3ano/AlunosSemEStagio";
 import RelatorioSegundoAno from "../../pages/relatorio-segundo-ano/RelatorioDoSegundoAno";
 
-const NAV_CIEC = [
+const NAV_CIEEC = [
   { to: "/", label: "Painel", icon: IconePainel, end: true },
   { to: "/cadastrarempresa", label: "Cadastrar Empresa", icon: IconeCadastrarEmpresa },
   { to: "/vagas", label: "Cadastrar Vaga", icon: IconeCadastrarVaga },
@@ -29,7 +29,7 @@ const NAV_CIEC = [
 
 export default function Layout() {
   return (
-    <AppShell navItems={NAV_CIEC} titulo="Estágios IFRO">
+    <AppShell navItems={NAV_CIEEC} titulo="Estágios IFRO">
       <Routes>
           <Route index element={<Painel />} />
 

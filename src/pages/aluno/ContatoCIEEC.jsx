@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './ContatoCIEC.module.css';
+import styles from './ContatoCIEEC.module.css';
 import { ArrowLeft, Phone, Mail } from 'lucide-react';
 
-export default function ContatoCIEC() {
+export default function ContatoCIEEC() {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -21,7 +21,7 @@ export default function ContatoCIEC() {
           <ArrowLeft size={24} strokeWidth={2.5} />
           <span>Painel aluno</span>
         </button>
-        <h2 className={styles.subtitle}>Contato CIEC</h2>
+        <h2 className={styles.subtitle}>Contato CIEEC</h2>
       </header>
 
       <section className={styles.cardsContainer}>
@@ -35,13 +35,13 @@ export default function ContatoCIEC() {
           </div>
         </a>
 
-        <a href="mailto:ciec.ifro@gmail.com" className={styles.card}>
+        <a href="mailto:cieec.ifro@gmail.com" className={styles.card}>
           <div className={styles.iconWrapper}>
             <Mail size={28} strokeWidth={2.5} />
           </div>
           <div className={styles.cardInfo}>
             <span className={styles.cardTitle}>Email</span>
-            <span className={styles.cardValue}>ciec.ifro@gmail.com</span>
+            <span className={styles.cardValue}>cieec.ifro@gmail.com</span>
           </div>
         </a>
       </section>

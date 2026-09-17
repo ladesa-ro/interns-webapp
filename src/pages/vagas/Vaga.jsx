@@ -117,7 +117,7 @@ export default function Vaga() {
     <div className={styles.layout}>
       <main className={styles.vagaContainer}>
         <PageHeader
-          title="Painel CIEC"
+          title="Painel CIEEC"
           description="Vagas Disponíveis"
           actions={
             <button

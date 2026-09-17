@@ -28,7 +28,7 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Rota para o fluxo ADMINISTRATIVO (CIEC) — só admins acessam */}
+      {/* Rota para o fluxo ADMINISTRATIVO (CIEEC) — só admins acessam */}
       <Route
         path="/*"
         element={

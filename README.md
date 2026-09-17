@@ -1,6 +1,6 @@
 # Sistema de Gerenciamento de Estágios — IFRO Campus Ji-Paraná
 
-Aplicação web desenvolvida para apoiar o acompanhamento de estágios no **IFRO Campus Ji-Paraná**, com foco no suporte às rotinas da CIEC (Coordenação de Integração Escola, Empresa e Comunidade).
+Aplicação web desenvolvida para apoiar o acompanhamento de estágios no **IFRO Campus Ji-Paraná**, com foco no suporte às rotinas da CIEEC (Coordenação de Integração Escola, Empresa e Comunidade).
 
 ## Objetivo
 
@@ -74,7 +74,7 @@ Principais diretórios:
 
 ## Público-alvo
 
-- Coordenação CIEC;
+- Coordenação CIEEC;
 - equipe administrativa ligada ao estágio;
 - comunidade acadêmica do IFRO Campus Ji-Paraná e outros campi.
 
