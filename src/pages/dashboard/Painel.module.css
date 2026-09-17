@@ -99,10 +99,9 @@
   color: var(--color-warning);
 }
 
-/* SETA */
-.setaScroll {
+/* SETAS */
+.setaScroll, .setaScrollEsq {
   position: absolute;
-  right: var(--space-5);
   top: 50%;
   transform: translateY(-50%);
   width: var(--space-12);
@@ -121,7 +120,15 @@
   transition: background-color var(--transition-fast);
 }
 
-.setaScroll:hover {
+.setaScroll {
+  right: var(--space-5);
+}
+
+.setaScrollEsq {
+  left: var(--space-5);
+}
+
+.setaScroll:hover, .setaScrollEsq:hover {
   background-color: var(--color-brand-hover);
 }
 

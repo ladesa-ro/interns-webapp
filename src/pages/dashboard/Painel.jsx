@@ -5,6 +5,7 @@ import {
   AlertCircle,
   FileText,
   ChevronRight,
+  ChevronLeft,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -80,6 +81,7 @@ export default function Painel() {
 
   const [mostrarSeta, setMostrarSeta] = useState(false);
   const [fimScroll, setFimScroll] = useState(false);
+  const [inicioScroll, setInicioScroll] = useState(true);
 
   const carregarIndicadores = useCallback(async () => {
     if (!ativoRef.current) return;
@@ -117,6 +119,8 @@ export default function Painel() {
       setFimScroll(
         el.scrollLeft + el.clientWidth >= el.scrollWidth - 5
       );
+      // verifica se está no início
+      setInicioScroll(el.scrollLeft <= 5);
     };
 
     verificarScroll();
@@ -138,10 +142,17 @@ export default function Painel() {
     };
   }, []);
 
-  // BOTÃO DA SETA
+  // BOTÕES DA SETA
   const scrollCards = () => {
     scrollRef.current.scrollBy({
       left: 320,
+      behavior: "smooth",
+    });
+  };
+
+  const scrollCardsEsq = () => {
+    scrollRef.current.scrollBy({
+      left: -320,
       behavior: "smooth",
     });
   };
@@ -196,7 +207,17 @@ export default function Painel() {
           />
         )}
 
-        {/* SETA */}
+        {/* SETAS */}
+        {mostrarSeta && !inicioScroll && (
+          <button
+            type="button"
+            className={styles.setaScrollEsq}
+            onClick={scrollCardsEsq}
+            aria-label="Ver indicadores anteriores"
+          >
+            <ChevronLeft size={30} aria-hidden="true" />
+          </button>
+        )}
         {mostrarSeta && !fimScroll && (
           <button
             type="button"
