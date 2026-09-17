@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import Styles from "./tabelaVagas.module.css";
 import PesquisaIcon from "../icons_Components/Icon_Pesquisa_Comp";
-import EditarIcon from "../icons_Components/Icon_Editar_Comp";
-import DeletarIcon from "../icons_Components/Icon_Deletar_Comp";
+import { Pencil, Trash2 } from "lucide-react";
 import apiFetch from "../../utils/api";
 import {
   Badge,
@@ -263,26 +262,26 @@ export default function TabelaVagas() {
                       <td>{vaga.nomeSupervisor}</td>
                       <td>{renderBadgeStatus(vaga.status)}</td>
                       <td className={Styles.actions}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
+                        <button
+                          type="button"
+                          className={Styles.actionBtn}
                           aria-label={`Editar vaga de ${vaga.empresaNome}`}
                           onClick={() => navigate(`/vagas/editar/${vaga.id}`)}
                         >
-                          <EditarIcon size={20} aria-hidden="true" />
-                        </Button>
+                          <Pencil size={20} aria-hidden="true" />
+                        </button>
 
-                        <Button
-                          variant="ghost"
-                          size="sm"
+                        <button
+                          type="button"
+                          className={Styles.actionBtnDanger}
                           aria-label={`Excluir vaga de ${vaga.empresaNome}`}
                           onClick={() => {
                             setVagaSelecionada(vaga);
                             setModalAberto(true);
                           }}
                         >
-                          <DeletarIcon size={20} aria-hidden="true" />
-                        </Button>
+                          <Trash2 size={20} aria-hidden="true" />
+                        </button>
                       </td>
                     </tr>
                   ))}

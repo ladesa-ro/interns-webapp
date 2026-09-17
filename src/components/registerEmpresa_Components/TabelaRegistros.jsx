@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import Styles from './tabelaRegistros.module.css';
 import Pesquisa from '../icons_Components/Icon_Pesquisa_Comp';
-import Editar from '../icons_Components/Icon_Editar_Comp';
-import Deletar from '../icons_Components/Icon_Deletar_Comp';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import apiFetch from '../../utils/api';
 import { Button, ConfirmDialog, EmptyState, ErrorState, Input, LoadingState } from '../ui';
@@ -187,26 +186,26 @@ export default function TabelaRegistros() {
                       <td>{empresa.email || '-'}</td>
                       <td>{empresa.endereco?.cidade?.nome || 'Não informada'}</td>
                       <td className={Styles.actions}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
+                        <button
+                          type="button"
+                          className={Styles.actionBtn}
                           aria-label={`Editar ${nome}`}
                           onClick={() => navigate(`/editar-empresa/${empresa.id}`)}
                         >
-                          <Editar aria-hidden="true" />
-                        </Button>
+                          <Pencil size={20} aria-hidden="true" />
+                        </button>
 
-                        <Button
-                          variant="ghost"
-                          size="sm"
+                        <button
+                          type="button"
+                          className={Styles.actionBtnDanger}
                           aria-label={`Excluir ${nome}`}
                           onClick={() => {
                             setEmpresaSelecionada(empresa);
                             setModalAberto(true);
                           }}
                         >
-                          <Deletar aria-hidden="true" />
-                        </Button>
+                          <Trash2 size={20} aria-hidden="true" />
+                        </button>
                       </td>
                     </tr>
                   );

@@ -155,6 +155,7 @@ export default function CadastroEmpresaForm({ modo }) {
 
       setLogradouro(dados.logradouro || "");
       setBairro(dados.bairro || "");
+      setComplemento(dados.complemento || "");
       setCidadeNome(dados.localidade);
       setEstado(dados.uf);
 
@@ -163,9 +164,12 @@ export default function CadastroEmpresaForm({ modo }) {
       );
       const cidadeDados = await cidadeResponse.json();
 
+      const normalizeStr = (str) =>
+        str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
+
       const cidadeEncontrada = cidadeDados.data?.find(
         (cidade) =>
-          cidade.nome.trim().toLowerCase() === dados.localidade.trim().toLowerCase() &&
+          normalizeStr(cidade.nome) === normalizeStr(dados.localidade) &&
           cidade.estado?.sigla.toUpperCase() === dados.uf.toUpperCase()
       );
 
