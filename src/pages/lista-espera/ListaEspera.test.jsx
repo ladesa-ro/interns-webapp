@@ -110,7 +110,6 @@ describe("ListaEspera", () => {
 
   it("exibe mensagem adequada quando a lista está vazia por causa do filtro de curso", async () => {
     apiMocks.buscarListaDeEspera.mockResolvedValue([]);
-    const user = userEvent.setup();
     renderizar();
 
     await waitFor(() => expect(screen.getByText("Nenhum aluno na lista de espera")).toBeInTheDocument());
