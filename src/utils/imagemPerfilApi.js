@@ -9,7 +9,7 @@ export async function buscarImagemPerfilUrl(usuarioId, { signal } = {}) {
 
   const resposta = await apiFetch(ENDPOINT(usuarioId), { signal });
 
-  const contentType = resposta.headers.get("Content-Type") ?? "";
+  const contentType = resposta?.headers?.get?.("Content-Type") ?? "";
 
   if (resposta.status === 404) return null;
 
