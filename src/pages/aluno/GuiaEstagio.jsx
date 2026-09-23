@@ -11,8 +11,9 @@ export default function GuiaEstagio() {
   };
 
   const handleAvaliarEmpresa = () => {
-    // Podemos passar um ID de empresa/estágio fictício ou que esteja no contexto
-    navigate('/aluno/avaliar/1');
+    // Provisório: Passando um UUID genérico para não quebrar validação de formato
+    // Futuramente, isso deverá vir da lista de estágios concluídos pelo aluno
+    navigate('/aluno/avaliar/00000000-0000-0000-0000-000000000000');
   };
 
   return (

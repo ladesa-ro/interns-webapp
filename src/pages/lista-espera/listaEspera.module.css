@@ -55,6 +55,45 @@
   box-shadow: 0 0 0 3px var(--color-brand-strong);
 }
 
+.barraBusca {
+  display: flex;
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-3);
+  margin-bottom: var(--space-5);
+  height: var(--space-10);
+  width: 100%;
+  max-width: 400px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.barraBusca:focus-within {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px var(--color-brand-subtle);
+}
+
+.iconeBusca {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.inputBusca {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  outline: none;
+  width: 100%;
+}
+
+.inputBusca::placeholder {
+  color: var(--color-text-muted);
+}
+
 @media (max-width: 768px) {
   .cards {
     flex-direction: column;
@@ -62,5 +101,9 @@
 
   .cardWrapper {
     width: 100%;
+  }
+
+  .barraBusca {
+    max-width: 100%;
   }
 }

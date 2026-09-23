@@ -236,7 +236,51 @@ describe("cancelarFolhaPonto", () => {
 });
 
 describe("buscarEstagiosDoAluno", () => {
-  it("resolve perfil -> estagiário -> estágio pelos filtros documentados", async () => {
+  it("resolve o estágio diretamente pela matrícula do usuário autenticado", async () => {
+    const { chamadas } = instalarFetch({
+      "/autenticacao/quem-sou-eu": () => ({
+        status: 200,
+        body: { usuario: { id: "u-1", matricula: "2024102020046" }, perfisAtivos: [] },
+      }),
+      "/estagios": () => ({
+        status: 200,
+        body: { data: [{ id: "est-1", empresa: { nome: "ACME" } }], total: 1, page: 1, limit: 50 },
+      }),
+    });
+
+    const estagios = await buscarEstagiosDoAluno();
+
+    expect(estagios).toEqual([{ id: "est-1", empresa: { nome: "ACME" } }]);
+    expect(chamadas).toHaveLength(2);
+    expect(urlDaChamada(chamadas, 1).searchParams.getAll("filter.estagiario.perfil.usuario.matricula"))
+      .toEqual(["2024102020046"]);
+  });
+
+  it("recorre ao encadeamento por perfil quando a busca por matrícula não encontra nada", async () => {
+    const { chamadas } = instalarFetch({
+      "/autenticacao/quem-sou-eu": () => ({
+        status: 200,
+        body: {
+          usuario: { id: "u-1", matricula: "2024102020046" },
+          perfisAtivos: [{ id: "perf-1", ativo: true, cargo: "aluno" }],
+        },
+      }),
+      "/estagios": ({ url }) =>
+        String(url).includes("filter.estagiario.perfil.usuario.matricula")
+          ? { status: 200, body: { data: [], total: 0, page: 1, limit: 50 } }
+          : { status: 200, body: { data: [{ id: "est-1" }], meta: {} } },
+      "/estagiarios": () => ({ status: 200, body: { data: [{ id: "estg-1" }], meta: {} } }),
+    });
+
+    const estagios = await buscarEstagiosDoAluno();
+
+    expect(estagios).toEqual([{ id: "est-1" }]);
+    expect(chamadas).toHaveLength(4);
+    expect(urlDaChamada(chamadas, 2).searchParams.getAll("filter.perfil.id")).toEqual(["perf-1"]);
+    expect(urlDaChamada(chamadas, 3).searchParams.getAll("filter.estagiario.id")).toEqual(["estg-1"]);
+  });
+
+  it("resolve perfil -> estagiário -> estágio quando a sessão não tem matrícula", async () => {
     const { chamadas } = instalarFetch({
       "/autenticacao/quem-sou-eu": () => ({
         status: 200,
@@ -253,7 +297,7 @@ describe("buscarEstagiosDoAluno", () => {
     expect(urlDaChamada(chamadas, 2).searchParams.getAll("filter.estagiario.id")).toEqual(["estg-1"]);
   });
 
-  it("retorna lista vazia quando não há vínculo de estagiário", async () => {
+  it("retorna lista vazia quando não há vínculo de estagiário nem matrícula", async () => {
     instalarFetch({
       "/autenticacao/quem-sou-eu": () => ({
         status: 200,

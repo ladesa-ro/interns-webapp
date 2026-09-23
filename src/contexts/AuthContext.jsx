@@ -103,7 +103,14 @@ export function AuthProvider({ children }) {
   // A API não expõe endpoint de logout; o encerramento é local. Quando o
   // backend publicar POST /autenticacao/logout, chamá-lo aqui antes de limpar.
   const logout = useCallback(async () => {
-    encerrarSessaoLocal();
+    try {
+      await apiJson("/autenticacao/logout", { method: "POST" });
+    } catch {
+      // Falhas no logout da API (ex: 404 por endpoint ainda não existir)
+      // não podem travar o logout local da sessão.
+    } finally {
+      encerrarSessaoLocal();
+    }
   }, [encerrarSessaoLocal]);
 
   return (
